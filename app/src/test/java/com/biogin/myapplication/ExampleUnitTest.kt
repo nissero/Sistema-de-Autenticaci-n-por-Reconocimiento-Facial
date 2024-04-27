@@ -1,4 +1,4 @@
-package com.biogin.sistema_reconomiento_facial
+package com.biogin.myapplication
 
 import org.junit.Test
 
