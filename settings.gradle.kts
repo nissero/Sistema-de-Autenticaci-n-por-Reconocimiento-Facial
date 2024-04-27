@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sistema-reconomiento-facial"
+rootProject.name = "My Application"
 include(":app")
  
