@@ -4,8 +4,6 @@ Este repositorio contiene scripts en Python para el reconocimiento facial utiliz
 
 ## Dependencias
 
-Asegúrate de tener las siguientes dependencias instaladas antes de ejecutar los scripts:
-
 - `Python` (versión 3.6 o superior)
 - `pip` (administrador de paquetes de Python)
 - `face_recognition`: Se puede instalar ejecutando `pip install face_recognition`
