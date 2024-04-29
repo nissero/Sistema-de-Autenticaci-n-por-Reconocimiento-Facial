@@ -5,8 +5,6 @@ from pathlib import Path
 
 import face_recognition
 from PIL import Image, ImageDraw
-import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
 
 DEFAULT_ENCODINGS_PATH = Path("output/encodings.pkl")
 BOUNDING_BOX_COLOR = "blue"
@@ -29,8 +27,8 @@ parser.add_argument(
     "-m",
     action="store",
     default="hog",
-    choices=["hog", "cnn", "knn"],  # Added KNN as an option
-    help="Which model to use for training/testing: hog (CPU), cnn (GPU), knn (KNN classifier)",
+    choices=["hog", "cnn"],
+    help="Which model to use for training/testing: hog (CPU), cnn (GPU)",
 )
 parser.add_argument(
     "-f", action="store", help="Path to an image with an unknown face"
@@ -163,35 +161,10 @@ def validate(model: str = "hog"):
                 image_location=str(filepath.absolute()), model=model
             )
 
-def train_knn(encodings_location: Path = DEFAULT_ENCODINGS_PATH):
-    """
-    Trains a k-nearest neighbors (KNN) classifier using the known face encodings.
-    """
-    with encodings_location.open(mode="rb") as f:
-        loaded_encodings = pickle.load(f)
-
-    X_train = np.array(loaded_encodings["encodings"])
-    y_train = np.array(loaded_encodings["names"])
-
-    knn_classifier = KNeighborsClassifier(n_neighbors=5)  # Adjust k as needed
-    knn_classifier.fit(X_train, y_train)
-
-    return knn_classifier
-
-if __name__ == "__main__":
-    knn_classifier = train_knn()
-    with open("output/knn_classifier.pkl", "wb") as f:
-        pickle.dump(knn_classifier, f)
-
 
 if __name__ == "__main__":
     if args.train:
-        if args.m == "knn":
-            knn_classifier = train_knn()
-            with open("output/knn_classifier.pkl", "wb") as f:
-                pickle.dump(knn_classifier, f)
-        else:
-            encode_known_faces(model=args.m)
+        encode_known_faces(model=args.m)
     if args.validate:
         validate(model=args.m)
     if args.test:
