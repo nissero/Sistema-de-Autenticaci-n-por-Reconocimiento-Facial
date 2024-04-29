@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <com.biogin.myapplication.GraphicOverlay
         android:id="@+id/graphicOverlay_finder"
         android:layout_width="match_parent"
@@ -32,6 +33,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_horizontal|bottom" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout  >

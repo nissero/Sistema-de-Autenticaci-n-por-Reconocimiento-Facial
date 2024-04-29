@@ -120,59 +120,6 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private inner class YourImageAnalyzer : ImageAnalysis.Analyzer {
-        @OptIn(ExperimentalGetImage::class)
-        override fun analyze(imageProxy: ImageProxy) {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-                val highAccuracyOpts = FaceDetectorOptions.Builder()
-                    .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
-                    .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-                    .enableTracking().build()
-
-                val detector = FaceDetection.getClient(highAccuracyOpts)
-
-                val result = detector.process(image)
-                    .addOnSuccessListener { faces ->
-                        for (face in faces) {
-                            val bounds = face.boundingBox
-                            val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
-                            val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
-
-                            // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
-                            // nose available):
-                            val leftEar = face.getLandmark(FaceLandmark.LEFT_EAR)
-                            leftEar?.let {
-                                val leftEarPos = leftEar.position
-                            }
-
-                            // If contour detection was enabled:
-                            val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)?.points
-                            val upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)?.points
-
-                            // If classification was enabled:
-                            if (face.smilingProbability != null) {
-                                val smileProb = face.smilingProbability
-                            }
-                            if (face.rightEyeOpenProbability != null) {
-                                val rightEyeOpenProb = face.rightEyeOpenProbability
-                            }
-
-                            // If face tracking was enabled:
-                            if (face.trackingId != null) {
-                                val id = face.trackingId
-                            }
-                        }
-                    }
-                    .addOnFailureListener{ e ->
-                    }
-                    .addOnCompleteListener{ imageProxy.close() }
-            }
-        }
-    }
-
     fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED

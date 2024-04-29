@@ -21,6 +21,10 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+<<<<<<< HEAD
+            android:name=".facedetection.FaceDetectionActivity"
+            android:exported="false" />
+=======
             android:name=".PhotoRegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication"
@@ -31,11 +35,11 @@
             android:exported="true"
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.MyApplication"/>
+>>>>>>> main
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_main_activity"
-            android:theme="@style/Theme.MyApplication" >
+            android:theme="@style/Theme.MyApplication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
