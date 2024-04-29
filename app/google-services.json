@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "620958752168",
+    "project_id": "sistema-autenticacion-facial",
+    "storage_bucket": "sistema-autenticacion-facial.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620958752168:android:79eaf5166c0a76b98e919d",
+        "android_client_info": {
+          "package_name": "com.biogin.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD47rKjsdmRMc7qGYQ9-LGYRbxrb1VGMrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620958752168:android:299cc981dd2d4f5c8e919d",
+        "android_client_info": {
+          "package_name": "com.biogin.sistema_reconomiento_facial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD47rKjsdmRMc7qGYQ9-LGYRbxrb1VGMrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
