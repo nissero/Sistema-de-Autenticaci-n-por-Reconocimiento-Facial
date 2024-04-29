@@ -3,4 +3,22 @@
     <string name="take_photo">Take Photo</string>
     <string name="start_capture">Start Capture</string>
     <string name="stop_capture">Stop Capture</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="prompt_surname">Apellido</string>
+    <string name="action_sign_in">Register</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="register">Register</string>
+    <string name="prompt_name">Nombre</string>
+    <string name="prompt_area">Area/s</string>
+    <string name="prompt_confirm_password">Confirmar contraseña</string>
+    <string name="confirm_password_not_equal_password">Las contraseñas no coinciden</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="prompt_dni">DNI</string>
+    <string name="title_activity_photo_register">PhotoRegister</string>
+    <string name="title_main_activity">Main Activity</string>
 </resources>
