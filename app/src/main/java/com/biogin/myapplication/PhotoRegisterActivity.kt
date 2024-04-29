@@ -103,6 +103,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                    finish()
                 }
                 override fun
                         onImageSaved(output: ImageCapture.OutputFileResults){
@@ -110,9 +111,11 @@ class PhotoRegisterActivity : AppCompatActivity() {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
+                    finish()
                 }
             }
         )
+
     }
 
     private fun captureVideo() {}
