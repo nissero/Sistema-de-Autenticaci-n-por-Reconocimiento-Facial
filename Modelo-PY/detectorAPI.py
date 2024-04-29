@@ -38,18 +38,23 @@ def train_model():
     image_file = request.files["image"]
     name = request.form.get("name")
 
-    # Load image and encode face
+    # Load image and encode face using HOG method
     input_image = face_recognition.load_image_file(image_file)
-    face_encodings = face_recognition.face_encodings(input_image)
+    face_locations = face_recognition.face_locations(input_image, model="hog")
+    face_encodings = face_recognition.face_encodings(input_image, face_locations)
 
     # Update loaded encodings with new face
+    num_new_encodings = 0
     if face_encodings:
+        num_new_encodings = len(face_encodings)
         loaded_encodings["encodings"].extend(face_encodings)
         loaded_encodings["names"].extend([name] * len(face_encodings))
         with open(ENCODINGS_PATH, "wb") as f:
             pickle.dump(loaded_encodings, f)
 
-    return jsonify({"message": "Model trained successfully"})
+    return jsonify({
+        "message": f"{num_new_encodings} new encoding(s) added for {name}. Model trained successfully."
+    })
 
 def _recognize_face(unknown_encoding):
     boolean_matches = face_recognition.compare_faces(loaded_encodings["encodings"], unknown_encoding)
