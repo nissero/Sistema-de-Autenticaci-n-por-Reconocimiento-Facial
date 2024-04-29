@@ -36,6 +36,7 @@ import androidx.core.content.PermissionChecker
 import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.storage.FirebaseStorage
+import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
@@ -49,9 +50,14 @@ typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
+
     private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
+    private var imageAnalyzer: ImageAnalysis? = null
+    private var graphicOverlay: GraphicOverlay? = null
+
+    //    private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
+
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalysis : ImageAnalysis
     private var personId = 1
@@ -61,21 +67,26 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        // Request camera permissions
+
+        //Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Set up the listeners for take photo and video capture buttons
+
+        //set up the listeners for take photo and video buttons
+
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-
     }
     private fun uploadPhotoToFirebase(photo: Uri?) {
         if (photo != null) {
@@ -91,144 +102,134 @@ class MainActivity : AppCompatActivity() {
     }
     fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+
+    }
+
+    private fun takePhoto() {
+        //Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
-        // Create time stamped name and MediaStore entry.
+        //create time stamped name and MediaStore entry
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
 
-        // Create output options object which contains file + metadata
+        //Create output options which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
+            .Builder(
+                contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
-            .build()
+                contentValues
+            ).build()
 
-        // Set up image capture listener, which is triggered after photo has
+        // Set up image capture options listener, which is triggered after photo has
         // been taken
+
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    val message = "Photo capture succeeded: ${outputFileResults.savedUri}"
+                    Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
                 }
+
                 override fun
                         onImageSaved(output: ImageCapture.OutputFileResults){
                     uploadPhotoToFirebase(output.savedUri)
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
+
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: $exception")
+
                 }
+
             }
         )
     }
 
-    private fun captureVideo() {}
+    private fun captureVideo() {
+
+    }
 
     fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
+            //Used to bind this lifecycle of the camera to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
+            //Preview
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
 
-            val imageAnalysis = ImageAnalysis.Builder()
+            imageCapture = ImageCapture.Builder().build()
+
+            // Instantiate the image analysis
+            imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, YourImageAnalyzer())
+//                    it.setAnalyzer(
+//                        cameraExecutor, LuminosityAnalyzer { luma ->
+//                            Log.d(TAG, "Average Luminousity: ")
+//                        }
+//                    )
+                    it.setAnalyzer(
+                        cameraExecutor, selectAnalyzer()
+                    )
                 }
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            imageCapture = ImageCapture.Builder()
-                .build()
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-
-                // Bind use cases to camera
+                //Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
-
-            } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                    this, cameraSelector, preview, imageCapture, imageAnalyzer
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "startCamera: $e")
             }
-
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private inner class YourImageAnalyzer : ImageAnalysis.Analyzer {
-        @OptIn(ExperimentalGetImage::class)
-        override fun analyze(imageProxy: ImageProxy) {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+    fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 
-                val highAccuracyOpts = FaceDetectorOptions.Builder()
-                    .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
-                    .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-                    .enableTracking().build()
-
-                val detector = FaceDetection.getClient(highAccuracyOpts)
-
-                val result = detector.process(image)
-                    .addOnSuccessListener { faces ->
-                        for (face in faces) {
-                            val bounds = face.boundingBox
-                            val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
-                            val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
-
-                            // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
-                            // nose available):
-                            val leftEar = face.getLandmark(FaceLandmark.LEFT_EAR)
-                            leftEar?.let {
-                                val leftEarPos = leftEar.position
-                            }
-
-                            // If contour detection was enabled:
-                            val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)?.points
-                            val upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)?.points
-
-                            // If classification was enabled:
-                            if (face.smilingProbability != null) {
-                                val smileProb = face.smilingProbability
-                            }
-                            if (face.rightEyeOpenProbability != null) {
-                                val rightEyeOpenProb = face.rightEyeOpenProbability
-                            }
-
-                            // If face tracking was enabled:
-                            if (face.trackingId != null) {
-                                val id = face.trackingId
-                            }
-                        }
-                    }
-                    .addOnFailureListener{ e ->
-                    }
-                    .addOnCompleteListener{ imageProxy.close() }
-            }
-        }
+        ContextCompat.checkSelfPermission(
+            baseContext, it
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera()
+            } else {
+                Toast.makeText(this, "Permissions not granted by the user", Toast.LENGTH_SHORT)
+                    .show()
+                finish()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -236,34 +237,45 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
+    private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
+
+        private fun ByteBuffer.toByteArray(): ByteArray {
+            rewind() //rewinds buffer to zero
+            val data = ByteArray(remaining())
+            get(data)  //Copy the buffer into byte array
+            return data
         }
+
+
+        override fun analyze(image: ImageProxy) {
+            val buffer = image.planes[0].buffer
+            val data = buffer.toByteArray()
+            val pixels = data.map { it.toInt() and 0xFF }
+            val luma = pixels.average()
+
+
+            listener(luma)
+            image.close()
+        }
+    }
+
+    private fun selectAnalyzer(): ImageAnalysis.Analyzer {
+        return FaceContourDetectionProcessor(viewBinding.graphicOverlayFinder)
     }
 
     companion object {
         private const val TAG = "CameraXApp"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val FILENAME_FORMAT = "yyy-MMM-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf (
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
-            ).apply {
+        private val REQUIRED_PERMISSIONS = mutableListOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+            .apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 }
             }.toTypedArray()
+
     }
 }
