@@ -48,6 +48,7 @@ class RegisterActivity : AppCompatActivity() {
             intent.putExtra("email", email?.text.toString())
             intent.putExtra("area", area?.text.toString())
             intent.putExtra("password", password.text.toString())
+
             startActivity(intent)
         }
 
@@ -84,7 +85,7 @@ class RegisterActivity : AppCompatActivity() {
             setResult(RESULT_OK)
 
             //Complete and destroy login activity once successful
-//            finish()
+            finish()
         })
 
         name?.afterTextChanged {
