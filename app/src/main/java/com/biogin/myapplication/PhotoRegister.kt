@@ -27,17 +27,10 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.video.FallbackStrategy
-import androidx.camera.video.MediaStoreOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
-import androidx.camera.video.VideoRecordEvent
-import androidx.core.content.PermissionChecker
 import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.storage.FirebaseStorage
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.google.mlkit.vision.common.InputImage
@@ -45,9 +38,7 @@ import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceLandmark
 
-typealias LumaListener = (luma: Double) -> Unit
-
-class MainActivity : AppCompatActivity() {
+class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -71,11 +62,6 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
-        viewBinding.registerButton.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
-
     }
     private fun uploadPhotoToFirebase(photo: Uri?) {
         if (photo != null) {

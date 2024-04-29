@@ -10,7 +10,21 @@
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+
+    </androidx.camera.view.PreviewView>
+
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="118dp"
+        android:layout_height="81dp"
+        android:elevation="10dp"
+        android:text="@string/register"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/vertical_centerline"/>
 
     <Button
         android:id="@+id/image_capture_button"
