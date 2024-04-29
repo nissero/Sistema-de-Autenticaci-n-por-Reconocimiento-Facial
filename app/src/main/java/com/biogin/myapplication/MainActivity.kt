@@ -2,9 +2,7 @@ package com.biogin.myapplication
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -34,8 +32,6 @@ import androidx.camera.video.QualitySelector
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.PermissionChecker
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.ui.login.RegisterActivity
-import com.google.firebase.storage.FirebaseStorage
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.nio.ByteBuffer
@@ -59,9 +55,7 @@ class MainActivity : AppCompatActivity() {
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var imageAnalysis : ImageAnalysis
-    private var personId = 1
-    private var storageRef = FirebaseStorage.getInstance().getReference()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -76,32 +70,10 @@ class MainActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        // Set up the listeners for take photo and video capture buttons
-
         //set up the listeners for take photo and video buttons
-
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
-        viewBinding.registerButton.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
-    }
-    private fun uploadPhotoToFirebase(photo: Uri?) {
-        if (photo != null) {
-            personId++
-            var imageRef = storageRef.child("images/${personId}/${photo.lastPathSegment}")
-            var uploadTask = imageRef.putFile(photo)
-            uploadTask.addOnFailureListener {
-                Log.e("Firebase", "Error al subir imagen")
-            }.addOnSuccessListener {
-                Log.e("Firebase", "Exito al subir imagen")
-            }
-        }
-    }
-    fun takePhoto() {
-        // Get a stable reference of the modifiable image capture use case
+
         cameraExecutor = Executors.newSingleThreadExecutor()
 
 
@@ -142,17 +114,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
-                    uploadPhotoToFirebase(output.savedUri)
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
-
-
                 override fun onError(exception: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: $exception")
-
                 }
 
             }
@@ -163,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun startCamera() {
+    private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             //Used to bind this lifecycle of the camera to the lifecycle owner
@@ -208,8 +171,7 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it
         ) == PackageManager.PERMISSION_GRANTED
