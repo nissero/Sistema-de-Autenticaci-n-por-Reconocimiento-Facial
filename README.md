@@ -27,6 +27,21 @@ Para probar el modelo con una imagen desconocida, proporciona la ruta de la imag
 ```bash
 python detector.py --test -f ruta/a/imagen_desconocida.jpg
 ```
+### Entrenamiento del Modelo
+Para entrenar el modelo se debe agregar una carpeta con el nombre de la persona y entre 1-3 fotos de la persona a reconocer, luego se debe ejecutar el siguiente comando:
+```bash
+python detector.py --train -m="hog"
+```
+Este comando utiliza el método HOG (Historiagram of Oriented Gradients) que divide la imagen en celdas pequeñas y calcula los gradientes de intensidad en cada celda. Luego, genera un historiagrama de orientaciones de gradientes y concatena estos historiagramas para formar un vector de características.
+
+También se puede usar el método CNN (Convolutional Neural Network) con el siguiente comando:
+```bash
+python detector.py --train -m="cnn"
+```
+Este método consiste en redes neuronales que aprenden automáticamente características de las imágenes durante el entrenamiento. Consisten en capas convolucionales que aplican filtros a la imagen de entrada para extraer características, seguido de capas de pooling para reducir la dimensionalidad.
+
+Sin embargo, al ser más preciso, CNN suele tardar más cuando se entrena el modelo, a comparación del método HOG.
+
 ### Reconocimiento en Video en Tiempo Real
 Para ejecutar el reconocimiento facial en tiempo real desde la cámara web, simplemente ejecuta el script detector-real-time.py:
 ```bash
