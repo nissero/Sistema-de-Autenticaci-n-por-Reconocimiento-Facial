@@ -2,7 +2,6 @@ package com.biogin.myapplication
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -28,7 +27,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.ui.login.RegisterActivity
+import com.biogin.myapplication.databinding.ActivityPhotoRegisterBinding
 import com.google.firebase.storage.FirebaseStorage
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.text.SimpleDateFormat
@@ -39,7 +38,7 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceLandmark
 
 class PhotoRegisterActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityMainBinding
+    private lateinit var viewBinding: ActivityPhotoRegisterBinding
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
@@ -49,7 +48,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     private var storageRef = FirebaseStorage.getInstance().getReference()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        viewBinding = ActivityPhotoRegisterBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         // Request camera permissions
@@ -65,8 +64,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
     private fun uploadPhotoToFirebase(photo: Uri?) {
         if (photo != null) {
-            personId++
-            var imageRef = storageRef.child("images/${personId}/${photo.lastPathSegment}")
+            var imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
             var uploadTask = imageRef.putFile(photo)
             uploadTask.addOnFailureListener {
                 Log.e("Firebase", "Error al subir imagen")

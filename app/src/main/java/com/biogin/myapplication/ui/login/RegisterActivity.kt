@@ -41,7 +41,13 @@ class RegisterActivity : AppCompatActivity() {
         register?.setOnClickListener {
             loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),area?.text.toString(), password.text.toString())
 
-            val intent = Intent(this, PhotoRegisterActivity::class.java)
+            val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+            intent.putExtra("name", name?.text.toString())
+            intent.putExtra("surname", surname?.text.toString())
+            intent.putExtra("dni", dni?.text.toString())
+            intent.putExtra("email", email?.text.toString())
+            intent.putExtra("area", area?.text.toString())
+            intent.putExtra("password", password.text.toString())
             startActivity(intent)
         }
 
