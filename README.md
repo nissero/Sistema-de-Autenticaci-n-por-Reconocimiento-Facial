@@ -46,4 +46,47 @@ Para ejecutar el reconocimiento facial en tiempo real desde la cámara web, simp
 python detector-real-time.py
 ```
 
-El script abrirá una ventana de video en tiempo real con el reconocimiento facial superpuesto en las caras detectadas. Para salir presione 'q'.
+## Reconocimiento Facial con Flask
+
+Este script implementa un servicio web Flask para el reconocimiento facial utilizando la biblioteca face_recognition en Python.
+
+### Endpoints API
+
+- **/recognize** (POST): Realiza el reconocimiento facial en una imagen proporcionada y devuelve los nombres de las caras reconocidas.
+- **/train** (POST): Entrena el modelo de reconocimiento facial con nuevas imágenes y nombres proporcionados.
+
+### Uso
+
+1. **/recognize**:
+   - **Método**: POST
+   - **Parámetros**: La imagen a procesar se envía como parte del cuerpo de la solicitud (formato multipart/form-data).
+   - **Respuesta**: Devuelve un objeto JSON con la lista de nombres de las caras reconocidas en la imagen.
+
+2. **/train**:
+   - **Método**: POST
+   - **Parámetros**: La imagen a entrenar y el nombre asociado se envían como parte del cuerpo de la solicitud (formato multipart/form-data).
+   - **Respuesta**: Devuelve un objeto JSON con un mensaje indicando el número de nuevas codificaciones agregadas y el éxito del entrenamiento del modelo.
+
+### Configuración y Ejecución
+
+1. Instala las dependencias necesarias utilizando `pip install -r requirements.txt`.
+2. Ejecuta el script utilizando `python detectorAPI.py`.
+3. Accede a los endpoints API a través de HTTP para realizar el reconocimiento facial y entrenar el modelo.
+
+### Notas
+
+- Las imágenes de entrenamiento se almacenan en un archivo `encodings.pkl` en el directorio de salida.
+- El script utiliza el método HOG (Histogram of Oriented Gradients) para codificar las imágenes y realizar el reconocimiento facial.
+- El script se ejecuta en modo de depuración (debug=True) para mostrar mensajes detallados de error en caso de problemas.
+
+### Testeo
+Se puede testear correctamente a través de un programa para simular HTTP requests como Postman. Además, se hosteó utilizando PythonAnywhere y se puede acceder con el endpoint `http://Biogin.pythonanywhere.com`
+
+### Requisitos
+
+- Python 3.x
+- Flask
+- face_recognition
+- numpy
+
+
