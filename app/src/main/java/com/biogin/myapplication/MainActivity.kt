@@ -34,6 +34,7 @@ import androidx.camera.video.QualitySelector
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.PermissionChecker
 import com.biogin.myapplication.databinding.ActivityMainBinding
+import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.storage.FirebaseStorage
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -54,9 +55,9 @@ class MainActivity : AppCompatActivity() {
     private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var imageAnalysis : ImageAnalysis
-    private var personId = 1
     private var storageRef = FirebaseStorage.getInstance().getReference()
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private var imageAnalyzer: ImageAnalysis? = null
+    override fun onCreate(savedInstanceState: Bundle?) {1
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
@@ -70,106 +71,52 @@ class MainActivity : AppCompatActivity() {
         }
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
     }
-    private fun uploadPhotoToFirebase(photo: Uri?) {
-        if (photo != null) {
-            personId++
-            var imageRef = storageRef.child("images/${personId}/${photo.lastPathSegment}")
-            var uploadTask = imageRef.putFile(photo)
-            uploadTask.addOnFailureListener {
-                Log.e("Firebase", "Error al subir imagen")
-            }.addOnSuccessListener {
-                Log.e("Firebase", "Exito al subir imagen")
-            }
-        }
-    }
-    fun takePhoto() {
-        // Get a stable reference of the modifiable image capture use case
-        val imageCapture = imageCapture ?: return
-
-        // Create time stamped name and MediaStore entry.
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
-
-        // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
-            .build()
-
-        // Set up image capture listener, which is triggered after photo has
-        // been taken
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                }
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
-                    uploadPhotoToFirebase(output.savedUri)
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
-                }
-            }
-        )
+    private fun selectAnalyzer(): ImageAnalysis.Analyzer {
+        return FaceContourDetectionProcessor(viewBinding.graphicOverlayFinder)
     }
 
-    private fun captureVideo() {}
-
-    fun startCamera() {
+    private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
+            //Used to bind this lifecycle of the camera to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
+            //Preview
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
 
-            val imageAnalysis = ImageAnalysis.Builder()
+            imageCapture = ImageCapture.Builder().build()
+
+            // Instantiate the image analysis
+            imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, YourImageAnalyzer())
+                    it.setAnalyzer(
+                        cameraExecutor, selectAnalyzer()
+                    )
                 }
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            imageCapture = ImageCapture.Builder()
-                .build()
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-
-                // Bind use cases to camera
+                //Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
-
-            } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                    this, cameraSelector, preview, imageCapture, imageAnalyzer
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "startCamera: $e")
             }
-
         }, ContextCompat.getMainExecutor(this))
     }
 
