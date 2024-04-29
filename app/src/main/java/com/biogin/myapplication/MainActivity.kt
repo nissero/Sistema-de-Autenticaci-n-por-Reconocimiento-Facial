@@ -76,6 +76,12 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    override fun onResume() {
+        super.onResume()
+        startCamera()
+        cameraExecutor = Executors.newSingleThreadExecutor()
+        // Set up the listeners for take photo and video capture buttons
+    }
     private fun selectAnalyzer(): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(viewBinding.graphicOverlayFinder)
     }
