@@ -22,4 +22,5 @@
     <string name="title_activity_photo_register">PhotoRegister</string>
     <string name="title_main_activity">Main Activity</string>
     <string name="text_view_person_name">[Nombre persona]</string>
+    <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial</string>
 </resources>
