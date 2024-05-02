@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E6E6E6"
+    tools:context=".HomeActivity">
+
+    <ImageView
+        android:id="@+id/home_photo"
+        android:layout_width="0dp"
+        android:layout_height="196dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="250dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.67"
+        app:srcCompat="@drawable/home_user_photo" />
+
+    <Button
+        android:id="@+id/button_face_recognition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="200dp"
+        android:text="@string/home_text_enter_face_recognition"
+        android:textAlignment="viewStart"
+        android:backgroundTint="#0D99FF"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/home_photo"
+        />
+
+    <TextView
+        android:id="@+id/view_text_register"
+        android:layout_width="99dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="300dp"
+        android:layout_marginEnd="90dp"
+        android:text="@string/register"
+        android:textAlignment="center"
+        android:textColor="#0D99FF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_face_recognition" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
