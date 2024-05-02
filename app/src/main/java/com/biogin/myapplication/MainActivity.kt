@@ -4,6 +4,11 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -45,6 +50,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceLandmark
+import java.io.ByteArrayOutputStream
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -82,44 +88,45 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         // Set up the listeners for take photo and video capture buttons
     }
-    private fun selectAnalyzer(): ImageAnalysis.Analyzer {
-        return FaceContourDetectionProcessor(viewBinding.graphicOverlayFinder)
+
+    private fun selectAnalyzer(originalImage: Bitmap): ImageAnalysis.Analyzer {
+        return FaceContourDetectionProcessor(this, viewBinding.graphicOverlayFinder, originalImage)
+    }
+
+    private inner class ImageAnalyzer : ImageAnalysis.Analyzer {
+        @OptIn(ExperimentalGetImage::class)
+        override fun analyze(imageProxy: ImageProxy) {
+            val originalImage = imageProxy.toBitmap() ?: return
+            val analyzer = selectAnalyzer(originalImage)
+            analyzer.analyze(imageProxy)
+        }
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            //Used to bind this lifecycle of the camera to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            //Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-                }
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+            }
 
             imageCapture = ImageCapture.Builder().build()
 
-            // Instantiate the image analysis
-            imageAnalyzer = ImageAnalysis.Builder()
+            val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-                .also {
-                    it.setAnalyzer(
-                        cameraExecutor, selectAnalyzer()
-                    )
-                }
 
-            // Select back camera as a default
+            imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                val originalImage = imageProxy.toBitmap() ?: return@setAnalyzer
+                val analyzer = selectAnalyzer(originalImage)
+                analyzer.analyze(imageProxy)
+            }
+
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
-                // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-                //Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture, imageAnalyzer
-                )
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis)
             } catch (e: Exception) {
                 Log.e(TAG, "startCamera: $e")
             }
@@ -204,6 +211,30 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun ImageProxy.toBitmap(): Bitmap? {
+        val yBuffer = planes[0].buffer // Y
+        val uBuffer = planes[1].buffer // U
+        val vBuffer = planes[2].buffer // V
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+        val imageBytes = out.toByteArray()
+
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+
 
     companion object {
         private const val TAG = "CameraXApp"
