@@ -1,6 +1,5 @@
 package com.biogin.myapplication.ui.login
 
-import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -9,9 +8,12 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
@@ -23,31 +25,40 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityRegisterBinding
 
+    init {
+        val modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
+        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf())
+        modulesAssociatedWithInstitutes.set("ICO", arrayListOf())
+        modulesAssociatedWithInstitutes.set("IDH", arrayListOf())
+        modulesAssociatedWithInstitutes.set("ICI", arrayListOf())
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val name = binding.name
-        val surname = binding.surname
-        val dni = binding.dni
-        val email = binding.email
-        val area = binding.area
-        val password = binding.password
-        val confirmPassword = binding.confirmPassword
-        val register = binding.registerButton
+
+        var user_categories = resources.getStringArray(R.array.user_categories)
+        val categories_spinner = findViewById<Spinner>(R.id.register_categories)
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, user_categories)
+
+        categories_spinner.adapter = adapter
+        val name = binding.registerName
+        val surname = binding.registerSurname
+        val dni = binding.registerDni
+        val email = binding.registerEmail
+        val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
+        val register = binding.registerContinueButton
 
         register?.setOnClickListener {
-            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),area?.text.toString(), password.text.toString())
+//            var institutesSelected = getInstitutesSelected(checkboxes)
+            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),checkboxes)
 
             val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
             intent.putExtra("name", name?.text.toString())
             intent.putExtra("surname", surname?.text.toString())
             intent.putExtra("dni", dni?.text.toString())
             intent.putExtra("email", email?.text.toString())
-            intent.putExtra("area", area?.text.toString())
-            intent.putExtra("password", password.text.toString())
 
             startActivity(intent)
         }
@@ -68,75 +79,56 @@ class RegisterActivity : AppCompatActivity() {
                     name.error = getString(loginState.usernameError)
                 }
             }
-            if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
-            }
+
         })
 
-        loginViewModel.loginResult.observe(this, Observer {
-            val loginResult = it ?: return@Observer
-
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
-            }
-            setResult(RESULT_OK)
-
-            //Complete and destroy login activity once successful
-            finish()
-        })
+//        loginViewModel.loginResult.observe(this, Observer {
+//            val loginResult = it ?: return@Observer
+//
+//            if (loginResult.error != null) {
+//                showLoginFailed(loginResult.error)
+//            }
+//            if (loginResult.success != null) {
+//                updateUiWithUser(loginResult.success)
+//            }
+//            setResult(RESULT_OK)
+//
+//            //Complete and destroy login activity once successful
+//            finish()
+//        })
 
         name?.afterTextChanged {
             loginViewModel.loginDataChanged(
                 name.text.toString(),
-                password.text.toString(),
-                confirmPassword?.text.toString()
+                "",
+               ""
             )
         }
-
-        confirmPassword?.apply {
-            afterTextChanged {
-                if (name != null) {
-                    loginViewModel.loginDataChanged(
-                        name.text.toString(),
-                        password.text.toString(),
-                        confirmPassword.text.toString()
-                    )
-                }
-            }
-
-            setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE ->
-                        if (name != null) {
-                            loginViewModel.login(
-                                name.text.toString(),
-                                password.text.toString()
-                            )
-                        }
-                }
-                false
-            }
         }
-    }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        // TODO : initiate successful logged in experience
-        Toast.makeText(
-            applicationContext,
-            "$welcome $displayName",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
-    }
+//    private fun getInstitutesSelected(checkboxes: ArrayList<CheckBox?>): Any {
+//        for (checkbox in checkboxes) {
+//            if(checkbox?.isSelected == true) {
+//
+//            }
+//        }
+//    }
 }
+
+//    private fun updateUiWithUser(model: LoggedInUserView) {
+//        val displayName = model.displayName
+//        // TODO : initiate successful logged in experience
+//        Toast.makeText(
+//            applicationContext,
+//            "$welcome $displayName",
+//            Toast.LENGTH_LONG
+//        ).show()
+//    }
+
+//    private fun showLoginFailed(@StringRes errorString: Int) {
+//        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+//    }
+//}
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.
