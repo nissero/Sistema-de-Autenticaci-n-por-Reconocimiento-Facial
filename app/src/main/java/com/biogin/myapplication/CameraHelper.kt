@@ -111,7 +111,7 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         )
     }
 
-    private fun uploadPhotoToFirebase(photo: Uri?, intent: Intent){
+    fun uploadPhotoToFirebase(photo: Uri?, intent: Intent){
         if (photo != null) {
             var imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
             var uploadTask = imageRef.putFile(photo)

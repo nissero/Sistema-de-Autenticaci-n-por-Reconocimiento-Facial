@@ -1,51 +1,24 @@
 package com.biogin.myapplication
 
 import android.Manifest
-import android.content.ContentValues
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.widget.Toast
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
-import androidx.camera.core.CameraSelector
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.CameraX
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.video.FallbackStrategy
-import androidx.camera.video.MediaStoreOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
-import androidx.camera.video.VideoRecordEvent
-import androidx.core.content.PermissionChecker
+import android.view.Window
+import android.widget.TextView
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
-import com.google.firebase.storage.FirebaseStorage
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
-import java.util.Locale
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.FaceContour
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceLandmark
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -72,7 +45,71 @@ class MainActivity : AppCompatActivity() {
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        viewBinding.pruebaButton.setOnClickListener{
+            buttonPrueba()
+        }
     }
+
+    private fun buttonPrueba() {
+        val firebaseMethods = FirebaseMethods()
+        val dniPrueba = "123" //esta valor de esta variable tiene que salir de la API
+                                //en caso de que no se reconozca a la persona en la api aka resultado = unkown
+                                //se llamaria directo a showAccessDeniedMessage
+        firebaseMethods.readData(dniPrueba) { usuario ->
+            if (usuario.getNombre().isNotEmpty()) {
+                showAuthorizationMessage(usuario)
+                Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
+            } else {
+                showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
+                                            //por la api pero no este en la base de datos ???
+                                            //no se si podria llegar a pasar
+                Log.d("Firestore", "El usuario no existe en la base de datos")
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showAuthorizationMessage(usuario: Usuario) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_authorization)
+
+        // Configurar los datos del usuario en el diálogo
+        dialog.findViewById<TextView>(R.id.textViewName).text = "Nombre: ${usuario.getNombre()}"
+        dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
+        dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
+
+        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
+        mediaPlayer.start()
+
+        // Mostrar el diálogo por unos segundos y luego cerrarlo
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 3000) // 3000 milisegundos (3 segundos)
+
+        dialog.show()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showAccessDeniedMessage() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_access_denied)
+
+        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
+        mediaPlayer.start()
+
+        // Mostrar el diálogo por unos segundos y luego cerrarlo
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 3000) // 3000 milisegundos (3 segundos)
+
+        dialog.show()
+    }
+
     override fun onResume() {
         super.onResume()
         initCamera()
