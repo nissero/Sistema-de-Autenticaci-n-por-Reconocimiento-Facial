@@ -38,9 +38,17 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    fun register(name: String, surname: String, dni: String,email: String, area: String, password: String): Result<LoggedInUser> {
+    fun register(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
         // handle login
-        val result = dataSource.register(name, surname, dni, email, area, password)
+        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
 
         if (result is Result.Success) {
             setLoggedInUser(result.data)

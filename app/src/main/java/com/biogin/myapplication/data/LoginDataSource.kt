@@ -2,12 +2,7 @@ package com.biogin.myapplication.data
 
 import android.util.Log
 import com.biogin.myapplication.data.model.LoggedInUser
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import java.util.UUID
 
@@ -25,10 +20,18 @@ class LoginDataSource {
         }
     }
 
-    fun register(name: String, surname: String, dni: String,email: String, area: String, password: String): Result<LoggedInUser> {
+    fun register(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
         try {
             var inserted: Boolean = true
-            uploadUserToFirebase(name, surname, dni, email, area, password) { result ->
+            uploadUserToFirebase(name, surname, dni, email, category, areasAllowed, institutesSelected) { result ->
                 inserted = result
             }
             if (!inserted) {
@@ -42,14 +45,24 @@ class LoginDataSource {
         }
     }
 
-    private fun uploadUserToFirebase(name: String, surname: String, dni: String, email: String, area: String, password: String, callback: (Boolean)->Unit): Boolean {
+    private fun uploadUserToFirebase(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>,
+        callback: (Boolean) -> Unit
+    ): Boolean {
         val newUser = hashMapOf(
             "nombre" to name,
             "apellido" to surname,
             "dni" to dni,
             "email" to email,
-            "area" to area,
-            "password" to password,
+            "category" to category,
+            "areasAllowed" to areasAllowed.toString(),
+            "institutes" to institutesSelected.toString()
         )
             val db = FirebaseFirestore.getInstance()
             db.collection("usuarios").document(dni)
