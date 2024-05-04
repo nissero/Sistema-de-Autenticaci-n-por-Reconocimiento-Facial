@@ -68,13 +68,13 @@
         android:inputType="text"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_categories"
+        app:layout_constraintBottom_toTopOf="@+id/register_categories_spinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register_email" />
 
     <Spinner
-        android:id="@+id/register_categories"
+        android:id="@+id/register_categories_spinner"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginBottom="100dp"
@@ -105,7 +105,7 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories" />
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
 
     <CheckBox
         android:id="@+id/checkbox_IDH"
@@ -116,7 +116,7 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
         app:layout_constraintStart_toEndOf="@+id/checkbox_ICO"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories" />
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
 
     <CheckBox
         android:id="@+id/checkbox_ICI"
@@ -127,7 +127,7 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
         app:layout_constraintStart_toEndOf="@+id/checkbox_IDH"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories" />
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
 
     <CheckBox
         android:id="@+id/checkbox_IDEI"
@@ -140,6 +140,6 @@
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/checkbox_ICI"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories" />
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

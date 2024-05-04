@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
@@ -34,18 +36,41 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
         var user_categories = resources.getStringArray(R.array.user_categories)
-        val categories_spinner = findViewById<Spinner>(R.id.register_categories)
+        val categories_spinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, user_categories)
-
         categories_spinner.adapter = adapter
+
+        categories_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+                var categorySelected  = spinner.selectedItem.toString()
+
+                if (categoriesWithNoInstitute.contains(categorySelected)) {
+                    disableCheckboxes()
+                } else {
+                    enableCheckboxes()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+
+        }
+
         val name = binding.registerName
         val surname = binding.registerSurname
         val dni = binding.registerDni
         val email = binding.registerEmail
         val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-        val spinner = binding.registerCategories
+        val spinner = binding.registerCategoriesSpinner
         val register = binding.registerContinueButton
 
         register?.setOnClickListener {
@@ -104,6 +129,34 @@ class RegisterActivity : AppCompatActivity() {
         }
         }
 
+    private fun enableCheckboxes() {
+        binding.checkboxIDEI?.isEnabled = true
+        binding.checkboxICO?.isEnabled = true
+        binding.checkboxIDH?.isEnabled = true
+        binding.checkboxICI?.isEnabled = true
+
+        binding.checkboxIDEI?.visibility = View.VISIBLE
+        binding.checkboxICO?.visibility = View.VISIBLE
+        binding.checkboxIDH?.visibility = View.VISIBLE
+        binding.checkboxICI?.visibility = View.VISIBLE
+    }
+
+    private fun disableCheckboxes() {
+        binding.checkboxIDEI?.isEnabled = false
+        binding.checkboxICO?.isEnabled = false
+        binding.checkboxIDH?.isEnabled = false
+        binding.checkboxICI?.isEnabled = false
+
+        binding.checkboxIDEI?.isChecked = false
+        binding.checkboxICO?.isChecked = false
+        binding.checkboxIDH?.isChecked = false
+        binding.checkboxICI?.isChecked = false
+
+        binding.checkboxIDEI?.visibility = View.INVISIBLE
+        binding.checkboxICO?.visibility = View.INVISIBLE
+        binding.checkboxIDH?.visibility = View.INVISIBLE
+        binding.checkboxICI?.visibility = View.INVISIBLE
+    }
     private fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
         val allowedAreas = mutableSetOf<String>()
         for (institute in institutes) {
