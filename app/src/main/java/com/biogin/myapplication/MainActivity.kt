@@ -3,6 +3,7 @@ package com.biogin.myapplication
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
@@ -23,7 +24,16 @@ import java.util.concurrent.Executors
 import android.util.Log
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import com.biogin.myapplication.databinding.ActivityMainBinding
+import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.storage.FirebaseStorage
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -70,16 +80,16 @@ class MainActivity : AppCompatActivity() {
     private fun buttonPrueba() {
         val firebaseMethods = FirebaseMethods()
         val dniPrueba = "123" //esta valor de esta variable tiene que salir de la API
-                                //en caso de que no se reconozca a la persona en la api aka resultado = unkown
-                                //se llamaria directo a showAccessDeniedMessage
+        //en caso de que no se reconozca a la persona en la api aka resultado = unkown
+        //se llamaria directo a showAccessDeniedMessage
         firebaseMethods.readData(dniPrueba) { usuario ->
             if (usuario.getNombre().isNotEmpty()) {
                 showAuthorizationMessage(usuario)
                 Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
             } else {
                 showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
-                                            //por la api pero no este en la base de datos ???
-                                            //no se si podria llegar a pasar
+                //por la api pero no este en la base de datos ???
+                //no se si podria llegar a pasar
                 Log.d("Firestore", "El usuario no existe en la base de datos")
             }
         }
@@ -114,7 +124,18 @@ class MainActivity : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.dialog_access_denied)
-        
+
+        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
+        mediaPlayer.start()
+
+        // Mostrar el diálogo por unos segundos y luego cerrarlo
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 3000) // 3000 milisegundos (3 segundos)
+
+        dialog.show()
+    }
+
     private fun selectAnalyzer(originalImage: Bitmap): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(this, viewBinding.graphicOverlayFinder, originalImage)
     }
@@ -135,16 +156,6 @@ class MainActivity : AppCompatActivity() {
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
             }
-            
-        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
-        mediaPlayer.start()
-
-        // Mostrar el diálogo por unos segundos y luego cerrarlo
-        Handler().postDelayed({
-            dialog.dismiss()
-        }, 3000) // 3000 milisegundos (3 segundos)
-
-        dialog.show()
 
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -156,6 +167,7 @@ class MainActivity : AppCompatActivity() {
                 analyzer.analyze(imageProxy)
             }
 
+            val imageCapture = ImageCapture.Builder().build()
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {

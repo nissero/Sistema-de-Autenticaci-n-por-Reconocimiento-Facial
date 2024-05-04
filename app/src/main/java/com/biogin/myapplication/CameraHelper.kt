@@ -5,6 +5,11 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -14,6 +19,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.Preview.SurfaceProvider
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -23,6 +29,7 @@ import androidx.lifecycle.coroutineScope
 import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -58,7 +65,9 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, selectAnalyzer())
+                    it.setAnalyzer(cameraExecutor) { imageProxy ->
+                        selectAnalyzer(imageProxy).analyze(imageProxy)
+                    }
                 }
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -113,8 +122,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
     fun uploadPhotoToFirebase(photo: Uri?, intent: Intent){
         if (photo != null) {
-            var imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
-            var uploadTask = imageRef.putFile(photo)
+            val imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
+            val uploadTask = imageRef.putFile(photo)
             uploadTask.addOnFailureListener {
                 Log.e("Firebase", "Error al subir imagen")
             }.addOnSuccessListener {
@@ -123,7 +132,43 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         }
     }
 
-    private fun selectAnalyzer(): ImageAnalysis.Analyzer {
-        return FaceContourDetectionProcessor(graphicOverlay)
+    private fun selectAnalyzer(imageProxy: ImageProxy): ImageAnalysis.Analyzer {
+        return ImageAnalysis.Analyzer { image ->
+            // Get the original image from the ImageProxy
+            val originalImage = imageProxy.toBitmap() ?: return@Analyzer
+
+            // Create a new instance of FaceContourDetectionProcessor
+            val processor = FaceContourDetectionProcessor(
+                context = viewBinding.root.context,
+                graphicOverlay,
+                originalImage = originalImage
+            )
+
+            // Analyze the image using the processor
+            processor.analyze(image)
+        }
+    }
+
+    fun ImageProxy.toBitmap(): Bitmap? {
+        val yBuffer = planes[0].buffer // Y
+        val uBuffer = planes[1].buffer // U
+        val vBuffer = planes[2].buffer // V
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+        val imageBytes = out.toByteArray()
+
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 }
