@@ -1,6 +1,5 @@
 package com.biogin.myapplication.data
 
-import android.widget.CheckBox
 import com.biogin.myapplication.data.model.LoggedInUser
 
 /**
@@ -40,10 +39,16 @@ class LoginRepository(val dataSource: LoginDataSource) {
     }
 
     fun register(
-        name: String, surname: String, dni: String,
-        email: String, categories: ArrayList<CheckBox?>): Result<LoggedInUser> {
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
         // handle login
-        val result = dataSource.register(name, surname, dni, email, categories)
+        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
 
         if (result is Result.Success) {
             setLoggedInUser(result.data)

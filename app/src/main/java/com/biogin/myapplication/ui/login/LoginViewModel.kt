@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import android.widget.CheckBox
 import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 
@@ -30,9 +29,17 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
-    fun register(name: String, surname: String, dni: String, email: String, categories: ArrayList<CheckBox?>) {
+    fun register(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.register(name, surname, dni, email, categories)
+        val result = loginRepository.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
 
         if (result is Result.Success) {
             _loginResult.value =

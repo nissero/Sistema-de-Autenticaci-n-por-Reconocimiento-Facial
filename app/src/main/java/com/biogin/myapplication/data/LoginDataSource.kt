@@ -1,7 +1,6 @@
 package com.biogin.myapplication.data
 
 import android.util.Log
-import android.widget.CheckBox
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.IOException
@@ -22,11 +21,17 @@ class LoginDataSource {
     }
 
     fun register(
-        name: String, surname: String, dni: String,
-        email: String, categories: ArrayList<CheckBox?>): Result<LoggedInUser> {
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
         try {
             var inserted: Boolean = true
-            uploadUserToFirebase(name, surname, dni, email, categories) { result ->
+            uploadUserToFirebase(name, surname, dni, email, category, areasAllowed, institutesSelected) { result ->
                 inserted = result
             }
             if (!inserted) {
@@ -40,13 +45,24 @@ class LoginDataSource {
         }
     }
 
-    private fun uploadUserToFirebase(name: String, surname: String, dni: String, email: String, categories: ArrayList<CheckBox?>, callback: (Boolean)->Unit): Boolean {
+    private fun uploadUserToFirebase(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>,
+        callback: (Boolean) -> Unit
+    ): Boolean {
         val newUser = hashMapOf(
             "nombre" to name,
             "apellido" to surname,
             "dni" to dni,
             "email" to email,
-            "area" to categories,
+            "category" to category,
+            "areasAllowed" to areasAllowed.toString(),
+            "institutes" to institutesSelected.toString()
         )
             val db = FirebaseFirestore.getInstance()
             db.collection("usuarios").document(dni)

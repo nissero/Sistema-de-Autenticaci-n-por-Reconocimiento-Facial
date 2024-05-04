@@ -4,17 +4,13 @@ import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.inputmethod.EditorInfo
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
@@ -22,15 +18,16 @@ import com.biogin.myapplication.R
 
 class RegisterActivity : AppCompatActivity() {
 
+    private lateinit var modulesAssociatedWithInstitutes : HashMap<String, ArrayList<String>>
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityRegisterBinding
 
     init {
-        val modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
-        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf())
-        modulesAssociatedWithInstitutes.set("ICO", arrayListOf())
-        modulesAssociatedWithInstitutes.set("IDH", arrayListOf())
-        modulesAssociatedWithInstitutes.set("ICI", arrayListOf())
+        modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
+        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf("Módulo 1", "Módulo 3", "Módulo 4","Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
+        modulesAssociatedWithInstitutes.set("ICO", arrayListOf("Módulo 1", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
+        modulesAssociatedWithInstitutes.set("IDH", arrayListOf("Módulo 1", "Módulo 2","Módulo 3", "Módulo 5", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
+        modulesAssociatedWithInstitutes.set("ICI", arrayListOf("Módulo 1", "Módulo 2", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,11 +45,12 @@ class RegisterActivity : AppCompatActivity() {
         val dni = binding.registerDni
         val email = binding.registerEmail
         val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
+        val spinner = binding.registerCategories
         val register = binding.registerContinueButton
 
         register?.setOnClickListener {
-//            var institutesSelected = getInstitutesSelected(checkboxes)
-            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),checkboxes)
+            var institutesSelected = getInstitutesSelected(checkboxes)
+            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(),getAllowedAreas(institutesSelected), institutesSelected)
 
             val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
             intent.putExtra("name", name?.text.toString())
@@ -106,13 +104,27 @@ class RegisterActivity : AppCompatActivity() {
         }
         }
 
-//    private fun getInstitutesSelected(checkboxes: ArrayList<CheckBox?>): Any {
-//        for (checkbox in checkboxes) {
-//            if(checkbox?.isSelected == true) {
-//
-//            }
-//        }
-//    }
+    private fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
+        val allowedAreas = mutableSetOf<String>()
+        for (institute in institutes) {
+            allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
+        }
+        return allowedAreas
+    }
+    private fun getInstitutesSelected(checkboxes: ArrayList<CheckBox?>): ArrayList<String> {
+        var institutesSelected = ArrayList<String>()
+        println(checkboxes)
+        for (checkbox in checkboxes) {
+            println(checkbox?.isChecked)
+            if(checkbox?.isChecked == true) {
+                institutesSelected.add(checkbox.text.toString())
+                println(institutesSelected)
+                println(checkbox.text.toString())
+            }
+        }
+
+        return institutesSelected
+    }
 }
 
 //    private fun updateUiWithUser(model: LoggedInUserView) {
