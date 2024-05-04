@@ -21,4 +21,5 @@
     <string name="prompt_dni">DNI</string>
     <string name="title_activity_photo_register">PhotoRegister</string>
     <string name="title_main_activity">Main Activity</string>
+    <string name="prueba">Prueba</string>
 </resources>

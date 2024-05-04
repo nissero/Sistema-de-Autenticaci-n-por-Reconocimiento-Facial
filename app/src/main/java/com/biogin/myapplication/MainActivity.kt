@@ -1,9 +1,11 @@
 package com.biogin.myapplication
 
 import android.Manifest
-import android.content.ContentValues
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
@@ -12,34 +14,16 @@ import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.widget.Toast
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
-import androidx.camera.core.CameraSelector
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.video.FallbackStrategy
-import androidx.camera.video.MediaStoreOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
-import androidx.camera.video.VideoRecordEvent
-import androidx.core.content.PermissionChecker
+import android.view.Window
+import android.widget.TextView
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.storage.FirebaseStorage
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -56,39 +40,81 @@ typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
-    private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var imageAnalysis : ImageAnalysis
-    private var storageRef = FirebaseStorage.getInstance().getReference()
-    private var imageAnalyzer: ImageAnalysis? = null
-    override fun onCreate(savedInstanceState: Bundle?) {1
+    private lateinit var camera: CameraHelper
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
         // Request camera permissions
         if (allPermissionsGranted()) {
-            startCamera()
+            initCamera()
         } else {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-        cameraExecutor = Executors.newSingleThreadExecutor()
+
         // Set up the listeners for take photo and video capture buttons
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-    }
-    override fun onResume() {
-        super.onResume()
-        startCamera()
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        // Set up the listeners for take photo and video capture buttons
+        viewBinding.pruebaButton.setOnClickListener{
+            buttonPrueba()
+        }
     }
 
+    private fun buttonPrueba() {
+        val firebaseMethods = FirebaseMethods()
+        val dniPrueba = "123" //esta valor de esta variable tiene que salir de la API
+                                //en caso de que no se reconozca a la persona en la api aka resultado = unkown
+                                //se llamaria directo a showAccessDeniedMessage
+        firebaseMethods.readData(dniPrueba) { usuario ->
+            if (usuario.getNombre().isNotEmpty()) {
+                showAuthorizationMessage(usuario)
+                Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
+            } else {
+                showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
+                                            //por la api pero no este en la base de datos ???
+                                            //no se si podria llegar a pasar
+                Log.d("Firestore", "El usuario no existe en la base de datos")
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showAuthorizationMessage(usuario: Usuario) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_authorization)
+
+        // Configurar los datos del usuario en el diálogo
+        dialog.findViewById<TextView>(R.id.textViewName).text = "Nombre: ${usuario.getNombre()}"
+        dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
+        dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
+
+        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
+        mediaPlayer.start()
+
+        // Mostrar el diálogo por unos segundos y luego cerrarlo
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 3000) // 3000 milisegundos (3 segundos)
+
+        dialog.show()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showAccessDeniedMessage() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_access_denied)
+        
     private fun selectAnalyzer(originalImage: Bitmap): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(this, viewBinding.graphicOverlayFinder, originalImage)
     }
@@ -109,8 +135,16 @@ class MainActivity : AppCompatActivity() {
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
             }
+            
+        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
+        mediaPlayer.start()
 
-            imageCapture = ImageCapture.Builder().build()
+        // Mostrar el diálogo por unos segundos y luego cerrarlo
+        Handler().postDelayed({
+            dialog.dismiss()
+        }, 3000) // 3000 milisegundos (3 segundos)
+
+        dialog.show()
 
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -133,60 +167,17 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private inner class YourImageAnalyzer : ImageAnalysis.Analyzer {
-        @OptIn(ExperimentalGetImage::class)
-        override fun analyze(imageProxy: ImageProxy) {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-                val highAccuracyOpts = FaceDetectorOptions.Builder()
-                    .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
-                    .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-                    .enableTracking().build()
-
-                val detector = FaceDetection.getClient(highAccuracyOpts)
-
-                val result = detector.process(image)
-                    .addOnSuccessListener { faces ->
-                        for (face in faces) {
-                            val bounds = face.boundingBox
-                            val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
-                            val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
-
-                            // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
-                            // nose available):
-                            val leftEar = face.getLandmark(FaceLandmark.LEFT_EAR)
-                            leftEar?.let {
-                                val leftEarPos = leftEar.position
-                            }
-
-                            // If contour detection was enabled:
-                            val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)?.points
-                            val upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)?.points
-
-                            // If classification was enabled:
-                            if (face.smilingProbability != null) {
-                                val smileProb = face.smilingProbability
-                            }
-                            if (face.rightEyeOpenProbability != null) {
-                                val rightEyeOpenProb = face.rightEyeOpenProbability
-                            }
-
-                            // If face tracking was enabled:
-                            if (face.trackingId != null) {
-                                val id = face.trackingId
-                            }
-                        }
-                    }
-                    .addOnFailureListener{ e ->
-                    }
-                    .addOnCompleteListener{ imageProxy.close() }
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        initCamera()
     }
 
-    fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+    private fun initCamera(){
+        camera = CameraHelper(this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder)
+        camera.startCamera()
+    }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
@@ -235,9 +226,8 @@ class MainActivity : AppCompatActivity() {
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
-
     companion object {
-        private const val TAG = "CameraXApp"
+        const val TAG = "Sistema de Autenticación Facial"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =

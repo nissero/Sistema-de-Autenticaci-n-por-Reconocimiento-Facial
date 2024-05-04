@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="#FFFFFF">
+
+        <!-- Tick verde (puedes reemplazarlo con tu propio icono) -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_cross_circle"
+            android:layout_gravity="center_horizontal"
+            app:tint="#FF0000" />
+
+        <!-- Datos del usuario -->
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ACCESO DENEGADO"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

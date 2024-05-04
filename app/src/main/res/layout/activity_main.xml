@@ -29,9 +29,21 @@
         android:text="@string/register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="center_horizontal|bottom" />
+        app:layout_constraintEnd_toStartOf="@+id/prueba_button"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp" />
 
+    <Button
+        android:id="@+id/prueba_button"
+        android:layout_width="118dp"
+        android:layout_height="81dp"
+        android:elevation="10dp"
+        android:text="@string/prueba"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/register_button"
+        app:layout_constraintHorizontal_bias="6"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout  >
