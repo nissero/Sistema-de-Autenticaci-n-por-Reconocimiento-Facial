@@ -97,4 +97,6 @@ dependencies {
     implementation("androidx.camera:camera-extensions:$camerax_version")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
