@@ -20,6 +20,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import android.os.Handler
+import android.os.Looper
 
 class FaceContourDetectionProcessor(
     private val context: Context,
@@ -42,6 +44,9 @@ class FaceContourDetectionProcessor(
         .build()
 
     private val detector = FaceDetection.getClient(realTimeOptions)
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val DELAY_MILLISECONDS = 1000 // Adjust the delay time as needed
 
     override val graphicOverlay: GraphicOverlay
         get() = view
@@ -85,6 +90,9 @@ class FaceContourDetectionProcessor(
                     }
                 }
             }
+
+            val faceBitmap = extractFaceBitmap(face, rect)
+            sendImageForRecognition(faceBitmap)
         }
         graphicOverlay.postInvalidate()
     }
@@ -107,7 +115,6 @@ class FaceContourDetectionProcessor(
     override fun onFailure(e: Exception) {
         Log.w(ContentValues.TAG, "Face Detector failed")
     }
-
 
     companion object {
         private const val TAG = "FaceContourProcessor"

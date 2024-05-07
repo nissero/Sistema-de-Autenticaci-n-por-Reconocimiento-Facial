@@ -156,7 +156,6 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-
     companion object {
         const val TAG = "Sistema de Autenticación Facial"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
