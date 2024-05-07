@@ -32,8 +32,7 @@ import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.MainActivity.Companion.TAG
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.storage.FirebaseStorage
-import java.io.ByteArrayOutputStream
-import okhttp3.Call
+ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -157,6 +156,55 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         }
     }
 
+    private fun sendImageForTraining(photoUri: Uri, dni: String, callback: (String?) -> Unit) {
+        val context = viewBinding.root.context
+
+        // Convert the photoUri to a Bitmap
+        val imageBitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(photoUri))
+
+        // Rotate the bitmap if needed
+        val rotatedBitmap = rotateBitmap(imageBitmap, 90f)
+
+        // Convert the rotated bitmap to bytes
+        val outputStream = ByteArrayOutputStream()
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        val imageBytes = outputStream.toByteArray()
+
+        // Build the request body with the image bytes
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("image", "face.jpg", imageBytes.toRequestBody(MultipartBody.FORM))
+            .addFormDataPart("name", dni)
+            .build()
+
+        // Build the request with the request body
+        val request = Request.Builder()
+            .url("https://Biogin.pythonanywhere.com/train")
+            .post(requestBody)
+            .build()
+
+        // Execute the request asynchronously
+        OkHttpClient().newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Failed to make request: ${e.message}")
+                callback(null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                // Log training result
+                Log.d(TAG, "Training result: $responseBody")
+                callback(responseBody)
+            }
+        })
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
     private fun selectAnalyzer(imageProxy: ImageProxy): ImageAnalysis.Analyzer {
         return ImageAnalysis.Analyzer { image ->
             // Get the original image from the ImageProxy
@@ -197,4 +245,7 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
+    companion object {
+        private const val TAG = "CameraHelper"
+    }
 }

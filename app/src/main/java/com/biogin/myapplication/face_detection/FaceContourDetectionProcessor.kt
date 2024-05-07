@@ -20,7 +20,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import android.os.Handler
 import android.os.Looper
 
 class FaceContourDetectionProcessor(
@@ -90,9 +89,6 @@ class FaceContourDetectionProcessor(
                     }
                 }
             }
-
-            val faceBitmap = extractFaceBitmap(face, rect)
-            sendImageForRecognition(faceBitmap)
         }
         graphicOverlay.postInvalidate()
     }
