@@ -21,6 +21,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import android.os.Handler
+import android.os.Looper
 
 class FaceContourDetectionProcessor(
     private val context: Context,
@@ -35,6 +37,9 @@ class FaceContourDetectionProcessor(
 
     private val detector = FaceDetection.getClient(realTimeOptions)
     private val client = OkHttpClient()
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val DELAY_MILLISECONDS = 1000 // Adjust the delay time as needed
 
     override val graphicOverlay: GraphicOverlay
         get() = view
@@ -56,9 +61,6 @@ class FaceContourDetectionProcessor(
         results.forEach { face ->
             val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
             graphicOverlay.add(faceGraphic)
-            // Save the extracted face bitmap
-            //saveExtractedFaceBitmap(face, rect)
-            // Send face image to API for recognition
             val faceBitmap = extractFaceBitmap(face, rect)
             sendImageForRecognition(faceBitmap)
         }
@@ -87,34 +89,6 @@ class FaceContourDetectionProcessor(
         return rotatedBitmap
     }
 
-/*    private fun saveExtractedFaceBitmap(face: Face, rect: Rect) {
-        val faceBitmap = extractFaceBitmap(face, rect)
-        val fileName = "face_${System.currentTimeMillis()}.jpg"
-
-        // Specify the absolute path to the Downloads directory
-        val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
-
-        try {
-            // Create the Downloads directory if it doesn't exist
-            if (!downloadsDir.exists()) {
-                downloadsDir.mkdirs()
-            }
-
-            // Create a File object with the specified directory and file name
-            val file = File(downloadsDir, fileName)
-
-            // Write the bitmap to the file
-            FileOutputStream(file).use { outputStream ->
-                faceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            }
-
-            Log.d(TAG, "Face bitmap saved: ${file.absolutePath}")
-        } catch (e: Exception) {
-            // Handle any exceptions that occur during file operations
-            Log.e(TAG, "Error saving face bitmap: ${e.message}")
-        }
-    }*/
-
     private fun sendImageForRecognition(faceBitmap: Bitmap) {
         val outputStream = ByteArrayOutputStream()
         faceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
@@ -125,23 +99,25 @@ class FaceContourDetectionProcessor(
             .addFormDataPart("image", "face.jpg", imageBytes.toRequestBody(MultipartBody.FORM))
             .build()
 
-        val request = Request.Builder()
-            .url("https://Biogin.pythonanywhere.com/recognize")
-            .post(requestBody)
-            .build()
+        val delayRunnable = Runnable {
+            val request = Request.Builder()
+                .url("https://Biogin.pythonanywhere.com/recognize")
+                .post(requestBody)
+                .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to make request: ${e.message}")
-            }
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e(TAG, "Failed to make request: ${e.message}")
+                }
 
-            override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                // Log recognition result
-                Log.d(TAG, "Recognition result: $responseBody")
-                // You can parse the response here and handle the recognized names
-            }
-        })
+                override fun onResponse(call: Call, response: Response) {
+                    val responseBody = response.body?.string()
+                    // Log recognition result
+                    Log.d(TAG, "Recognition result: $responseBody")
+                }
+            })
+        }
+        handler.postDelayed(delayRunnable, DELAY_MILLISECONDS.toLong())
     }
 
     companion object {

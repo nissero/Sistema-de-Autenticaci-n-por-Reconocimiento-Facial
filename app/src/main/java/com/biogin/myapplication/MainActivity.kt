@@ -141,42 +141,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class ImageAnalyzer : ImageAnalysis.Analyzer {
-        @OptIn(ExperimentalGetImage::class)
         override fun analyze(imageProxy: ImageProxy) {
             val originalImage = imageProxy.toBitmap() ?: return
             val analyzer = selectAnalyzer(originalImage)
             analyzer.analyze(imageProxy)
         }
-    }
-
-    private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-            }
-
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-
-            imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                val originalImage = imageProxy.toBitmap() ?: return@setAnalyzer
-                val analyzer = selectAnalyzer(originalImage)
-                analyzer.analyze(imageProxy)
-            }
-
-            val imageCapture = ImageCapture.Builder().build()
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis)
-            } catch (e: Exception) {
-                Log.e(TAG, "startCamera: $e")
-            }
-        }, ContextCompat.getMainExecutor(this))
     }
 
     override fun onResume() {
@@ -197,22 +166,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
     }
 
     fun ImageProxy.toBitmap(): Bitmap? {
