@@ -73,10 +73,10 @@ class FaceContourDetectionProcessor(
                         val faceBitmap = apiManager.extractFaceBitmap(rect)
                         Log.d(TAG, "SE LLAMO A LA API")
                         apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
-                            if (faceDetected) {
-                                Log.d(TAG, "Se detecto una cara")
+                            if (faceDetected != "null") {
+                                Log.d(TAG, "CARA DETECTADA: $faceDetected")
                             } else {
-                                Log.d(TAG, "No se detecto ninguna cara")
+                                Log.e(TAG, "ERROR EN LA API")
                             }
                         }
 

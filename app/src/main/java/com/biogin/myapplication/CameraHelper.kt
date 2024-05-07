@@ -139,9 +139,9 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
             // Create a new instance of FaceContourDetectionProcessor
             val processor = FaceContourDetectionProcessor(
-                context = viewBinding.root.context,
+                viewBinding.root.context,
                 graphicOverlay,
-                originalImage = originalImage
+                originalImage
             )
 
             // Analyze the image using the processor
