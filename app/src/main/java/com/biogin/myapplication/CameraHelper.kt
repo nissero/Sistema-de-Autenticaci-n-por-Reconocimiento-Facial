@@ -200,38 +200,6 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         })
     }
 
-    private fun saveBitmapToFile(bitmap: Bitmap, filename: String): Uri? {
-        // Get the context
-        val context = viewBinding.root.context
-
-        // Get the directory where you want to save the file
-        val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        // Create a new file in the directory
-        val file = File(directory, filename)
-
-        return try {
-            // Create a rotated bitmap
-            val rotatedBitmap = rotateBitmap(bitmap, 90f)
-
-            // Create a FileOutputStream for the file
-            val outputStream = FileOutputStream(file)
-
-            // Compress the rotated bitmap to JPEG format and write it to the output stream
-            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-
-            // Flush and close the output stream
-            outputStream.flush()
-            outputStream.close()
-
-            // Return the Uri of the saved file
-            Uri.fromFile(file)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(degrees)
