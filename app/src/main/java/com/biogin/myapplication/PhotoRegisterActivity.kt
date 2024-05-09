@@ -47,7 +47,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, false)
+        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
     }
 
