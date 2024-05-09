@@ -57,10 +57,12 @@ class FaceContourDetectionProcessor(
     override fun onSuccess(results: List<Face>, graphicOverlay: GraphicOverlay, rect: Rect) {
         graphicOverlay.clear()
         results.forEach { face ->
-            val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
-            graphicOverlay.add(faceGraphic)
+
 
             if (sendDataToAPI && isFaceComplete(face, rect)){
+                val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
+                graphicOverlay.add(faceGraphic)
+
                 //Log.d(TAG, "se detecto una cara")
                 val faceBitmap = apiManager.extractFaceBitmap(rect)
 
@@ -72,6 +74,7 @@ class FaceContourDetectionProcessor(
                         if (faceDetected != "null") {
                             Log.d(TAG, "CARA DETECTADA: $faceDetected")
                             camera.verifyUser(faceDetected)
+                            camera.wasAnalyzed()
                         } else {
                             Log.e(TAG, "ERROR EN LA API")
                         }
@@ -97,7 +100,6 @@ class FaceContourDetectionProcessor(
                 }
             }
         }
-
         return true
     }
 

@@ -11,6 +11,8 @@ import android.graphics.Rect
 import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -46,23 +48,27 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
                    private val viewBinding: ViewBinding,
                    private val surfaceProvider: SurfaceProvider,
                    private val graphicOverlay: GraphicOverlay,
+                   private val dialogShowTime: Long?,
                    private var withAnalyzer: Boolean
 )  {
 
     private var imageCapture: ImageCapture? = null
-    private var imageAnalyzer: ImageAnalysis? = null
+    private lateinit var imageAnalyzer: ImageAnalysis
     private var storageRef = FirebaseStorage.getInstance().getReference()
 
     private val apiCallIntervalMillis = 2000L
     private var lastApiCallTimeMillis = System.currentTimeMillis()
     private var isApiCallInProgress = false
 
+    private lateinit var cameraProvider: ProcessCameraProvider
+
+
     val firebaseMethods = FirebaseMethods()
 
     fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(viewBinding.root.context)
         cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder()
                 .build()
@@ -85,6 +91,7 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(viewBinding.root.context))
+
     }
     fun takePhoto(tag: String, fileNameFormat: String, context: ContextWrapper, intent: Intent, fin: () -> Unit){
         val imageCapture = imageCapture ?: return
@@ -199,12 +206,16 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         imageAnalyzer = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
-            .also {
-                it.setAnalyzer(cameraExecutor) { imageProxy ->
-                    selectAnalyzer(sendDataToAPI, imageProxy).analyze(imageProxy)
-                }
-            }
+
+        seleccionarAnalizador(sendDataToAPI)
     }
+
+    private fun seleccionarAnalizador(sendDataToAPI: Boolean) {
+        imageAnalyzer.setAnalyzer(cameraExecutor) { imageProxy ->
+            selectAnalyzer(sendDataToAPI, imageProxy).analyze(imageProxy)
+        }
+    }
+
 
     private fun selectAnalyzer(sendDataToAPI: Boolean, imageProxy: ImageProxy): ImageAnalysis.Analyzer {
         return ImageAnalysis.Analyzer { image ->
@@ -261,6 +272,17 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     fun stopAnalyzing(){
         isApiCallInProgress = false
     }
+
+    fun wasAnalyzed(){
+        imageAnalyzer.clearAnalyzer()
+
+        if (dialogShowTime != null) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                seleccionarAnalizador(true)
+            }, dialogShowTime)
+        }
+    }
+
     fun setLasApiCallTime(){
         lastApiCallTimeMillis = System.currentTimeMillis()
     }
@@ -270,7 +292,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
             if (usuario.getNombre().isNotEmpty()) {
                 mainActivity?.showAuthorizationMessage(usuario)
                 Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
-                withAnalyzer = false
+
+
             } else {
                 mainActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
                 //por la api pero no este en la base de datos ???

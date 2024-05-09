@@ -23,6 +23,7 @@ import com.biogin.myapplication.ui.login.RegisterActivity
 typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() {
+    private var dialogShowTime = 10000L
     private lateinit var viewBinding: ActivityMainBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
@@ -62,12 +63,11 @@ class MainActivity : AppCompatActivity() {
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
         mediaPlayer.start()
 
+        dialog.show()
         // Mostrar el diálogo por unos segundos y luego cerrarlo
         Handler().postDelayed({
             dialog.dismiss()
-        }, 3000) // 3000 milisegundos (3 segundos)
-
-        dialog.show()
+        }, dialogShowTime) // 3000 milisegundos (3 segundos)
     }
 
     @SuppressLint("SetTextI18n")
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         // Mostrar el diálogo por unos segundos y luego cerrarlo
         Handler().postDelayed({
             dialog.dismiss()
-        }, 3000) // 3000 milisegundos (3 segundos)
+        }, dialogShowTime) // 3000 milisegundos (3 segundos)
 
         dialog.show()
     }
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCamera(){
-        camera = CameraHelper(this, this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, true)
+        camera = CameraHelper(this, this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
         camera.startCamera()
     }
 
