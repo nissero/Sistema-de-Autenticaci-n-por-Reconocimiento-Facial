@@ -27,7 +27,8 @@ class FaceContourDetectionProcessor(
     private val context: Context,
     private val view: GraphicOverlay,
     private val originalImage: Bitmap,
-    private val camera: CameraHelper
+    private val camera: CameraHelper,
+    private val sendDataToAPI: Boolean
 ) : BaseImageAnalyzer<List<Face>>() {
     private val apiManager = APIManager(originalImage)
 
@@ -59,7 +60,7 @@ class FaceContourDetectionProcessor(
             val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
             graphicOverlay.add(faceGraphic)
 
-            if (isFaceComplete(face, rect)){
+            if (sendDataToAPI && isFaceComplete(face, rect)){
                 //Log.d(TAG, "se detecto una cara")
                 val faceBitmap = apiManager.extractFaceBitmap(rect)
 
@@ -70,6 +71,7 @@ class FaceContourDetectionProcessor(
                     apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
                         if (faceDetected != "null") {
                             Log.d(TAG, "CARA DETECTADA: $faceDetected")
+                            camera.verifyUser(faceDetected)
                         } else {
                             Log.e(TAG, "ERROR EN LA API")
                         }

@@ -3,16 +3,9 @@ package com.biogin.myapplication
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageFormat
-import android.graphics.Rect
-import android.graphics.YuvImage
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -24,27 +17,8 @@ import java.util.concurrent.Executors
 import android.util.Log
 import android.view.Window
 import android.widget.TextView
-import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
-import com.google.firebase.storage.FirebaseStorage
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
-import java.util.Locale
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.FaceContour
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceLandmark
-import java.io.ByteArrayOutputStream
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -96,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showAuthorizationMessage(usuario: Usuario) {
+    fun showAuthorizationMessage(usuario: Usuario) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
@@ -119,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showAccessDeniedMessage() {
+    fun showAccessDeniedMessage() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
@@ -142,7 +116,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCamera(){
-        camera = CameraHelper(this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder)
+        camera = CameraHelper(this, this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, true)
         camera.startCamera()
     }
 

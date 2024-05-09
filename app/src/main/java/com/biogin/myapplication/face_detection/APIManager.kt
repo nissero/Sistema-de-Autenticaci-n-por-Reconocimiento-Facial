@@ -46,7 +46,7 @@ class APIManager(
                     if (isValidRecognitionResult(responseBody)){
                         val cleanDNI = extractNameFromResponse(responseBody)
 
-                        Log.d(TAG, "Recognition result: $responseBody")
+                        Log.d(TAG, "$responseBody")
                         Log.d(TAG, "RESULTADO LIMPIO: $cleanDNI}")
 
                         onResult(cleanDNI) // Devolver el resultado de la detección de cara
@@ -86,7 +86,7 @@ class APIManager(
 
 
     private fun isValidRecognitionResult(responseBody: String): Boolean {
-        return responseBody.contains("Unknown") || responseBody.contains("{\"names\":")
+        return responseBody.contains("{\"names\":[\"") && !responseBody.contains("{\"names\":[]}")
     }
     fun extractFaceBitmap(rect: Rect): Bitmap {
         val left = rect.left.coerceAtLeast(0)
