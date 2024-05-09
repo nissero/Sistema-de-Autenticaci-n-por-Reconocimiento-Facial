@@ -47,7 +47,7 @@ class APIManager(
                         val cleanDNI = extractNameFromResponse(responseBody)
 
                         Log.d(TAG, "$responseBody")
-                        Log.d(TAG, "RESULTADO LIMPIO: $cleanDNI}")
+                        Log.d(TAG, "RESULTADO LIMPIO: $cleanDNI")
 
                         onResult(cleanDNI) // Devolver el resultado de la detección de cara
                     }
