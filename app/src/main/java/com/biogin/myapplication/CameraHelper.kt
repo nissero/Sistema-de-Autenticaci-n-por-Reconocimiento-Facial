@@ -61,6 +61,10 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     private var imageAnalyzer: ImageAnalysis? = null
     private var storageRef = FirebaseStorage.getInstance().getReference()
 
+    private val apiCallIntervalMillis = 2000L
+    private var lastApiCallTimeMillis = System.currentTimeMillis()
+    private var isApiCallInProgress = false
+
     fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(viewBinding.root.context)
         cameraProviderFuture.addListener({
@@ -212,9 +216,10 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
             // Create a new instance of FaceContourDetectionProcessor
             val processor = FaceContourDetectionProcessor(
-                context = viewBinding.root.context,
+                viewBinding.root.context,
                 graphicOverlay,
-                originalImage = originalImage
+                originalImage,
+                this
             )
 
             // Analyze the image using the processor
@@ -243,6 +248,23 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         val imageBytes = out.toByteArray()
 
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+    fun canAnalize(): Boolean{
+        return System.currentTimeMillis() - lastApiCallTimeMillis >= apiCallIntervalMillis
+    }
+
+    fun isAnalyzing(): Boolean{
+        return isApiCallInProgress
+    }
+    fun analyzing(){
+        isApiCallInProgress = true
+    }
+
+    fun stopAnalyzing(){
+        isApiCallInProgress = false
+    }
+    fun setLasApiCallTime(){
+        lastApiCallTimeMillis = System.currentTimeMillis()
     }
 
     companion object {

@@ -21,20 +21,14 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import android.os.Looper
+import com.biogin.myapplication.CameraHelper
 
 class FaceContourDetectionProcessor(
     private val context: Context,
     private val view: GraphicOverlay,
-    private val originalImage: Bitmap
+    private val originalImage: Bitmap,
+    private val camera: CameraHelper
 ) : BaseImageAnalyzer<List<Face>>() {
-
-    private val apiCallIntervalMillis = 17L
-    private var lastApiCallTimeMillis = System.currentTimeMillis()
-    private var isApiCallInProgress = false
-    private val apiLock = Any()
-    private val currentThreadName: String
-        get() = Thread.currentThread().name
-
     private val apiManager = APIManager(originalImage)
 
     private val realTimeOptions = FaceDetectorOptions.Builder()
@@ -43,9 +37,6 @@ class FaceContourDetectionProcessor(
         .build()
 
     private val detector = FaceDetection.getClient(realTimeOptions)
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val DELAY_MILLISECONDS = 1000 // Adjust the delay time as needed
 
     override val graphicOverlay: GraphicOverlay
         get() = view
@@ -67,28 +58,28 @@ class FaceContourDetectionProcessor(
         results.forEach { face ->
             val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
             graphicOverlay.add(faceGraphic)
-            val currentTimeMillis = System.currentTimeMillis()
 
             if (isFaceComplete(face, rect)){
-                synchronized(apiLock){
-                    if (!isApiCallInProgress && currentTimeMillis - lastApiCallTimeMillis >= apiCallIntervalMillis) {
-                        isApiCallInProgress = true
+                //Log.d(TAG, "se detecto una cara")
+                val faceBitmap = apiManager.extractFaceBitmap(rect)
 
-                        val faceBitmap = apiManager.extractFaceBitmap(rect)
-                        Log.d(TAG, "SE LLAMO A LA API")
-                        apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
-                            if (faceDetected != "null") {
-                                Log.d(TAG, "CARA DETECTADA: $faceDetected")
-                            } else {
-                                Log.e(TAG, "ERROR EN LA API")
-                            }
+                if (camera.canAnalize() && !camera.isAnalyzing()){
+                    camera.analyzing()
+
+                    Log.d(TAG, "SE LLAMO A LA API")
+                    apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
+                        if (faceDetected != "null") {
+                            Log.d(TAG, "CARA DETECTADA: $faceDetected")
+                        } else {
+                            Log.e(TAG, "ERROR EN LA API")
                         }
-
-                        lastApiCallTimeMillis = currentTimeMillis
-                        isApiCallInProgress = false
                     }
+
+                    camera.setLasApiCallTime()
+                    camera.stopAnalyzing()
                 }
             }
+
         }
         graphicOverlay.postInvalidate()
     }
