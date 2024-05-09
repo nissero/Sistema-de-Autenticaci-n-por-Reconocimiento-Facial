@@ -1,12 +1,10 @@
 package com.biogin.myapplication
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
 import androidx.camera.video.Recorder
@@ -16,26 +14,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.widget.Toast
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
-import androidx.camera.core.CameraSelector
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.databinding.ActivityPhotoRegisterBinding
 import com.google.firebase.storage.FirebaseStorage
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import java.text.SimpleDateFormat
-import java.util.Locale
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.FaceContour
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceLandmark
 
 class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPhotoRegisterBinding
@@ -65,7 +47,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder)
+        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, false)
         camera.startCamera()
     }
 

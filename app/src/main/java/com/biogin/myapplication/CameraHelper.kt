@@ -1,8 +1,6 @@
 package com.biogin.myapplication
 
-import android.content.ContentResolver
 import android.content.ContentValues
-import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,7 +11,6 @@ import android.graphics.Rect
 import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -27,34 +24,29 @@ import androidx.camera.core.Preview.SurfaceProvider
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.coroutineScope
 import androidx.viewbinding.ViewBinding
-import com.biogin.myapplication.MainActivity.Companion.TAG
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.storage.FirebaseStorage
  import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
-import kotlin.coroutines.CoroutineContext
 
 class CameraHelper(private val lifecycleOwner: LifecycleOwner,
+                   private val mainActivity: MainActivity?,
                    private val cameraExecutor: ExecutorService,
                    private val viewBinding: ViewBinding,
                    private val surfaceProvider: SurfaceProvider,
-                   private val graphicOverlay: GraphicOverlay
+                   private val graphicOverlay: GraphicOverlay,
+                   private var withAnalyzer: Boolean
 )  {
 
     private var imageCapture: ImageCapture? = null
@@ -64,6 +56,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     private val apiCallIntervalMillis = 2000L
     private var lastApiCallTimeMillis = System.currentTimeMillis()
     private var isApiCallInProgress = false
+
+    val firebaseMethods = FirebaseMethods()
 
     fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(viewBinding.root.context)
@@ -78,14 +72,7 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
             imageCapture = ImageCapture.Builder().build()
 
-            imageAnalyzer = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor) { imageProxy ->
-                        selectAnalyzer(imageProxy).analyze(imageProxy)
-                    }
-                }
+            startAnalyzer(withAnalyzer)
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -99,7 +86,6 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
             }
         }, ContextCompat.getMainExecutor(viewBinding.root.context))
     }
-
     fun takePhoto(tag: String, fileNameFormat: String, context: ContextWrapper, intent: Intent, fin: () -> Unit){
         val imageCapture = imageCapture ?: return
 
@@ -209,7 +195,18 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-    private fun selectAnalyzer(imageProxy: ImageProxy): ImageAnalysis.Analyzer {
+    private fun startAnalyzer(sendDataToAPI: Boolean) {
+        imageAnalyzer = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+            .also {
+                it.setAnalyzer(cameraExecutor) { imageProxy ->
+                    selectAnalyzer(sendDataToAPI, imageProxy).analyze(imageProxy)
+                }
+            }
+    }
+
+    private fun selectAnalyzer(sendDataToAPI: Boolean, imageProxy: ImageProxy): ImageAnalysis.Analyzer {
         return ImageAnalysis.Analyzer { image ->
             // Get the original image from the ImageProxy
             val originalImage = imageProxy.toBitmap() ?: return@Analyzer
@@ -219,7 +216,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
                 viewBinding.root.context,
                 graphicOverlay,
                 originalImage,
-                this
+                this,
+                sendDataToAPI
             )
 
             // Analyze the image using the processor
@@ -227,7 +225,7 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         }
     }
 
-    fun ImageProxy.toBitmap(): Bitmap? {
+    private fun ImageProxy.toBitmap(): Bitmap? {
         val yBuffer = planes[0].buffer // Y
         val uBuffer = planes[1].buffer // U
         val vBuffer = planes[2].buffer // V
@@ -265,6 +263,21 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     }
     fun setLasApiCallTime(){
         lastApiCallTimeMillis = System.currentTimeMillis()
+    }
+
+    fun verifyUser(dni: String){
+        firebaseMethods.readData(dni){ usuario ->
+            if (usuario.getNombre().isNotEmpty()) {
+                mainActivity?.showAuthorizationMessage(usuario)
+                Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
+                withAnalyzer = false
+            } else {
+                mainActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
+                //por la api pero no este en la base de datos ???
+                //no se si podria llegar a pasar
+                Log.d("Firestore", "El usuario no existe en la base de datos")
+            }
+        }
     }
 
     companion object {
