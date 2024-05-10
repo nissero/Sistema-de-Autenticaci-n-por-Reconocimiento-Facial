@@ -32,7 +32,7 @@
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.MyApplication"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".FaceRecognitionActivity"
             android:exported="true"
             android:label="@string/title_main_activity"
             android:theme="@style/Theme.MyApplication" >

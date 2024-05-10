@@ -43,7 +43,7 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 
 class CameraHelper(private val lifecycleOwner: LifecycleOwner,
-                   private val mainActivity: MainActivity?,
+                   private val faceRecognitionActivity: FaceRecognitionActivity?,
                    private val cameraExecutor: ExecutorService,
                    private val viewBinding: ViewBinding,
                    private val surfaceProvider: SurfaceProvider,
@@ -290,12 +290,12 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     fun verifyUser(dni: String){
         firebaseMethods.readData(dni){ usuario ->
             if (usuario.getNombre().isNotEmpty()) {
-                mainActivity?.showAuthorizationMessage(usuario)
+                faceRecognitionActivity?.showAuthorizationMessage(usuario)
                 Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
 
 
             } else {
-                mainActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
+                faceRecognitionActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
                 //por la api pero no este en la base de datos ???
                 //no se si podria llegar a pasar
                 Log.d("Firestore", "El usuario no existe en la base de datos")

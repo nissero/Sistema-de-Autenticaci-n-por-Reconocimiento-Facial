@@ -14,7 +14,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.util.Log
 import android.view.Window
 import android.widget.TextView
 import com.biogin.myapplication.databinding.ActivityMainBinding
@@ -22,7 +21,7 @@ import com.biogin.myapplication.ui.login.RegisterActivity
 
 typealias LumaListener = (luma: Double) -> Unit
 
-class MainActivity : AppCompatActivity() {
+class FaceRecognitionActivity : AppCompatActivity() {
     private var dialogShowTime = 10000L
     private lateinit var viewBinding: ActivityMainBinding
     private lateinit var cameraExecutor: ExecutorService

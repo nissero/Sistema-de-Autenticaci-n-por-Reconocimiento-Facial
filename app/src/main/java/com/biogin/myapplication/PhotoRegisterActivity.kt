@@ -21,13 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPhotoRegisterBinding
-    private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var imageAnalysis : ImageAnalysis
-    private var personId = 1
-    private var storageRef = FirebaseStorage.getInstance().getReference()
     private lateinit var camera: CameraHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
