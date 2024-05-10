@@ -46,28 +46,6 @@ class MainActivity : AppCompatActivity() {
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-
-        viewBinding.pruebaButton.setOnClickListener{
-            buttonPrueba()
-        }
-    }
-
-    private fun buttonPrueba() {
-        val firebaseMethods = FirebaseMethods()
-        val dniPrueba = "123" //esta valor de esta variable tiene que salir de la API
-        //en caso de que no se reconozca a la persona en la api aka resultado = unkown
-        //se llamaria directo a showAccessDeniedMessage
-        firebaseMethods.readData(dniPrueba) { usuario ->
-            if (usuario.getNombre().isNotEmpty()) {
-                showAuthorizationMessage(usuario)
-                Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
-            } else {
-                showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
-                //por la api pero no este en la base de datos ???
-                //no se si podria llegar a pasar
-                Log.d("Firestore", "El usuario no existe en la base de datos")
-            }
-        }
     }
 
     @SuppressLint("SetTextI18n")
