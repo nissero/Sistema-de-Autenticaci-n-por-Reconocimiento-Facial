@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CameraXApp</string>
+    <string name="app_name">BioginX</string>
     <string name="take_photo">Tomar foto</string>
     <string name="start_capture">Start Capture</string>
     <string name="stop_capture">Stop Capture</string>
@@ -13,6 +13,7 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="register">Registrarse</string>
+    <string name="switch_camera">Cambiar camara</string>
     <string name="prompt_name">Nombre</string>
     <string name="prompt_area">Area/s</string>
     <string name="prompt_confirm_password">Confirmar contraseña</string>

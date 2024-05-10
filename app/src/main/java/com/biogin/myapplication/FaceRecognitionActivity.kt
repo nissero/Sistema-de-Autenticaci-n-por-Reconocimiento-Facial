@@ -44,6 +44,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        viewBinding.switchCameraButton.setOnClickListener {
+            camera.flipCamera()
+        }
     }
     
     @SuppressLint("SetTextI18n")
@@ -92,7 +96,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun initCamera(){
-        camera = CameraHelper(this, this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
+        camera = CameraHelper(this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
         camera.startCamera()
     }
 
@@ -103,7 +107,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        camera.shutdown()
     }
 
 

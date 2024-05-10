@@ -41,7 +41,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
+        camera = CameraHelper(this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
     }
     private fun takePhoto() {
@@ -55,7 +55,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        camera.shutdown()
     }
 
     companion object {
