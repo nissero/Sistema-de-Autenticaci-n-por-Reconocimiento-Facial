@@ -25,43 +25,13 @@
 
     <Button
         android:id="@+id/register_button"
-        android:layout_width="140dp"
-        android:layout_height="60dp"
+        android:layout_width="118dp"
+        android:layout_height="81dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="140dp"
         android:elevation="10dp"
         android:text="@string/register"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="center_horizontal|bottom" />
-
-    <TextView
-        android:id="@+id/text_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_view_person_name"
-        android:textSize="16sp"
-        android:textColor="#00FF00"
-        app:layout_constraintTop_toTopOf="@id/register_button"
-        app:layout_constraintStart_toStartOf="@id/register_button"
-        app:layout_constraintEnd_toEndOf="@id/register_button"
-        android:layout_marginTop="-40dp"
-        android:layout_marginBottom="40dp"
-        android:textAlignment="center"
-        />
-
-    <Button
-        android:id="@+id/image_capture_button"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="300dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="center_horizontal|bottom"
-        android:text="@string/take_photo"
-        />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout  >
