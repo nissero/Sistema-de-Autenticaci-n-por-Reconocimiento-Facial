@@ -107,6 +107,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
             CameraSelector.DEFAULT_FRONT_CAMERA
         }
 
+        graphicOverlay.toggleSelector()
+
         startCamera()
     }
 

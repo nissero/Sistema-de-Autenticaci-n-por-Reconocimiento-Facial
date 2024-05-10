@@ -70,7 +70,15 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
                     left = centerX - (centerX - left)
                     right = centerX + (right - centerX)
                 }
+            } else {
+                val centerX = overlay.width.toFloat() / 2
+                mappedBox.apply {
+                    left = centerX + (centerX - left)
+                    right = centerX - (right - centerX)
+                }
             }
+
+
             return mappedBox
         }
     }

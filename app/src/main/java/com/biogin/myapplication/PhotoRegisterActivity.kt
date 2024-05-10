@@ -38,6 +38,9 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.switchCameraButton.setOnClickListener {
+            camera.flipCamera()
+        }
     }
 
     private fun initCamera() {
@@ -59,7 +62,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "CameraXApp"
+        private const val TAG = "PhotoRegisterActivity"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =
