@@ -50,18 +50,6 @@ class PhotoRegisterActivity : AppCompatActivity() {
         camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
     }
-
-    private fun uploadPhotoToFirebase(photo: Uri?) {
-        if (photo != null) {
-            var imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
-            var uploadTask = imageRef.putFile(photo)
-            uploadTask.addOnFailureListener {
-                Log.e("Firebase", "Error al subir imagen")
-            }.addOnSuccessListener {
-                Log.e("Firebase", "Exito al subir imagen")
-            }
-        }
-    }
     private fun takePhoto() {
         camera.takePhoto(TAG, FILENAME_FORMAT, this, intent, ::finish)
     }
