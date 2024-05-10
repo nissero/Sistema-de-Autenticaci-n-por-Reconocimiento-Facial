@@ -29,9 +29,17 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
-    fun register(name: String, surname: String, dni: String,email: String, area: String, password: String) {
+    fun register(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.register(name, surname, dni, email, area, password)
+        val result = loginRepository.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
 
         if (result is Result.Success) {
             _loginResult.value =
