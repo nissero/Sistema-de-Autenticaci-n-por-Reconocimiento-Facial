@@ -38,10 +38,13 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.switchCameraButton.setOnClickListener {
+            camera.flipCamera()
+        }
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
+        camera = CameraHelper(this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
     }
     private fun takePhoto() {
@@ -55,11 +58,11 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        camera.shutdown()
     }
 
     companion object {
-        private const val TAG = "CameraXApp"
+        private const val TAG = "PhotoRegisterActivity"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =

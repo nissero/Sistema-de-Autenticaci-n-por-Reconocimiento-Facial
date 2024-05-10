@@ -18,6 +18,7 @@ import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
 import android.view.Window
 import android.widget.TextView
+import android.view.View
 
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -29,9 +30,9 @@ class FaceRecognitionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        
+
         cameraExecutor = Executors.newSingleThreadExecutor()
-        
+
         // Request camera permissions
         if (allPermissionsGranted()) {
             initCamera()
@@ -39,13 +40,17 @@ class FaceRecognitionActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-        
+
         // Set up the listeners for take photo and video capture buttons
         viewBinding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        viewBinding.switchCameraButton.setOnClickListener {
+            camera.flipCamera()
+        }
     }
-    
+
     @SuppressLint("SetTextI18n")
     fun showAuthorizationMessage(usuario: Usuario) {
         val dialog = Dialog(this)
@@ -60,6 +65,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
 
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
         mediaPlayer.start()
+
+        dialog.window?.decorView?.findViewById<View>(android.R.id.content)?.setOnClickListener {
+            dialog.dismiss()
+        }
 
         dialog.show()
         // Mostrar el diálogo por unos segundos y luego cerrarlo
@@ -78,6 +87,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
         mediaPlayer.start()
 
+        dialog.window?.decorView?.findViewById<View>(android.R.id.content)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
         // Mostrar el diálogo por unos segundos y luego cerrarlo
         Handler().postDelayed({
             dialog.dismiss()
@@ -92,7 +105,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun initCamera(){
-        camera = CameraHelper(this, this, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
+        camera = CameraHelper(this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
         camera.startCamera()
     }
 
@@ -103,7 +116,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        camera.shutdown()
     }
 
 
