@@ -6,10 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.media.MediaPlayer
@@ -18,33 +14,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.widget.Toast
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
-import androidx.camera.core.CameraSelector
-import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.biogin.myapplication.ui.login.RegisterActivity
-import com.google.firebase.storage.FirebaseStorage
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.FaceContour
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceLandmark
 import android.view.Window
 import android.widget.TextView
-import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.ui.login.RegisterActivity
 
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var dialogShowTime = 10000L
-    private lateinit var viewBinding: ActivityMainBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
 
