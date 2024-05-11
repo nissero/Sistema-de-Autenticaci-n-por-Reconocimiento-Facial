@@ -65,12 +65,14 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
     private lateinit var cameraProvider: ProcessCameraProvider
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+    private var cameraNumber: Int = 1
 
 
     val firebaseMethods = FirebaseMethods()
 
     fun startCamera() {
         cameraExecutor = Executors.newSingleThreadExecutor()
+        graphicOverlay.toggleSelector(cameraNumber)
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(viewBinding.root.context)
         cameraProviderFuture.addListener({
@@ -101,13 +103,13 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     fun flipCamera(){
         cameraProvider.unbindAll()
 
-        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
-            CameraSelector.DEFAULT_BACK_CAMERA
+        if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
+            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            cameraNumber = 1
         } else {
-            CameraSelector.DEFAULT_FRONT_CAMERA
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            cameraNumber = 0
         }
-
-        graphicOverlay.toggleSelector()
 
         startCamera()
     }
