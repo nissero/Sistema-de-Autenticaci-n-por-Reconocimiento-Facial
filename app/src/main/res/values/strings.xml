@@ -35,4 +35,8 @@
         <item>Externo</item>
         <item>Temporal</item>
     </string-array>
+    <string-array name="user_active_options">
+        <item>Activo</item>
+        <item>Inactivo</item>
+    </string-array>
 </resources>

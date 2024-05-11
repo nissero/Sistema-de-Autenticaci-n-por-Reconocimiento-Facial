@@ -5,13 +5,16 @@
       <entry key="MainActivity">
         <State />
       </entry>
-      <entry key="PhotoRegister">
-        <State />
-      </entry>
       <entry key="PhotoRegisterActivity">
         <State />
       </entry>
       <entry key="RegisterActivity">
+        <State />
+      </entry>
+      <entry key="UserFinderActivity">
+        <State />
+      </entry>
+      <entry key="UserManagement">
         <State />
       </entry>
       <entry key="app">

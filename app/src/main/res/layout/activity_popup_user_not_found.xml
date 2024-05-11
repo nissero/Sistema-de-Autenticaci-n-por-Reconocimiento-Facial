@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PopupUserNotFound"
+    android:background="#E6E6E6"
+    >
+
+
+    <TextView
+        android:id="@+id/text_popup_user_not_found"
+        android:layout_width="311dp"
+        android:layout_height="96dp"
+        android:background="#3F3F3F"
+        android:text="El usuario no existe para el DNI ingresado"
+        android:textAlignment="center"
+        android:textColor="#DFDFDF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
+
+    <Button
+        android:id="@+id/continue_button_popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#0D99FF"
+        android:text="Reintentar"
+        app:layout_constraintBottom_toBottomOf="@+id/text_popup_user_not_found"
+        app:layout_constraintEnd_toEndOf="@+id/text_popup_user_not_found"
+        app:layout_constraintStart_toStartOf="@+id/text_popup_user_not_found"
+        app:layout_constraintTop_toTopOf="@+id/text_popup_user_not_found"
+        app:layout_constraintVertical_bias="0.708" />
+</androidx.constraintlayout.widget.ConstraintLayout>

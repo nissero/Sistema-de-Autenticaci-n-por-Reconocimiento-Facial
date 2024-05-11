@@ -21,6 +21,15 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".PopupUserNotFound"
+            android:exported="true" />
+        <activity
+            android:name=".UserFinderActivity"
+            android:exported="true" />
+        <activity
+            android:name=".UserManagement"
+            android:exported="true" />
+        <activity
             android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
