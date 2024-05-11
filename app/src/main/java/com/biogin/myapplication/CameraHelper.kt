@@ -29,7 +29,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.storage.FirebaseStorage
- import okhttp3.Call
+import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient

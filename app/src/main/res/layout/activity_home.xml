@@ -28,15 +28,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="200dp"
+        android:backgroundTint="@color/blue"
         android:text="@string/home_text_enter_face_recognition"
         android:textAlignment="viewStart"
-        android:backgroundTint="#0D99FF"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_photo"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/home_photo" />
+
+    <Button
+        android:id="@+id/button_face_recognition_rrhh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:backgroundTint="@color/blue"
+        android:text="@string/home_text_enter_face_recognition_rrhh"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/home_photo" />
 
     <TextView
         android:id="@+id/view_text_register"
@@ -46,7 +58,7 @@
         android:layout_marginEnd="90dp"
         android:text="@string/register"
         android:textAlignment="center"
-        android:textColor="#0D99FF"
+        android:textColor="@color/blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

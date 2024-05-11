@@ -22,11 +22,18 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        viewBinding.buttonFaceRecognition.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "seguridad")
+            startActivity(intent)
+        }
+        viewBinding.buttonFaceRecognitionRrhh.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "rrhh")
+            startActivity(intent)
+        }
         viewBinding.viewTextRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
-        }
-        viewBinding.buttonFaceRecognition.setOnClickListener {
-            startActivity(Intent(this, FaceRecognitionActivity::class.java))
         }
     }
 }
