@@ -27,16 +27,16 @@ class LoginRepository(val dataSource: LoginDataSource) {
         dataSource.logout()
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
-        // handle login
-        val result = dataSource.login(username, password)
-
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
-
-        return result
-    }
+//    fun login(username: String, password: String): Result<LoggedInUser> {
+//        // handle login
+//        val result = dataSource.login(username, password)
+//
+//        if (result is Result.Success) {
+//            setLoggedInUser(result.data)
+//        }
+//
+//        return result
+//    }
 
     fun register(
         name: String,
@@ -55,6 +55,25 @@ class LoginRepository(val dataSource: LoginDataSource) {
         }
 
         return result
+    }
+
+//    fun updateUser(
+//        name: String,
+//        surname: String,
+//        dni: String,
+//        email: String,
+//        category: String,
+//        areasAllowed: MutableSet<String>,
+//        institutesSelected: ArrayList<String>
+//    ) : Result<LoggedInUser> {
+//        var result = da
+//    }
+
+    suspend fun getUser(dni: String) : Result<LoggedInUser>{
+        if (dni == "") {
+            return Result.Error(Exception("Se ingreso un dni vacío, ingrese uno nuevamente"))
+        }
+        return dataSource.getUserFromFirebase(dni)
     }
 
     private fun setLoggedInUser(loggedInUser: LoggedInUser) {
