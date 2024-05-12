@@ -9,7 +9,6 @@ import com.biogin.myapplication.utils.AllowedAreasUtils
  */
 
 class LoginRepository(val dataSource: LoginDataSource) {
-    private var allowedAreasUtils : AllowedAreasUtils = AllowedAreasUtils()
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null
         private set
@@ -27,17 +26,6 @@ class LoginRepository(val dataSource: LoginDataSource) {
         user = null
         dataSource.logout()
     }
-
-//    fun login(username: String, password: String): Result<LoggedInUser> {
-//        // handle login
-//        val result = dataSource.login(username, password)
-//
-//        if (result is Result.Success) {
-//            setLoggedInUser(result.data)
-//        }
-//
-//        return result
-//    }
 
     fun register(
         name: String,
@@ -57,42 +45,6 @@ class LoginRepository(val dataSource: LoginDataSource) {
 
         return result
     }
-
-
-//    fun modifyUser(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        institutesSelected: ArrayList<String>
-//    ) : Result<Boolean>  {
-//        if (dni.isEmpty()) {
-//            return Result.Error(Exception("No se ingresó ningun dni válido, ingrese uno"))
-//        }
-//
-//        dataSource.modifyUserFirebase(name, surname, dni, email, category, allowedAreasUtils.getAllowedAreas(institutesSelected), institutesSelected) {result ->
-//
-//        if (!successfulUpdate) {
-//            return Result.Error(Exception("No se pudo actualizar el usuario"))
-//        }
-//
-//        return Result.Success(successfulUpdate)
-//    }
-
-//    fun duplicateUser(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        areasAllowed: MutableSet<String>,
-//        institutesSelected: ArrayList<String>
-//    ) : Result<Boolean> {
-//        if (dni.isEmpty()) {
-//            return Result.Error(Exception("No se ingresó ningun dni válido, ingrese uno"))
-//        }
-//    }
 
     suspend fun getUser(dni: String) : Result<LoggedInUser>{
         if (dni == "") {

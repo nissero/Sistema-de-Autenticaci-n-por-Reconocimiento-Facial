@@ -102,21 +102,6 @@ class RegisterActivity : AppCompatActivity() {
 
         })
 
-//        loginViewModel.loginResult.observe(this, Observer {
-//            val loginResult = it ?: return@Observer
-//
-//            if (loginResult.error != null) {
-//                showLoginFailed(loginResult.error)
-//            }
-//            if (loginResult.success != null) {
-//                updateUiWithUser(loginResult.success)
-//            }
-//            setResult(RESULT_OK)
-//
-//            //Complete and destroy login activity once successful
-//            finish()
-//        })
-
         name?.afterTextChanged {
             loginViewModel.loginDataChanged(
                 name.text.toString(),
@@ -156,21 +141,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 
 }
-
-//    private fun updateUiWithUser(model: LoggedInUserView) {
-//        val displayName = model.displayName
-//        // TODO : initiate successful logged in experience
-//        Toast.makeText(
-//            applicationContext,
-//            "$welcome $displayName",
-//            Toast.LENGTH_LONG
-//        ).show()
-//    }
-
-//    private fun showLoginFailed(@StringRes errorString: Int) {
-//        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
-//    }
-//}
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.

@@ -15,15 +15,6 @@ import java.io.IOException
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
-    //    fun login(username: String, password: String): Result<LoggedInUser> {
-//        try {
-//            // TODO: handle loggedInUser authentication
-//            val fakeUser = LoggedInUser(UUID.randomUUID().toString(), "Jane Doe")
-//            return Result.Success(fakeUser)
-//        } catch (e: Throwable) {
-//            return Result.Error(IOException("Error logging in", e))
-//        }
-//    }
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
     fun register(
         name: String,
@@ -160,20 +151,6 @@ class LoginDataSource {
         )
 
     }
-
-//    fun duplicateUserFirebase(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        areasAllowed: MutableSet<String>,
-//        institutesSelected: ArrayList<String>,
-//        callback: (Boolean) -> Unit
-//    ) : Boolean {
-//        val db = FirebaseFirestore.getInstance()
-//        db.collection("usuarios").document(dni)
-//    }
 
     fun existsUserInFirebase(dni: String): Task<DocumentSnapshot> {
         val db = FirebaseFirestore.getInstance()
