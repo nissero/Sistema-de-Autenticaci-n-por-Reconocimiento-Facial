@@ -21,13 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPhotoRegisterBinding
-    private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var imageAnalysis : ImageAnalysis
-    private var personId = 1
-    private var storageRef = FirebaseStorage.getInstance().getReference()
     private lateinit var camera: CameraHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,23 +38,14 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.switchCameraButton.setOnClickListener {
+            camera.flipCamera()
+        }
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, null, cameraExecutor, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
+        camera = CameraHelper(this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
-    }
-
-    private fun uploadPhotoToFirebase(photo: Uri?) {
-        if (photo != null) {
-            var imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
-            var uploadTask = imageRef.putFile(photo)
-            uploadTask.addOnFailureListener {
-                Log.e("Firebase", "Error al subir imagen")
-            }.addOnSuccessListener {
-                Log.e("Firebase", "Exito al subir imagen")
-            }
-        }
     }
     private fun takePhoto() {
         camera.takePhoto(TAG, FILENAME_FORMAT, this, intent, ::finish)
@@ -73,11 +58,11 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        camera.shutdown()
     }
 
     companion object {
-        private const val TAG = "CameraXApp"
+        private const val TAG = "PhotoRegisterActivity"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =

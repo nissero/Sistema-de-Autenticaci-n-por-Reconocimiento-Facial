@@ -41,10 +41,11 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 
 class CameraHelper(private val lifecycleOwner: LifecycleOwner,
-                   private val mainActivity: MainActivity?,
-                   private val cameraExecutor: ExecutorService,
+                   private val faceRecognitionActivity: FaceRecognitionActivity?,
                    private val viewBinding: ViewBinding,
                    private val surfaceProvider: SurfaceProvider,
                    private val graphicOverlay: GraphicOverlay,
@@ -60,12 +61,17 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     private var lastApiCallTimeMillis = System.currentTimeMillis()
     private var isApiCallInProgress = false
 
+    private lateinit var cameraExecutor : ExecutorService
+
     private lateinit var cameraProvider: ProcessCameraProvider
+    private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
 
     val firebaseMethods = FirebaseMethods()
 
     fun startCamera() {
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(viewBinding.root.context)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
@@ -80,8 +86,6 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
 
             startAnalyzer(withAnalyzer)
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
@@ -93,6 +97,21 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
         }, ContextCompat.getMainExecutor(viewBinding.root.context))
 
     }
+
+    fun flipCamera(){
+        cameraProvider.unbindAll()
+
+        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        } else {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+
+        graphicOverlay.toggleSelector()
+
+        startCamera()
+    }
+
     fun takePhoto(tag: String, fileNameFormat: String, context: ContextWrapper, intent: Intent, fin: () -> Unit){
         val imageCapture = imageCapture ?: return
 
@@ -290,17 +309,20 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
     fun verifyUser(dni: String){
         firebaseMethods.readData(dni){ usuario ->
             if (usuario.getNombre().isNotEmpty()) {
-                mainActivity?.showAuthorizationMessage(usuario)
+                faceRecognitionActivity?.showAuthorizationMessage(usuario)
                 Log.d("Firestore", "Nombre del usuario: ${usuario.getNombre()}")
 
 
             } else {
-                mainActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
+                faceRecognitionActivity?.showAccessDeniedMessage() //esto se podría dejar en un caso extremo de que la persona sea reconocida
                 //por la api pero no este en la base de datos ???
                 //no se si podria llegar a pasar
                 Log.d("Firestore", "El usuario no existe en la base de datos")
             }
         }
+    }
+    fun shutdown(){
+        cameraExecutor.shutdown()
     }
 
     companion object {
