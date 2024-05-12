@@ -3,10 +3,8 @@ package com.biogin.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.PopupMenu
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -14,12 +12,9 @@ import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
-import com.biogin.myapplication.databinding.ActivityRegisterBinding
 import com.biogin.myapplication.databinding.ActivityUserFinderBinding
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.Executors
 
 class UserFinderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserFinderBinding
@@ -45,11 +40,9 @@ class UserFinderActivity : AppCompatActivity() {
 
                     if (result is Result.Success) {
                         val userData = (result as Result.Success<LoggedInUser>).data
-                        Log.e("data", userData.toString())
                         startActitivyUserManagement(userData, false)
                     } else {
-                        val intent = Intent(this@UserFinderActivity, PopupUserNotFound::class.java)
-                        startActivity(intent)
+                        openPopupUserNotFound()
                     }
                 }
             }
@@ -68,14 +61,19 @@ class UserFinderActivity : AppCompatActivity() {
                         Log.e("data", userData.toString())
                         startActitivyUserManagement(userData, true)
                     } else {
-                        val intent = Intent(this@UserFinderActivity, PopupUserNotFound::class.java)
-                        startActivity(intent)
+                        openPopupUserNotFound()
                     }
                 }
             }
         }
     }
 
+    private fun openPopupUserNotFound() {
+        val intent = Intent(this@UserFinderActivity, Popup::class.java)
+        intent.putExtra("popup_text", "El usuario no existe para el DNI ingresado")
+        intent.putExtra("text_button", "Reintentar")
+        startActivity(intent)
+    }
     private fun startActitivyUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {
         val intent = Intent(this@UserFinderActivity, UserManagement::class.java)
         intent.putExtra("dni", userData.dni)
