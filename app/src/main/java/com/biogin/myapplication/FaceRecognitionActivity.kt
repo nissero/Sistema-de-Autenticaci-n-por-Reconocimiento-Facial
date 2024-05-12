@@ -1,23 +1,26 @@
 package com.biogin.myapplication
 
 import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.R.attr.text
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaPlayer
+import android.os.Build
+import android.os.Bundle
 import android.os.Handler
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import com.biogin.myapplication.databinding.ActivityMainBinding
+import android.view.View
 import android.view.Window
 import android.widget.TextView
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.biogin.myapplication.databinding.ActivityMainBinding
+import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -59,6 +62,15 @@ class FaceRecognitionActivity : AppCompatActivity() {
             "rrhh" -> viewBinding.skipButton.setOnClickListener {
                 val intent = Intent(this, RRHHActivity::class.java)
                 startActivity(intent)
+                finish()
+            }
+            "fin de turno" -> viewBinding.skipButton.setOnClickListener {
+                val intent = Intent(this@FaceRecognitionActivity,
+                    AutenticacionFragment::class.java
+                )
+                intent.putExtra("autenticado", true)
+
+                setResult(RESULT_OK, intent)
                 finish()
             }
             else -> {
