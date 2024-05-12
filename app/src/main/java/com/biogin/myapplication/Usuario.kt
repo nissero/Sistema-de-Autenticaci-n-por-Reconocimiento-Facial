@@ -6,7 +6,7 @@ class Usuario (
     private val dni: String = "",
     private val email: String = "",
     private val area: String = "",
-    private val password: String = ""
+    private val categoria: String = ""
 ){
     fun getNombre(): String {
         return nombre
@@ -28,8 +28,8 @@ class Usuario (
         return area
     }
 
-    fun getPassword(): String {
-        return password
+    fun getCategoria(): String{
+        return categoria
     }
 
     //MODIFICAR CUANDO SE MODIFIQUE LA BASE DE DATOS

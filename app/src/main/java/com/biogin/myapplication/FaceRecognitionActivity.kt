@@ -10,6 +10,8 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.media.MediaPlayer
 import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
@@ -37,7 +39,25 @@ class FaceRecognitionActivity : AppCompatActivity() {
 
         // Request camera permissions
         if (allPermissionsGranted()) {
-            initCamera()
+            when(authenticationType){
+                "seguridad" -> initCamera(:: ifSecurity)
+                "rrhh" -> initCamera(:: ifRRHH)
+                else -> initCamera(:: ifAny)
+            }
+
+            when(authenticationType) {
+                "seguridad" ->
+                    viewBinding.skipButton.setOnClickListener {
+                        goToSeguridadActivity()
+                    }
+                "rrhh" -> viewBinding.skipButton.setOnClickListener {
+                        goToRRHHActivity()
+                }
+                else -> {
+                    viewBinding.skipButton.visibility = View.INVISIBLE
+                    viewBinding.skipButton.isClickable = false
+                }
+            }
         } else {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
@@ -50,27 +70,24 @@ class FaceRecognitionActivity : AppCompatActivity() {
 //        }
 
         //saltearse la autenticacion y pasar a la activity como si se hubiera autenticado
-        when(authenticationType) {
-            "seguridad" -> viewBinding.skipButton.setOnClickListener {
-                val intent = Intent(this, SeguridadActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-            "rrhh" -> viewBinding.skipButton.setOnClickListener {
-                val intent = Intent(this, RRHHActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-            else -> {
-                viewBinding.skipButton.visibility = View.INVISIBLE
-                viewBinding.skipButton.isClickable = false
-            }
-
-        }
 
         viewBinding.switchCameraButton.setOnClickListener {
             camera.flipCamera()
         }
+    }
+
+    private fun goToRRHHActivity() {
+        camera.shutdown()
+        val intent = Intent(this, RRHHActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun goToSeguridadActivity() {
+        camera.shutdown()
+        val intent = Intent(this, SeguridadActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     @SuppressLint("SetTextI18n")
@@ -123,11 +140,51 @@ class FaceRecognitionActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        initCamera()
+        when(authenticationType){
+            "seguridad" -> initCamera(:: ifSecurity)
+            "rrhh" -> initCamera(:: ifRRHH)
+            else -> initCamera(:: ifAny)
+        }
     }
 
-    private fun initCamera(){
-        camera = CameraHelper(this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
+    private fun ifSecurity(user: Usuario){
+        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+            this.showAuthorizationMessage(user)
+            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+            Handler(Looper.getMainLooper()).postDelayed({
+                goToSeguridadActivity()
+            }, dialogShowTime)
+        } else {
+            this.showAccessDeniedMessage()
+            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
+        }
+    }
+
+    private fun ifRRHH(user: Usuario){
+        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "rrhh") {
+            this.showAuthorizationMessage(user)
+            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+            Handler(Looper.getMainLooper()).postDelayed({
+                goToRRHHActivity()
+            }, dialogShowTime)
+        } else {
+            this.showAccessDeniedMessage()
+            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es RRHH")
+        }
+    }
+
+    private fun ifAny(user: Usuario){
+        if (user.getNombre().isNotEmpty()) {
+            this.showAuthorizationMessage(user)
+            Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+        } else {
+            this.showAccessDeniedMessage()
+            Log.d(TAG, "El usuario no existe en la base de datos")
+        }
+    }
+
+    private fun initCamera(typeOfAuthorization: (Usuario) -> Unit){
+        camera = CameraHelper(typeOfAuthorization, this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
         camera.startCamera()
     }
 
