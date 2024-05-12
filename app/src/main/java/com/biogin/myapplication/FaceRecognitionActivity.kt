@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.biogin.myapplication.databinding.ActivityMainBinding
-import com.biogin.myapplication.ui.login.RegisterActivity
 import android.view.Window
 import android.widget.TextView
 import android.view.View
@@ -25,11 +24,14 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private var dialogShowTime = 10000L
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
+    private lateinit var authenticationType: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        authenticationType = intent.getStringExtra("authenticationType").toString()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -42,8 +44,28 @@ class FaceRecognitionActivity : AppCompatActivity() {
         }
 
         // Set up the listeners for take photo and video capture buttons
-        viewBinding.registerButton.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+
+//        viewBinding.registerButton.setOnClickListener {
+//            startActivity(Intent(this, RegisterActivity::class.java))
+//        }
+
+        //saltearse la autenticacion y pasar a la activity como si se hubiera autenticado
+        when(authenticationType) {
+            "seguridad" -> viewBinding.skipButton.setOnClickListener {
+                val intent = Intent(this, SeguridadActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            "rrhh" -> viewBinding.skipButton.setOnClickListener {
+                val intent = Intent(this, RRHHActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            else -> {
+                viewBinding.skipButton.visibility = View.INVISIBLE
+                viewBinding.skipButton.isClickable = false
+            }
+
         }
 
         viewBinding.switchCameraButton.setOnClickListener {

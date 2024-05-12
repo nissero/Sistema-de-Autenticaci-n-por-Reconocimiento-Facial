@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation2"
+    app:startDestination="@+id/navigation_abm">
+
+    <fragment
+        android:id="@+id/navigation_abm"
+        android:name="com.biogin.myapplication.ui.rrhh.abm.ABMFragment"
+        android:label="@string/title_abm"
+        tools:layout="@layout/fragment_abm" />
+
+    <fragment
+        android:id="@+id/navigation_logs2"
+        android:name="com.biogin.myapplication.ui.rrhh.logs.LogsRRHHFragment"
+        android:label="@string/title_logs"
+        tools:layout="@layout/fragment_logs_rrhh" />
+
+    <fragment
+        android:id="@+id/navigation_modulos"
+        android:name="com.biogin.myapplication.ui.rrhh.modulos.ModulosFragment"
+        android:label="@string/title_modulos"
+        tools:layout="@layout/fragment_modulos" />
+</navigation>
