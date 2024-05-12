@@ -17,25 +17,22 @@ import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
 import com.biogin.myapplication.R
+import com.biogin.myapplication.utils.AllowedAreasUtils
+import com.biogin.myapplication.utils.InstitutesUtils
 
 class RegisterActivity : AppCompatActivity() {
-
-    private lateinit var modulesAssociatedWithInstitutes : HashMap<String, ArrayList<String>>
+    private lateinit var allowedAreasUtils : AllowedAreasUtils
+    private lateinit var institutesUtils : InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityRegisterBinding
 
-    init {
-        modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
-        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf("Módulo 1", "Módulo 3", "Módulo 4","Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-        modulesAssociatedWithInstitutes.set("ICO", arrayListOf("Módulo 1", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-        modulesAssociatedWithInstitutes.set("IDH", arrayListOf("Módulo 1", "Módulo 2","Módulo 3", "Módulo 5", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-        modulesAssociatedWithInstitutes.set("ICI", arrayListOf("Módulo 1", "Módulo 2", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+        setContentView(binding.root)
+        allowedAreasUtils = AllowedAreasUtils()
+        institutesUtils = InstitutesUtils()
         var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
         var user_categories = resources.getStringArray(R.array.user_categories)
         val categories_spinner = findViewById<Spinner>(R.id.register_categories_spinner)
@@ -74,8 +71,8 @@ class RegisterActivity : AppCompatActivity() {
         val register = binding.registerContinueButton
 
         register?.setOnClickListener {
-            var institutesSelected = getInstitutesSelected(checkboxes)
-            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(),getAllowedAreas(institutesSelected), institutesSelected)
+            var institutesSelected = institutesUtils.getInstitutesSelected2(checkboxes)
+            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(), allowedAreasUtils.getAllowedAreas(institutesSelected), institutesSelected)
 
             val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
             intent.putExtra("name", name?.text.toString())
@@ -157,27 +154,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxIDH?.visibility = View.INVISIBLE
         binding.checkboxICI?.visibility = View.INVISIBLE
     }
-    private fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
-        val allowedAreas = mutableSetOf<String>()
-        for (institute in institutes) {
-            allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
-        }
-        return allowedAreas
-    }
-    private fun getInstitutesSelected(checkboxes: ArrayList<CheckBox?>): ArrayList<String> {
-        var institutesSelected = ArrayList<String>()
-        println(checkboxes)
-        for (checkbox in checkboxes) {
-            println(checkbox?.isChecked)
-            if(checkbox?.isChecked == true) {
-                institutesSelected.add(checkbox.text.toString())
-                println(institutesSelected)
-                println(checkbox.text.toString())
-            }
-        }
 
-        return institutesSelected
-    }
 }
 
 //    private fun updateUiWithUser(model: LoggedInUserView) {
