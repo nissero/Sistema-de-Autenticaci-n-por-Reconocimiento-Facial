@@ -2,22 +2,14 @@ package com.biogin.myapplication
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.util.Log
-import androidx.camera.core.ImageAnalysis
 import com.biogin.myapplication.databinding.ActivityPhotoRegisterBinding
-import com.google.firebase.storage.FirebaseStorage
 
 class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPhotoRegisterBinding
@@ -44,7 +36,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
     }
 
     private fun initCamera() {
-        camera = CameraHelper(this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
+        camera = CameraHelper(null, this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
         camera.startCamera()
     }
     private fun takePhoto() {

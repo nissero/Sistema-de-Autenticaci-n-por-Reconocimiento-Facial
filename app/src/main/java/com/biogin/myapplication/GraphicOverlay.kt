@@ -17,7 +17,7 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
     var mScale: Float? = null
     var mOffsetX: Float? = null
     var mOffsetY: Float? = null
-    var cameraSelector: Int = CameraSelector.LENS_FACING_FRONT
+    private var cameraSelector: Int = CameraSelector.LENS_FACING_BACK
 
     abstract class Graphic(private val overlay: GraphicOverlay) {
 
@@ -67,14 +67,14 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
             if (overlay.isFrontMode()) {
                 val centerX = overlay.width.toFloat() / 2
                 mappedBox.apply {
-                    left = centerX - (centerX - left)
-                    right = centerX + (right - centerX)
+                    left = centerX + (centerX - left)
+                    right = centerX - (right - centerX)
                 }
             } else {
                 val centerX = overlay.width.toFloat() / 2
                 mappedBox.apply {
-                    left = centerX + (centerX - left)
-                    right = centerX - (right - centerX)
+                    left = centerX - (centerX - left)
+                    right = centerX + (right - centerX)
                 }
             }
 
@@ -85,10 +85,8 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
 
     fun isFrontMode() = cameraSelector == CameraSelector.LENS_FACING_FRONT
 
-    fun toggleSelector() {
-        cameraSelector =
-            if (cameraSelector == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT
-            else CameraSelector.LENS_FACING_BACK
+    fun toggleSelector(cameraNumber: Int) {
+        cameraSelector = cameraNumber
     }
 
     fun clear() {

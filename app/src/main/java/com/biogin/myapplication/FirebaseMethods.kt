@@ -19,9 +19,9 @@ class FirebaseMethods {
                     val apellido = userData?.get("apellido") as? String ?: ""
                     val email = userData?.get("email") as? String ?: ""
                     val area = userData?.get("area") as? String ?: ""
-                    val password = userData?.get("password") as? String ?: ""
+                    val categoria = userData?.get("categoria") as? String ?: ""
 
-                    val usuario = Usuario(nombre, apellido, dni, email, area, password)
+                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria)
                     callback(usuario)
                 } else {
                     // Usuario no encontrado, devolver objeto Usuario vacío
