@@ -24,9 +24,6 @@
             android:name=".Popup"
             android:exported="true" />
         <activity
-            android:name=".UserFinderActivity"
-            android:exported="true" />
-        <activity
             android:name=".UserManagement"
             android:exported="true" />
         <activity

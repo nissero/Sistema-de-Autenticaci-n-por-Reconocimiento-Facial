@@ -2,18 +2,83 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E6E6E6"
     tools:context=".ui.rrhh.abm.ABMFragment">
 
-    <Button
-        android:id="@+id/button_register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
-        android:backgroundTint="@color/blue"
-        android:text="@string/action_sign_in"
+    <EditText
+        android:id="@+id/dni_user_to_find"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:ems="10"
+        android:hint="DNI"
+        android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/update_user_option_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#0D99FF"
+        android:text="Modificar usuario"
+        app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
+        app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
+        app:layout_constraintTop_toBottomOf="@+id/dni_user_to_find" />
+
+    <Button
+        android:id="@+id/update_user_dni_option_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#0D99FF"
+        android:text="Modificar DNI usuario"
+        app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_option_button" />
+
+    <Button
+        android:id="@+id/register_user_option_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="116dp"
+        android:layout_marginEnd="50dp"
+        android:backgroundTint="#0D99FF"
+        android:text="Registrar usuario"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_view_modifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Modificaciones"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/dni_user_to_find"
+        app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
+        app:layout_constraintStart_toStartOf="@+id/dni_user_to_find" />
+
+    <TextView
+        android:id="@+id/text_view_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Alta"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/register_user_option_button"
+        app:layout_constraintEnd_toEndOf="@+id/update_user_dni_option_button"
+        app:layout_constraintStart_toStartOf="@+id/update_user_dni_option_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>
