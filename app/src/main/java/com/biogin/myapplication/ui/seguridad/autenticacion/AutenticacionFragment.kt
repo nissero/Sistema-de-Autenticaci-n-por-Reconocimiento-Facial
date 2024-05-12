@@ -79,7 +79,6 @@ class AutenticacionFragment : Fragment() {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
-//                                mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 

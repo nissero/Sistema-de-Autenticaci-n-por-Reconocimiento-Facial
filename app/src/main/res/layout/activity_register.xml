@@ -95,51 +95,68 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <CheckBox
-        android:id="@+id/checkbox_ICO"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:contentDescription="ICO"
-        android:text="ICO"
-        android:textColor="@color/black"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="386dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
+        app:layout_constraintEnd_toEndOf="@+id/register_categories_spinner"
+        app:layout_constraintStart_toStartOf="@+id/register_categories_spinner"
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner">
 
-    <CheckBox
-        android:id="@+id/checkbox_IDH"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="IDH"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintStart_toEndOf="@+id/checkbox_ICO"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
+        <CheckBox
+            android:id="@+id/checkbox_ICO"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:contentDescription="ICO"
+            android:text="ICO"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
-        android:id="@+id/checkbox_ICI"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="ICI"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintStart_toEndOf="@+id/checkbox_IDH"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
+        <CheckBox
+            android:id="@+id/checkbox_IDH"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:text="IDH"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkbox_ICI"
+            app:layout_constraintHorizontal_bias="0.885"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
-        android:id="@+id/checkbox_IDEI"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="10dp"
-        android:text="IDEI"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/checkbox_ICI"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner" />
+        <CheckBox
+            android:id="@+id/checkbox_ICI"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginBottom="5dp"
+            android:text="ICI"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkbox_IDEI"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/checkbox_IDEI"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="IDEI"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,18 +50,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/home_photo" />
 
-    <TextView
-        android:id="@+id/view_text_register"
-        android:layout_width="99dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="300dp"
-        android:layout_marginEnd="90dp"
-        android:text="@string/register"
-        android:textAlignment="center"
-        android:textColor="@color/blue"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_face_recognition" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

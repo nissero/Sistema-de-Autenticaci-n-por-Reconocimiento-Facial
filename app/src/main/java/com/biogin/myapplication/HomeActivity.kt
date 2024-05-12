@@ -32,8 +32,5 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("authenticationType", "rrhh")
             startActivity(intent)
         }
-        viewBinding.viewTextRegister.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
     }
 }
