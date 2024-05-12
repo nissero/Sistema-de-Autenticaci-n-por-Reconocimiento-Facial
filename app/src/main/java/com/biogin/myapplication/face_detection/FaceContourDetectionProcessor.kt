@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
+import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import com.biogin.myapplication.BaseImageAnalyzer
@@ -21,16 +22,20 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import android.os.Looper
+import androidx.camera.core.CameraSelector
 import com.biogin.myapplication.CameraHelper
+import java.io.File
+import java.io.FileOutputStream
 
 class FaceContourDetectionProcessor(
     private val context: Context,
     private val view: GraphicOverlay,
     private val originalImage: Bitmap,
     private val camera: CameraHelper,
-    private val sendDataToAPI: Boolean
+    private val sendDataToAPI: Boolean,
+    private val cameraSelector: CameraSelector
 ) : BaseImageAnalyzer<List<Face>>() {
-    private val apiManager = APIManager(originalImage)
+    private val apiManager = APIManager(originalImage, cameraSelector)
 
     private val realTimeOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -70,6 +75,7 @@ class FaceContourDetectionProcessor(
                     camera.analyzing()
 
                     Log.d(TAG, "SE LLAMO A LA API")
+                    saveExtractedFaceBitmap(face, rect)
                     apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
                         if (faceDetected != "null") {
                             Log.d(TAG, "CARA DETECTADA: $faceDetected")
@@ -101,6 +107,29 @@ class FaceContourDetectionProcessor(
             }
         }
         return true
+    }
+
+    private fun saveExtractedFaceBitmap(face: Face, rect: Rect) {
+        val faceBitmap = apiManager.extractFaceBitmap(rect)
+        val fileName = "face_${System.currentTimeMillis()}.jpg"
+        // Specify the absolute path to the Downloads directory
+        val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+        try {
+            // Create the Downloads directory if it doesn't exist
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdirs()
+            }
+            // Create a File object with the specified directory and file name
+            val file = File(downloadsDir, fileName)
+            // Write the bitmap to the file
+            FileOutputStream(file).use { outputStream ->
+                faceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            Log.d(TAG, "Face bitmap saved: ${file.absolutePath}")
+        } catch (e: Exception) {
+            // Handle any exceptions that occur during file operations
+            Log.e(TAG, "Error saving face bitmap: ${e.message}")
+        }
     }
 
     override fun onFailure(e: Exception) {

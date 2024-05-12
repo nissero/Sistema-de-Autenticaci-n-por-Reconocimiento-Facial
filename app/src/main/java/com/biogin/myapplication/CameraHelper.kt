@@ -247,7 +247,8 @@ class CameraHelper(private val lifecycleOwner: LifecycleOwner,
                 graphicOverlay,
                 originalImage,
                 this,
-                sendDataToAPI
+                sendDataToAPI,
+                cameraSelector
             )
 
             // Analyze the image using the processor
