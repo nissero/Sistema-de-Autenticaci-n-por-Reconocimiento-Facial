@@ -14,101 +14,119 @@
 
 
     <EditText
-        android:id="@+id/register_name"
+        android:id="@+id/update_user_name"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="Nombre"
         android:inputType="text"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_surname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/update_user_dni" />
 
     <EditText
-        android:id="@+id/register_surname"
+        android:id="@+id/update_user_surname"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="Apellido"
         android:inputType="text"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_name" />
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_name" />
 
     <EditText
-        android:id="@+id/register_email"
+        android:id="@+id/update_user_email"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_dni"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_surname" />
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_surname" />
 
     <EditText
-        android:id="@+id/register_dni"
+        android:id="@+id/update_user_dni"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="60dp"
         android:ems="10"
         android:hint="DNI"
         android:inputType="text"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/register_categories_spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_email" />
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
-        android:id="@+id/register_categories_spinner"
+        android:id="@+id/update_user_categories_spinner"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_dni" />
+        android:layout_marginTop="40dp"
+        android:entries="@array/user_categories"
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_email" />
+
+    <Spinner
+        android:id="@+id/update_user_state_spinner"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:entries="@array/user_active_options"
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_categories_spinner" />
 
     <Button
-        android:id="@+id/register_continue_button"
-        android:layout_width="0dp"
+        android:id="@+id/update_user_button"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:backgroundTint="#0D99FF"
-        android:text="Continuar"
+        android:text="Actualizar usuario"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <Button
+        android:id="@+id/duplicate_user_button"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="#0D99FF"
+        android:text="Modificar DNI usuario"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
         android:layout_width="386dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintEnd_toEndOf="@+id/register_categories_spinner"
-        app:layout_constraintStart_toStartOf="@+id/register_categories_spinner"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner">
+        android:layout_height="59dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintStart_toStartOf="@+id/update_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_state_spinner">
 
         <CheckBox
             android:id="@+id/checkbox_ICO"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="23dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:contentDescription="ICO"
@@ -120,7 +138,7 @@
 
         <CheckBox
             android:id="@+id/checkbox_IDH"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="10dp"
@@ -129,34 +147,35 @@
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/checkbox_ICI"
-            app:layout_constraintHorizontal_bias="0.885"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkbox_ICO"
             app:layout_constraintTop_toTopOf="parent" />
 
         <CheckBox
             android:id="@+id/checkbox_ICI"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="36dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginBottom="5dp"
             android:text="ICI"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/checkbox_IDEI"
+            app:layout_constraintStart_toEndOf="@+id/checkbox_IDH"
             app:layout_constraintTop_toTopOf="parent" />
 
         <CheckBox
             android:id="@+id/checkbox_IDEI"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="5dp"
             android:text="IDEI"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

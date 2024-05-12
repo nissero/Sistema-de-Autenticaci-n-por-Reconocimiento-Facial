@@ -15,20 +15,6 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
     private val _loginResult = MutableLiveData<LoginResult>()
-    val loginResult: LiveData<LoginResult> = _loginResult
-
-    fun login(name: String, password: String) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.login(name, password)
-
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
-        }
-    }
-
     fun register(
         name: String,
         surname: String,
@@ -43,7 +29,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
         if (result is Result.Success) {
             _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+                LoginResult(success = LoggedInUserView(displayName = result.data.name))
         } else {
             _loginResult.value = LoginResult(error = R.string.login_failed)
         }
