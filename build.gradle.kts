@@ -14,4 +14,7 @@ buildscript {
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
+    application
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.serialization") version "1.9.23"
 }

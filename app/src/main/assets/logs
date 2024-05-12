@@ -1,0 +1,16 @@
+[
+  {
+    "fecha": "27/02/2000",
+    "hora": "14:30:00",
+    "idAutenticador": 1,
+    "idVisitante": 5,
+    "lugarFisico": "Módulo 7"
+  },
+  {
+    "fecha": "27/02/2000",
+    "hora": "14:32:00",
+    "idAutenticador": 1,
+    "idVisitante": 9,
+    "lugarFisico": "Módulo 3"
+  }
+]
