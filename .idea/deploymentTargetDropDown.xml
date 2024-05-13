@@ -2,36 +2,8 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
-        <State />
-      </entry>
-      <entry key="RRHHActivity">
-        <State />
-      </entry>
-      <entry key="RegisterActivity">
-        <State />
-      </entry>
-      <entry key="UserFinderActivity">
-        <State />
-      </entry>
-      <entry key="UserManagement">
-        <State />
-      </entry>
       <entry key="app">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="adb-RFCW21P767L-albqwm._adb-tls-connect._tcp" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-12T18:56:22.362912400Z" />
-        </State>
+        <State />
       </entry>
     </value>
   </component>
