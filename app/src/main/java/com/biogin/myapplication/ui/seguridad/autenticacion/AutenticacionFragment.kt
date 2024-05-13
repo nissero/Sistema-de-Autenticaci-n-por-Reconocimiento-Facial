@@ -1,5 +1,6 @@
 package com.biogin.myapplication.ui.seguridad.autenticacion
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.FaceRecognitionActivity
@@ -42,15 +44,33 @@ class AutenticacionFragment : Fragment() {
 
         val autenticacionButton = root.findViewById<Button>(R.id.button_visitantes)
         autenticacionButton.visibility = View.INVISIBLE
+
+        val turnoButton = root.findViewById<Button>(R.id.button_turno)
+
+        val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
+
+        //metodo para crear una actividad nueva y obtener un resultado
+        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+                if(data?.getBooleanExtra("autenticado", false) == true) {
+                    turnoIniciado = false
+                    autenticacionButton.visibility = View.INVISIBLE
+                    turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+                    mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
+                }
+            }
+        }
+
         autenticacionButton.setOnClickListener {
             val intent = Intent(root.context, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "visitante")
             startActivity(intent)
         }
 
-        val turnoButton = root.findViewById<Button>(R.id.button_turno)
         turnoButton.setOnClickListener {
-            val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
+
             if(!turnoIniciado) {
                 val dialogClickListener =
                     DialogInterface.OnClickListener { dialog, which ->
@@ -59,7 +79,6 @@ class AutenticacionFragment : Fragment() {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
-//                                mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 
@@ -75,10 +94,9 @@ class AutenticacionFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                turnoIniciado = false
-                                autenticacionButton.visibility = View.INVISIBLE
-                                turnoButton.text = this.context?.getString(R.string.iniciar_turno)
-                                mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
+                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
+                                intent.putExtra("authenticationType", "fin de turno")
+                                resultLauncher.launch(intent)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 

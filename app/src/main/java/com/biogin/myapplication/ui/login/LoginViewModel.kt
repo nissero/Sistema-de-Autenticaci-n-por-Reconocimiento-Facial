@@ -15,25 +15,25 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
     private val _loginResult = MutableLiveData<LoginResult>()
-    fun register(
-        name: String,
-        surname: String,
-        dni: String,
-        email: String,
-        category: String,
-        areasAllowed: MutableSet<String>,
-        institutesSelected: ArrayList<String>
-    ) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
-
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.name))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
-        }
-    }
+//    fun register(
+//        name: String,
+//        surname: String,
+//        dni: String,
+//        email: String,
+//        category: String,
+//        areasAllowed: MutableSet<String>,
+//        institutesSelected: ArrayList<String>
+//    ) {
+//        // can be launched in a separate asynchronous job
+//        val result = loginRepository.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
+//
+//        if (result is Result.Success) {
+//            _loginResult.value =
+//                LoginResult(success = LoggedInUserView(displayName = result.data.name))
+//        } else {
+//            _loginResult.value = LoginResult(error = R.string.login_failed)
+//        }
+//    }
 
     fun loginDataChanged(name: String, password: String, confirmPassword: String) {
         if (!isUserNameValid(name)) {

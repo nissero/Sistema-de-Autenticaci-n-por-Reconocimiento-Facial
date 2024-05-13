@@ -250,7 +250,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                 graphicOverlay,
                 originalImage,
                 this,
-                sendDataToAPI
+                sendDataToAPI,
+                cameraSelector
             )
 
             // Analyze the image using the processor
