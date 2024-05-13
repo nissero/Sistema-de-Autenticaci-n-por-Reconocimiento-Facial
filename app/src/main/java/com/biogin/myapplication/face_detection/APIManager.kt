@@ -69,23 +69,23 @@ class APIManager(
     }
 
     fun extractNameFromResponse(responseBody: String): String {
-        // Si la respuesta contiene "Unknown", devuelve "Unknown"
+        // If the response contains "Unknown", return "Unknown"
         if (responseBody.contains("Unknown")) {
             return "Unknown"
         }
-        // Si la respuesta contiene el formato de nombres, extrae el contenido dentro de los corchetes
+        // If the response contains the names format, extract the content within the brackets
         else if (responseBody.contains("{\"names\":")) {
             val startIndex = responseBody.indexOf('[')
             val endIndex = responseBody.indexOf(']')
-            // Extrae el contenido dentro de los corchetes
+            // Extract the content within the brackets
             val nameContent = responseBody.substring(startIndex + 1, endIndex)
-            // Elimina cualquier espacio en blanco y comillas
-            return nameContent.replace(" ", "").replace("\"", "")
+            // Split the names by comma and return the first name
+            val names = nameContent.split(",")
+            return names.first().replace(" ", "").replace("\"", "")
         }
-        // Si no se cumplen ninguna de las condiciones anteriores, devuelve "Unknown"
+        // If none of the conditions above are met, return "Unknown"
         return "Unknown"
     }
-
 
     private fun isValidRecognitionResult(responseBody: String): Boolean {
         return responseBody.contains("{\"names\":[\"") && !responseBody.contains("{\"names\":[]}")
