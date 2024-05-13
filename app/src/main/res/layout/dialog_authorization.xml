@@ -58,5 +58,14 @@
             android:textSize="16sp"
             android:layout_marginTop="5dp"/>
 
+        <TextView
+            android:id="@+id/textViewAreasPermitidas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Areas Permitidas:"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"/>
+
     </LinearLayout>
 </RelativeLayout>

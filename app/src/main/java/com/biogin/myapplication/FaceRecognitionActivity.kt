@@ -117,6 +117,9 @@ class FaceRecognitionActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
         dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
         dialog.findViewById<TextView>(R.id.textViewCategoria).text = "Categoria: ${usuario.getCategoria()}"
+        dialog.findViewById<TextView>(R.id.textViewAreasPermitidas).text = "Areas Permitidas: ${usuario.getAreasPermitidas()}"
+
+        Log.d(TAG, usuario.getAreasPermitidas())
 
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
         mediaPlayer.start()
