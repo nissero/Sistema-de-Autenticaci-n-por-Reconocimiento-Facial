@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
@@ -18,6 +19,7 @@ import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
 import com.biogin.myapplication.R
 import com.biogin.myapplication.utils.AllowedAreasUtils
+import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 
 class RegisterActivity : AppCompatActivity() {
@@ -25,7 +27,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var institutesUtils : InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityRegisterBinding
-
+    private var validations  = FormValidations()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -54,6 +56,7 @@ class RegisterActivity : AppCompatActivity() {
                 } else {
                     enableCheckboxes()
                 }
+                checkContinueButtonActivation()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -66,12 +69,62 @@ class RegisterActivity : AppCompatActivity() {
         val surname = binding.registerSurname
         val dni = binding.registerDni
         val email = binding.registerEmail
-        val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-        val spinner = binding.registerCategoriesSpinner
-        val register = binding.registerContinueButton
+        val checkboxes = getCheckboxesArray()
 
-        register?.setOnClickListener {
-            var institutesSelected = institutesUtils.getInstitutesSelected2(checkboxes)
+        val spinner = binding.registerCategoriesSpinner
+        val continueButton = binding.registerContinueButton
+
+        name?.setOnEditorActionListener { _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+                validations.validateName(name)
+                checkContinueButtonActivation()
+                return@setOnEditorActionListener false
+            }
+            false
+        }
+
+        surname?.setOnEditorActionListener {  _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+                validations.validateSurname(surname)
+                checkContinueButtonActivation()
+                return@setOnEditorActionListener false
+            }
+            false
+        }
+
+        dni?.setOnEditorActionListener {  _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+                validations.validateDNI(dni)
+                checkContinueButtonActivation()
+                return@setOnEditorActionListener false
+            }
+            false
+        }
+
+        email?.setOnEditorActionListener {  _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+                validations.validateEmail(email)
+                checkContinueButtonActivation()
+                return@setOnEditorActionListener false
+            }
+            false
+        }
+
+        binding.checkboxIDH?.setOnCheckedChangeListener { _, _ ->
+            checkContinueButtonActivation()
+        }
+        binding.checkboxICI?.setOnCheckedChangeListener { _, _ ->
+            checkContinueButtonActivation()
+        }
+        binding.checkboxICO?.setOnCheckedChangeListener { _, _ ->
+            checkContinueButtonActivation()
+        }
+        binding.checkboxIDEI?.setOnCheckedChangeListener { _, _ ->
+            checkContinueButtonActivation()
+        }
+
+        continueButton?.setOnClickListener {
+            var institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(), allowedAreasUtils.getAllowedAreas(institutesSelected), institutesSelected)
 
             val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
@@ -90,8 +143,8 @@ class RegisterActivity : AppCompatActivity() {
             val loginState = it ?: return@Observer
 
             // disable login button unless both username / password is valid
-            if (register != null) {
-                register.isEnabled = loginState.isDataValid
+            if (continueButton != null) {
+                continueButton.isEnabled = loginState.isDataValid
             }
 
             if (loginState.usernameError != null) {
@@ -138,6 +191,45 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxICO?.visibility = View.INVISIBLE
         binding.checkboxIDH?.visibility = View.INVISIBLE
         binding.checkboxICI?.visibility = View.INVISIBLE
+    }
+
+    private fun checkContinueButtonActivation() {
+        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+
+        val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+        var categorySelected  = spinner.selectedItem.toString()
+
+        if (formHasNoErrors()) {
+            if (!categoriesWithNoInstitute.contains(categorySelected)) {
+                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
+                    binding.registerContinueButton?.isEnabled = true
+                } else {
+                    binding.registerContinueButton?.isEnabled = false
+                }
+            } else {
+                binding.registerContinueButton?.isEnabled = true
+            }
+        } else {
+            binding.registerContinueButton?.isEnabled = false
+        }
+
+    }
+
+    private fun getCheckboxesArray() : ArrayList<CheckBox> {
+        val checkboxICO = findViewById<CheckBox>(R.id.checkbox_ICO)
+        val checkboxICI = findViewById<CheckBox>(R.id.checkbox_ICI)
+        val checkboxIDH = findViewById<CheckBox>(R.id.checkbox_IDH)
+        val checkboxIDEI = findViewById<CheckBox>(R.id.checkbox_IDEI)
+        return arrayListOf(checkboxICO, checkboxICI, checkboxIDH, checkboxIDEI)
+    }
+
+    private fun formHasNoErrors() : Boolean{
+        val nameHasNoErrors = binding.registerName?.error == null
+        val surnameHasNoErrors = binding.registerSurname?.error == null
+        val dniHasNoErrors = binding.registerDni?.error == null
+        val emailHasNoErrors = binding.registerEmail?.error == null
+
+        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
     }
 
 }
