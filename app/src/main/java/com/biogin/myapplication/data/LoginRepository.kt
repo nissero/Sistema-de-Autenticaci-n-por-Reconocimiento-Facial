@@ -1,6 +1,7 @@
 package com.biogin.myapplication.data
 
 import com.biogin.myapplication.data.model.LoggedInUser
+import com.biogin.myapplication.utils.AllowedAreasUtils
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -8,7 +9,6 @@ import com.biogin.myapplication.data.model.LoggedInUser
  */
 
 class LoginRepository(val dataSource: LoginDataSource) {
-
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null
         private set
@@ -27,35 +27,33 @@ class LoginRepository(val dataSource: LoginDataSource) {
         dataSource.logout()
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
-        // handle login
-        val result = dataSource.login(username, password)
+//    fun register(
+//        name: String,
+//        surname: String,
+//        dni: String,
+//        email: String,
+//        category: String,
+//        areasAllowed: MutableSet<String>,
+//        institutesSelected: ArrayList<String>
+//    ): Result<LoggedInUser> {
+//        // handle login
+//        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
+//
+//        if (result is Result.Success) {
+//            setLoggedInUser(result.data)
+//        }
+//
+//        return result
+//    }
 
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
+    suspend fun getUser(dni: String) : Result<LoggedInUser>{
+        if (dni == "") {
+            return Result.Error(Exception("Se ingreso un dni vacío, ingrese uno nuevamente"))
         }
-
-        return result
+        return dataSource.getUserFromFirebase(dni)
     }
 
-    fun register(
-        name: String,
-        surname: String,
-        dni: String,
-        email: String,
-        category: String,
-        areasAllowed: MutableSet<String>,
-        institutesSelected: ArrayList<String>
-    ): Result<LoggedInUser> {
-        // handle login
-        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
 
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
-
-        return result
-    }
 
     private fun setLoggedInUser(loggedInUser: LoggedInUser) {
         this.user = loggedInUser

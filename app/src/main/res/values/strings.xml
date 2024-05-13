@@ -24,16 +24,54 @@
     <string name="title_main_activity">Main Activity</string>
     <string name="text_view_person_name">[Nombre persona]</string>
     <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial</string>
+    <string name="home_text_enter_face_recognition_rrhh">Ingresar con\nreconocimiento facial (RRHH)</string>
+    <string name="face_recognition_visitors">Autenticacion de\nvisitantes</string>
     <string-array name="user_categories">
         <item>Docente</item>
         <item>No docente</item>
         <item>Estudiante</item>
         <item>Externo</item>
         <item>Jerarquico</item>
+        <item>RRHH</item>
         <item>Temporal</item>
     </string-array>
     <string-array name="user_categories_with_no_institute">
         <item>Externo</item>
         <item>Temporal</item>
+        <item>RRHH</item>
+        <item>Jerarquico</item>
     </string-array>
+    <string-array name="user_active_options">
+        <item>Activo</item>
+        <item>Inactivo</item>
+    </string-array>
+    <string name="title_activity_admin_autenticacion">AdminAutenticacionActivity</string>
+    <string name="title_autenticacion">Autenticación</string>
+    <string name="title_logs">Logs</string>
+    <string name="title_Acerca">Acerca</string>
+    <string name="disclaimer">© Biogin 2024 – 2024\nBiogin X – Todos los derechos reservados</string>
+    <string name="iniciar_turno">Iniciar turno</string>
+    <string name="finalizar_turno">Finalizar turno</string>
+    <string name="mansaje_inicio_turno">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
+    <string name="mensaje_turno_iniciado">Ubique su restro en el centro de la camara</string>
+    <string name="fecha">Fecha</string>
+    <string name="hora">Hora</string>
+    <string name="id_autenticador">ID\nAutenticador</string>
+    <string name="id_visitante">ID\nVisitante</string>
+    <string name="lugar_fisico">Lugar\nFísico</string>
+    <string name="title_activity_rrhhactivity">RRHHActivity</string>
+    <string name="title_abm">ABM</string>
+    <string name="title_modulos">Modulos</string>
+    <string name="integrantes_biogin">
+        <b>Nuestro Equipo:\n</b>
+        • Antúnez, Fernando Iván\n
+        • Barrientos, Francisco\n
+        • Cabrera, Juan Manuel\n
+        • Chun, Mariano\n
+        • Hirschfeld, Agustina Camila\n
+        • Nissero, Matías Daniel\n
+        • Verón, Adrián Gustavo
+    </string>
+    <string name="skip">Skip</string>
+    >>>>>>> origin/fernando2
 </resources>
