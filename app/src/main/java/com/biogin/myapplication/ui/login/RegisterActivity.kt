@@ -1,5 +1,7 @@
 package com.biogin.myapplication.ui.login
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -7,6 +9,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
@@ -14,20 +17,26 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import com.biogin.myapplication.FaceRecognitionActivity
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
 import com.biogin.myapplication.R
+import com.biogin.myapplication.data.LoginDataSource
+import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
+import com.google.firebase.firestore.FirebaseFirestoreException
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var allowedAreasUtils : AllowedAreasUtils
     private lateinit var institutesUtils : InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
+    private  var dataSource = LoginDataSource()
     private lateinit var binding: ActivityRegisterBinding
     private var validations  = FormValidations()
+    private var loadingDialog = LoadingDialog(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -124,16 +133,52 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         continueButton?.setOnClickListener {
+            loadingDialog.startLoadingDialog()
             var institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
-            loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(), allowedAreasUtils.getAllowedAreas(institutesSelected), institutesSelected)
+            dataSource.uploadUserToFirebase(
+                name?.text.toString(),
+                surname?.text.toString(),
+                dni?.text.toString(),
+                email?.text.toString(),
+                spinner?.selectedItem.toString(),
+                institutesSelected).
+            addOnSuccessListener {
+                loadingDialog.dismissDialog()
+                val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+                intent.putExtra("name", name?.text.toString())
+                intent.putExtra("surname", surname?.text.toString())
+                intent.putExtra("dni", dni?.text.toString())
+                intent.putExtra("email", email?.text.toString())
 
-            val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-            intent.putExtra("name", name?.text.toString())
-            intent.putExtra("surname", surname?.text.toString())
-            intent.putExtra("dni", dni?.text.toString())
-            intent.putExtra("email", email?.text.toString())
+                startActivity(intent)
+            }.addOnFailureListener { ex ->
+                loadingDialog.dismissDialog()
+                try {
+                    throw ex
+                } catch (e : FirebaseFirestoreException) {
+                    Log.e("Firebase", e.message.toString())
+                    val dialogClickListener =
+                        DialogInterface.OnClickListener { _, which ->
+                            when (which) {
+                                DialogInterface.BUTTON_NEUTRAL -> {
+                                }
+                            }
+                        }
 
-            startActivity(intent)
+                    val builder = AlertDialog.Builder(binding.root.context)
+
+                    if(e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
+                        builder.setMessage("El usuario ingresado ya existe").
+                        setNeutralButton("Reintentar", dialogClickListener).
+                        show()
+                    } else {
+                        builder.setMessage("Error al dar de alta el usuario, intente nuevamente").
+                        setNeutralButton("Reintentar", dialogClickListener).
+                        show()
+                    }
+                }
+            }
+
         }
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
