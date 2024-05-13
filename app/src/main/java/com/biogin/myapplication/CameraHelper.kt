@@ -181,8 +181,11 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         // Convert the photoUri to a Bitmap
         val imageBitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(photoUri))
 
-        // Rotate the bitmap if needed
-        val rotatedBitmap = rotateBitmap(imageBitmap, 90f)
+        // Rotate the bitmap based on the camera selector
+        val rotatedBitmap = when (cameraSelector) {
+            CameraSelector.DEFAULT_FRONT_CAMERA -> rotateBitmap(imageBitmap, -90f) // Rotate -90 degrees for front camera
+            else -> rotateBitmap(imageBitmap, 90f) // Rotate 90 degrees for back camera or any other camera
+        }
 
         // Convert the rotated bitmap to bytes
         val outputStream = ByteArrayOutputStream()
@@ -203,19 +206,26 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
             .build()
 
         // Execute the request asynchronously
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to make request: ${e.message}")
-                callback(null)
-            }
+        val client = OkHttpClient()
 
-            override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                // Log training result
-                Log.d(TAG, "Training result: $responseBody")
-                callback(responseBody)
-            }
-        })
+        // Define the number of times to send the call
+        val numberOfAttempts = 3
+
+        for (i in 1..numberOfAttempts) {
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e(TAG, "Failed to make request: ${e.message}")
+                    callback(null)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val responseBody = response.body?.string()
+                    // Log training result
+                    Log.d(TAG, "Training result: $responseBody")
+                    callback(responseBody)
+                }
+            })
+        }
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
@@ -250,7 +260,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                 graphicOverlay,
                 originalImage,
                 this,
-                sendDataToAPI
+                sendDataToAPI,
+                cameraSelector
             )
 
             // Analyze the image using the processor
