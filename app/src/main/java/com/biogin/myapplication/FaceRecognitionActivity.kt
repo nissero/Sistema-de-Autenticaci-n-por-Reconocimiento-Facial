@@ -26,6 +26,7 @@ import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var dialogShowTime = 10000L
+    private var analyzeAgain = 12000L
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
     private lateinit var authenticationType: String
@@ -115,6 +116,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.textViewName).text = "Nombre: ${usuario.getNombre()}"
         dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
         dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
+        dialog.findViewById<TextView>(R.id.textViewCategoria).text = "Categoria: ${usuario.getCategoria()}"
+        dialog.findViewById<TextView>(R.id.textViewAreasPermitidas).text = "Areas Permitidas: ${usuario.getAreasPermitidas()}"
+
+        Log.d(TAG, usuario.getAreasPermitidas())
 
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
         mediaPlayer.start()
@@ -211,7 +216,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun initCamera(typeOfAuthorization: (Usuario) -> Unit){
-        camera = CameraHelper(typeOfAuthorization, this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
+        camera = CameraHelper(typeOfAuthorization, this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, analyzeAgain, true)
         camera.startCamera()
     }
 
