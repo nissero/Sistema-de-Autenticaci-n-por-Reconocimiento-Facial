@@ -8,7 +8,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
 
@@ -17,79 +16,81 @@ import java.io.IOException
  */
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
-//    fun register(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        areasAllowed: MutableSet<String>,
-//        institutesSelected: ArrayList<String>
-//    ): Result<LoggedInUser> {
-//        try {
-//
-//
-//                uploadUserToFirebase(
-//                    name,
-//                    surname,
-//                    dni,
-//                    email,
-//                    category,
-//                    areasAllowed,
-//                    institutesSelected
-//                ).addOnSuccessListener {
-//                    val userCreated = LoggedInUser(
-//                        dni,
-//                        name,
-//                        surname,
-//                        email,
-//                        category,
-//                        "Activo",
-//                        institutesSelected,
-//                        ArrayList(areasAllowed)
-//                    )
-//                }
-//            }
-//
-//        } catch (e: FirebaseFirestoreException) {
-//            if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-//                return Result.Error(e)
-//            }
-//            return Result.Error(IOException("Error al dar de alta el usuario", e))
-//        }
-//    }
-
-    public fun uploadUserToFirebase(
+    fun register(
         name: String,
         surname: String,
         dni: String,
         email: String,
         category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
+        try {
+            var inserted: Boolean = true
+            uploadUserToFirebase(
+                name,
+                surname,
+                dni,
+                email,
+                category,
+                areasAllowed,
+                institutesSelected
+            ) { result ->
+                inserted = result
+            }
+            if (!inserted) {
+                return Result.Error(Exception("No se pudo insertar el documento para el dni $dni"))
+            }
+            // TODO: handle loggedInUser authentication
+            val userCreated = LoggedInUser(
+                dni,
+                name,
+                surname,
+                email,
+                category,
+                "Activo",
+                institutesSelected,
+                ArrayList(areasAllowed)
+            )
+            return Result.Success(userCreated)
+        } catch (e: Throwable) {
+            return Result.Error(IOException("Error logging in", e))
+        }
+    }
+
+    private fun uploadUserToFirebase(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
         institutesSelected: ArrayList<String>,
-    ): Task<Transaction> {
+        callback: (Boolean) -> Unit
+    ): Boolean {
+        val newUser = hashMapOf(
+            "nombre" to name,
+            "apellido" to surname,
+            "dni" to dni,
+            "email" to email,
+            "categoria" to category,
+            "areasPermitidas" to areasAllowed.toList(),
+            "institutos" to institutesSelected,
+            "estado" to "Activo"
+        )
         val db = FirebaseFirestore.getInstance()
-        val docRefDni = db.collection("usuarios").document(dni)
-        return db.runTransaction { transaction ->
-            if(transaction.get(docRefDni).exists()) {
-                throw FirebaseFirestoreException(
-                    "El usuario ingresado ya existe, compruebe el dni ingresado",
-                    FirebaseFirestoreException.Code.ALREADY_EXISTS
-                )
+        db.collection("usuarios").document(dni)
+            .set(newUser)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Documento añadido con ID $dni")
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firebase", "Error al añadir el documento", e)
+                callback(false)
             }
 
-            val newUser = hashMapOf(
-                "nombre" to name,
-                "apellido" to surname,
-                "dni" to dni,
-                "email" to email,
-                "categoria" to category,
-                "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                "institutos" to institutesSelected,
-                "estado" to "Activo"
-            )
-
-            transaction.set(docRefDni, newUser)
-        }
+        return true
     }
 
     public fun duplicateUserInFirebase(
@@ -151,7 +152,7 @@ class LoginDataSource {
 
     }
 
-    fun getDocument(dni: String): Task<DocumentSnapshot> {
+    fun existsUserInFirebase(dni: String): Task<DocumentSnapshot> {
         val db = FirebaseFirestore.getInstance()
         return db.collection("usuarios").document(dni).get()
     }

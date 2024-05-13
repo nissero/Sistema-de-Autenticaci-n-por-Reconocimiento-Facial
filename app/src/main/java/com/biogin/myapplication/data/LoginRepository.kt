@@ -27,24 +27,24 @@ class LoginRepository(val dataSource: LoginDataSource) {
         dataSource.logout()
     }
 
-//    fun register(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        areasAllowed: MutableSet<String>,
-//        institutesSelected: ArrayList<String>
-//    ): Result<LoggedInUser> {
-//        // handle login
-//        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
-//
-//        if (result is Result.Success) {
-//            setLoggedInUser(result.data)
-//        }
-//
-//        return result
-//    }
+    fun register(
+        name: String,
+        surname: String,
+        dni: String,
+        email: String,
+        category: String,
+        areasAllowed: MutableSet<String>,
+        institutesSelected: ArrayList<String>
+    ): Result<LoggedInUser> {
+        // handle login
+        val result = dataSource.register(name, surname, dni, email, category, areasAllowed, institutesSelected)
+
+        if (result is Result.Success) {
+            setLoggedInUser(result.data)
+        }
+
+        return result
+    }
 
     suspend fun getUser(dni: String) : Result<LoggedInUser>{
         if (dni == "") {
