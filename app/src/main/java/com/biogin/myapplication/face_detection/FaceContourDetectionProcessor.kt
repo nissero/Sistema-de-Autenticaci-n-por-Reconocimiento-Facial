@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
-import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import com.biogin.myapplication.BaseImageAnalyzer
@@ -22,20 +21,16 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import android.os.Looper
-import androidx.camera.core.CameraSelector
 import com.biogin.myapplication.CameraHelper
-import java.io.File
-import java.io.FileOutputStream
 
 class FaceContourDetectionProcessor(
     private val context: Context,
     private val view: GraphicOverlay,
     private val originalImage: Bitmap,
     private val camera: CameraHelper,
-    private val sendDataToAPI: Boolean,
-    private val cameraSelector: CameraSelector
+    private val sendDataToAPI: Boolean
 ) : BaseImageAnalyzer<List<Face>>() {
-    private val apiManager = APIManager(originalImage, cameraSelector)
+    private val apiManager = APIManager(originalImage)
 
     private val realTimeOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
