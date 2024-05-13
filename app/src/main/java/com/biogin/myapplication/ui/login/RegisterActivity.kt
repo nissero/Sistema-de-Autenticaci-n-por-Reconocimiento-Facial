@@ -11,6 +11,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
 import com.biogin.myapplication.PhotoRegisterActivity
@@ -68,7 +69,8 @@ class RegisterActivity : AppCompatActivity() {
         val surname = binding.registerSurname
         val dni = binding.registerDni
         val email = binding.registerEmail
-        val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
+        val checkboxes = getCheckboxesArray()
+
         val spinner = binding.registerCategoriesSpinner
         val continueButton = binding.registerContinueButton
 
@@ -122,7 +124,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         continueButton?.setOnClickListener {
-            var institutesSelected = institutesUtils.getInstitutesSelected2(checkboxes)
+            var institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             loginViewModel.register(name?.text.toString(), surname?.text.toString(), dni?.text.toString(), email?.text.toString(),spinner?.selectedItem.toString(), allowedAreasUtils.getAllowedAreas(institutesSelected), institutesSelected)
 
             val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
@@ -199,7 +201,7 @@ class RegisterActivity : AppCompatActivity() {
 
         if (formHasNoErrors()) {
             if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                if (isAnyInstituteSelected()) {
+                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
                     binding.registerContinueButton?.isEnabled = true
                 } else {
                     binding.registerContinueButton?.isEnabled = false
@@ -213,6 +215,14 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
+    private fun getCheckboxesArray() : ArrayList<CheckBox> {
+        val checkboxICO = findViewById<CheckBox>(R.id.checkbox_ICO)
+        val checkboxICI = findViewById<CheckBox>(R.id.checkbox_ICI)
+        val checkboxIDH = findViewById<CheckBox>(R.id.checkbox_IDH)
+        val checkboxIDEI = findViewById<CheckBox>(R.id.checkbox_IDEI)
+        return arrayListOf(checkboxICO, checkboxICI, checkboxIDH, checkboxIDEI)
+    }
+
     private fun formHasNoErrors() : Boolean{
         val nameHasNoErrors = binding.registerName?.error == null
         val surnameHasNoErrors = binding.registerSurname?.error == null
@@ -222,15 +232,6 @@ class RegisterActivity : AppCompatActivity() {
         return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
     }
 
-    private fun isAnyInstituteSelected() : Boolean{
-        val institutesCheckboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-        var isAnyInstituteSelected = false
-        for (checkbox in institutesCheckboxes) {
-            isAnyInstituteSelected = isAnyInstituteSelected || checkbox?.isChecked == true
-        }
-
-        return isAnyInstituteSelected
-    }
 }
 
 /**

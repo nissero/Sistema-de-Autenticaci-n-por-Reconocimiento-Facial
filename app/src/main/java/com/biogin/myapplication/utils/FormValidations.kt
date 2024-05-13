@@ -2,6 +2,7 @@ package com.biogin.myapplication.utils
 
 import android.util.Patterns
 import android.view.inputmethod.EditorInfo
+import android.widget.CheckBox
 import android.widget.EditText
 import androidx.core.text.isDigitsOnly
 import org.checkerframework.checker.regex.qual.Regex
@@ -51,11 +52,19 @@ class FormValidations {
         }
     }
 
+    fun isAnyInstituteSelected(institutesCheckboxes : ArrayList<CheckBox>) : Boolean{
+        var isAnyInstituteSelected = false
+        for (checkbox in institutesCheckboxes) {
+            isAnyInstituteSelected = isAnyInstituteSelected || checkbox.isChecked == true
+        }
 
+        return isAnyInstituteSelected
+    }
     private fun hasOnlyLetters(text : String) : Boolean {
         val alphanumericRegex = "^[A-Za-z]*$".toRegex()
         return alphanumericRegex.matches(text)
     }
+
 
 
 }
