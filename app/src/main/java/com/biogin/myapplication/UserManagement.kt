@@ -106,6 +106,7 @@ class UserManagement : AppCompatActivity() {
                 binding.updateUserDni.text.toString(),
                 binding.updateUserEmail.text.toString(),
                 binding.updateUserCategoriesSpinner.selectedItem.toString(),
+                binding.updateUserStateSpinner.selectedItem.toString(),
                 selectedIstitutes
             )
 

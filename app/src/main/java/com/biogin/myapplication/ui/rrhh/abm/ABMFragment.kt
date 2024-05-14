@@ -16,7 +16,9 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
+import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.ui.login.RegisterActivity
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -29,6 +31,7 @@ class ABMFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var loginRepo: LoginRepository
+    private lateinit var dataSource : LoginDataSource
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,7 +39,8 @@ class ABMFragment : Fragment() {
     ): View {
         super.onCreate(savedInstanceState)
         _binding = FragmentAbmBinding.inflate(layoutInflater)
-        loginRepo = LoginRepository(LoginDataSource())
+        dataSource = LoginDataSource()
+        loginRepo = LoginRepository(dataSource)
 
         binding.updateUserOptionButton.setOnClickListener {
             var result: Result<LoggedInUser>
@@ -78,6 +82,23 @@ class ABMFragment : Fragment() {
             startActivity(Intent(binding.root.context, RegisterActivity::class.java))
         }
 
+        binding.deleteUserOption.setOnClickListener {
+            dataSource.deactivateUserFirebase(binding.dniUserToFind.text.toString()).
+            addOnSuccessListener {
+                openPopupUserSuccessfullyDeleted()
+            }.addOnFailureListener { ex ->
+                try {
+                    throw ex
+                } catch (e: FirebaseFirestoreException) {
+                    if (e.code == FirebaseFirestoreException.Code.NOT_FOUND) {
+                        openPopupUserNotFound()
+                    } else if (e.code == FirebaseFirestoreException.Code.INVALID_ARGUMENT) {
+                        openPopupUserAlreadyDeactivated()
+                    }
+                }
+            }
+        }
+
         return binding.root
     }
 
@@ -85,6 +106,20 @@ class ABMFragment : Fragment() {
         val intent = Intent(binding.root.context, Popup::class.java)
         intent.putExtra("popup_text", "El usuario no existe para el DNI ingresado")
         intent.putExtra("text_button", "Reintentar")
+        startActivity(intent)
+    }
+
+    private fun openPopupUserAlreadyDeactivated() {
+        val intent = Intent(binding.root.context, Popup::class.java)
+        intent.putExtra("popup_text", "El usuario ya se encuentra eliminado")
+        intent.putExtra("text_button", "Continuar")
+        startActivity(intent)
+    }
+
+    private fun openPopupUserSuccessfullyDeleted() {
+        val intent = Intent(binding.root.context, Popup::class.java)
+        intent.putExtra("popup_text", "Usuario eliminado de forma exitosa")
+        intent.putExtra("text_button", "Continuar")
         startActivity(intent)
     }
     private fun startActitivyUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {

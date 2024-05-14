@@ -2,6 +2,7 @@ package com.biogin.myapplication.ui
 
 import android.app.Activity
 import android.app.AlertDialog
+import androidx.fragment.app.Fragment
 import com.biogin.myapplication.R
 
 class LoadingDialog (myActivity : Activity) {
