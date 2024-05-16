@@ -17,47 +17,7 @@ import java.io.IOException
  */
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
-//    fun register(
-//        name: String,
-//        surname: String,
-//        dni: String,
-//        email: String,
-//        category: String,
-//        areasAllowed: MutableSet<String>,
-//        institutesSelected: ArrayList<String>
-//    ): Result<LoggedInUser> {
-//        try {
-//
-//
-//                uploadUserToFirebase(
-//                    name,
-//                    surname,
-//                    dni,
-//                    email,
-//                    category,
-//                    areasAllowed,
-//                    institutesSelected
-//                ).addOnSuccessListener {
-//                    val userCreated = LoggedInUser(
-//                        dni,
-//                        name,
-//                        surname,
-//                        email,
-//                        category,
-//                        "Activo",
-//                        institutesSelected,
-//                        ArrayList(areasAllowed)
-//                    )
-//                }
-//            }
-//
-//        } catch (e: FirebaseFirestoreException) {
-//            if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-//                return Result.Error(e)
-//            }
-//            return Result.Error(IOException("Error al dar de alta el usuario", e))
-//        }
-//    }
+
 
     public fun uploadUserToFirebase(
         name: String,
@@ -137,6 +97,7 @@ class LoginDataSource {
         dni: String,
         email: String,
         category: String,
+        state: String,
         institutesSelected: ArrayList<String>
     ): Task<Void> {
         val db = FirebaseFirestore.getInstance()
@@ -145,10 +106,36 @@ class LoginDataSource {
             "apellido", surname,
             "email", email,
             "categoria", category,
+            "estado", state,
             "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
             "institutos", institutesSelected
         )
 
+    }
+
+    fun deactivateUserFirebase(dni: String) : Task<Transaction> {
+        val db = FirebaseFirestore.getInstance()
+        val docRefDni = db.collection("usuarios").document(dni)
+        return db.runTransaction { transaction ->
+            val dniDoc = transaction.get(docRefDni)
+            if (!dniDoc.exists()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val estado = dniDoc.data?.get("estado")
+            if (estado != null) {
+                if (estado == "Inactivo") {
+                    throw FirebaseFirestoreException(
+                        "El usuario ya fue eliminado",
+                        FirebaseFirestoreException.Code.INVALID_ARGUMENT
+                    )
+                }
+            }
+            transaction.update(docRefDni, "estado", "Inactivo")
+        }
     }
 
     fun getDocument(dni: String): Task<DocumentSnapshot> {

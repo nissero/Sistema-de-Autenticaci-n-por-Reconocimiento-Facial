@@ -39,12 +39,25 @@
         android:id="@+id/update_user_dni_option_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:backgroundTint="#0D99FF"
         android:text="Modificar DNI usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/update_user_option_button" />
+
+    <Button
+        android:id="@+id/delete_user_option"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#0D99FF"
+        android:text="Eliminar usuario"
+        app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_dni_option_button" />
 
     <Button
         android:id="@+id/register_user_option_button"
@@ -65,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="Modificaciones"
+        android:text="Modificaciones/Baja"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/dni_user_to_find"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
@@ -81,4 +94,5 @@
         app:layout_constraintBottom_toTopOf="@+id/register_user_option_button"
         app:layout_constraintEnd_toEndOf="@+id/update_user_dni_option_button"
         app:layout_constraintStart_toStartOf="@+id/update_user_dni_option_button" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
