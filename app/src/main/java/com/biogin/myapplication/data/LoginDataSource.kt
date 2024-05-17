@@ -115,8 +115,15 @@ class LoginDataSource {
 
     fun deactivateUserFirebase(dni: String) : Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
-        val docRefDni = db.collection("usuarios").document(dni)
         return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
             val dniDoc = transaction.get(docRefDni)
             if (!dniDoc.exists()) {
                 throw FirebaseFirestoreException(

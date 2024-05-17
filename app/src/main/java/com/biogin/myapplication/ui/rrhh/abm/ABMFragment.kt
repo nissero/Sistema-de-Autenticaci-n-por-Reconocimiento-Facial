@@ -82,7 +82,7 @@ class ABMFragment : Fragment() {
             startActivity(Intent(binding.root.context, RegisterActivity::class.java))
         }
 
-        binding.deleteUserOption.setOnClickListener {
+        binding.deactivateUserOption.setOnClickListener {
             dataSource.deactivateUserFirebase(binding.dniUserToFind.text.toString()).
             addOnSuccessListener {
                 openPopupUserSuccessfullyDeleted()
