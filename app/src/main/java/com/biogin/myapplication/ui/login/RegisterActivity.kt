@@ -17,23 +17,20 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
-import com.biogin.myapplication.FaceRecognitionActivity
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.ui.LoadingDialog
-import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 
 class RegisterActivity : AppCompatActivity() {
-    private lateinit var allowedAreasUtils : AllowedAreasUtils
-    private lateinit var institutesUtils : InstitutesUtils
+    private lateinit var institutesUtils: InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
-    private  var dataSource = LoginDataSource()
+    private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
     private var validations  = FormValidations()
     private var loadingDialog = LoadingDialog(this)
@@ -42,7 +39,7 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-        allowedAreasUtils = AllowedAreasUtils()
+        dataSource = LoginDataSource(binding.root)
         institutesUtils = InstitutesUtils()
         var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
         var user_categories = resources.getStringArray(R.array.user_categories)
@@ -181,7 +178,7 @@ class RegisterActivity : AppCompatActivity() {
 
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(binding.root))
             .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this, Observer {

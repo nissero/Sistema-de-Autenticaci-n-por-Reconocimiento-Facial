@@ -1,6 +1,7 @@
 package com.biogin.myapplication.data
 
 import android.util.Log
+import android.view.View
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.google.android.gms.tasks.Task
@@ -15,9 +16,9 @@ import java.io.IOException
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
-class LoginDataSource {
-    private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
-
+class LoginDataSource(view: View) {
+    private var root = view
+    private var allowedAreasUtils = AllowedAreasUtils(root)
 
     public fun uploadUserToFirebase(
         name: String,
