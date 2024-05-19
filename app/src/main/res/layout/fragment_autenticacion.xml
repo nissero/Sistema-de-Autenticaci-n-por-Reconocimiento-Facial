@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="120dp"
         android:backgroundTint="@color/blue"
-        android:text="@string/iniciar_turno"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -23,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:textAlignment="center"
-        android:text="@string/mansaje_inicio_turno"
         app:layout_constraintBottom_toTopOf="@+id/button_turno"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

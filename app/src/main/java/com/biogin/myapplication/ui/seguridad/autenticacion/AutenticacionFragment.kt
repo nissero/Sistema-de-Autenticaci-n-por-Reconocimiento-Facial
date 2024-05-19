@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,9 @@ class AutenticacionFragment : Fragment() {
 
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
+    private lateinit var autenticacionButton: Button
+    private lateinit var turnoButton: Button
+    private lateinit var mensaje: TextView
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -37,12 +41,20 @@ class AutenticacionFragment : Fragment() {
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val autenticacionButton = root.findViewById<Button>(R.id.button_visitantes)
-        autenticacionButton.visibility = View.INVISIBLE
+        autenticacionButton = root.findViewById(R.id.button_visitantes)
 
-        val turnoButton = root.findViewById<Button>(R.id.button_turno)
+        turnoButton = root.findViewById(R.id.button_turno)
 
-        val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
+        mensaje = root.findViewById(R.id.message_main_screen)
+        if(turnoIniciado) {
+            turnoButton.text = this.context?.getString(R.string.finalizar_turno)
+            mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
+            autenticacionButton.visibility = View.VISIBLE
+        } else {
+            turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+            mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
+            autenticacionButton.visibility = View.INVISIBLE
+        }
 
         //metodo para crear una actividad nueva y obtener un resultado
         val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -53,7 +65,7 @@ class AutenticacionFragment : Fragment() {
                     turnoIniciado = false
                     autenticacionButton.visibility = View.INVISIBLE
                     turnoButton.text = this.context?.getString(R.string.iniciar_turno)
-                    mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
+                    mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
                 }
             }
         }
@@ -74,6 +86,7 @@ class AutenticacionFragment : Fragment() {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
+                                mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 

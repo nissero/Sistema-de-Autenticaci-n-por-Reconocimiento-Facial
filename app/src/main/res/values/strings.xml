@@ -52,8 +52,8 @@
     <string name="disclaimer">© Biogin 2024 – 2024\nBiogin X – Todos los derechos reservados</string>
     <string name="iniciar_turno">Iniciar turno</string>
     <string name="finalizar_turno">Finalizar turno</string>
-    <string name="mansaje_inicio_turno">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
-    <string name="mensaje_turno_iniciado">Ubique su restro en el centro de la camara</string>
+    <string name="mansaje_turno_no_iniciado">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
+    <string name="mensaje_turno_iniciado">Presione el boton de arriba\npara autenticar visitantes</string>
     <string name="fecha">Fecha</string>
     <string name="hora">Hora</string>
     <string name="id_autenticador">ID\nAutenticador</string>
