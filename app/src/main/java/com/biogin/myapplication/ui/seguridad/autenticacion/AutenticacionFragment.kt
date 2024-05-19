@@ -37,11 +37,6 @@ class AutenticacionFragment : Fragment() {
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.textHome
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-
         val autenticacionButton = root.findViewById<Button>(R.id.button_visitantes)
         autenticacionButton.visibility = View.INVISIBLE
 

@@ -20,9 +20,8 @@ import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 
-
 class UserManagement : AppCompatActivity() {
-    private lateinit var dataSource: LoginDataSource
+    private var dataSource = LoginDataSource()
     private var loginRepo = LoginRepository(dataSource)
     private var insitutesUtils = InstitutesUtils()
     private lateinit var binding: ActivityUserManagementBinding
@@ -34,7 +33,6 @@ class UserManagement : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityUserManagementBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        dataSource = LoginDataSource(binding.root)
 
         var name = binding.updateUserName
         var surname = binding.updateUserSurname

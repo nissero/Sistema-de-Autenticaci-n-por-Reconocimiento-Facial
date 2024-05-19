@@ -16,9 +16,8 @@ import java.io.IOException
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
-class LoginDataSource(view: View) {
-    private var root = view
-    private var allowedAreasUtils = AllowedAreasUtils(root)
+class LoginDataSource() {
+    private var allowedAreasUtils = AllowedAreasUtils()
 
     public fun uploadUserToFirebase(
         name: String,

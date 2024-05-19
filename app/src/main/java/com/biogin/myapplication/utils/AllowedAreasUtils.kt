@@ -1,15 +1,10 @@
 package com.biogin.myapplication.utils
 
-import android.view.View
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import com.biogin.myapplication.FirebaseMethods
 
-class AllowedAreasUtils(view: View) {
-    private var root = view
+class AllowedAreasUtils() {
+    private var firebaseMethods = FirebaseMethods()
     private var modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
-
-    @Serializable
-    data class Institute(val name: String, val areas: ArrayList<String>)
 
     init {
 //        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf("Módulo 1", "Módulo 3", "Módulo 4","Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
@@ -17,13 +12,22 @@ class AllowedAreasUtils(view: View) {
 //        modulesAssociatedWithInstitutes.set("IDH", arrayListOf("Módulo 1", "Módulo 2","Módulo 3", "Módulo 5", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
 //        modulesAssociatedWithInstitutes.set("ICI", arrayListOf("Módulo 1", "Módulo 2", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
 
-        val institutesString: String =
-            root.context.assets.open("areas").bufferedReader().use { it.readText() }
+//        val institutesString: String =
+//            root.context.assets.open("areas").bufferedReader().use { it.readText() }
+//
+//        val institutes = Json.decodeFromString<ArrayList<Institute>>(institutesString)
 
-        val institutes = Json.decodeFromString<List<Institute>>(institutesString)
-
-        for(institute in institutes) {
-            modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+        firebaseMethods.readInstitutes("ICI") {
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+        }
+        firebaseMethods.readInstitutes("ICO") {
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+        }
+        firebaseMethods.readInstitutes("IDH") {
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+        }
+        firebaseMethods.readInstitutes("IDEI") {
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
     }
     fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
@@ -35,19 +39,35 @@ class AllowedAreasUtils(view: View) {
         return allowedAreas
     }
 
-    fun getAllAreas(): ArrayList<String> {
-        val allAreas = ArrayList<String>()
-
-        for(institute in modulesAssociatedWithInstitutes) {
-            for(area in institute.value) {
-                if(!allAreas.contains(area)) {
-                    allAreas.add(area)
-                }
-            }
-        }
-
-        allAreas.sort()
-
-        return allAreas
-    }
+//    fun addAreaToInstitute(instituteName: String, area: String) {
+//        if(modulesAssociatedWithInstitutes.containsKey(instituteName)) {
+//            if(!modulesAssociatedWithInstitutes.get(instituteName)?.contains(area)!!) {
+//                modulesAssociatedWithInstitutes.get(instituteName)!!.add(area)
+//            }
+//        }
+//    }
+//
+//    fun getAllAreas(): ArrayList<String> {
+//        val allAreas = ArrayList<String>()
+//
+//        for(institute in modulesAssociatedWithInstitutes) {
+//            for(area in institute.value) {
+//                if(!allAreas.contains(area)) {
+//                    allAreas.add(area)
+//                }
+//            }
+//        }
+//
+//        allAreas.sort()
+//
+//        return allAreas
+//    }
+//
+//    private fun updateFile() {
+//        val institutes = ArrayList<Institute>()
+//        for(institute in modulesAssociatedWithInstitutes) {
+//            institutes.add(Institute(institute.key, institute.value))
+//        }
+//        val json = Json.encodeToString(institutes)
+//    }
 }

@@ -39,7 +39,7 @@ class ABMFragment : Fragment() {
     ): View {
         super.onCreate(savedInstanceState)
         _binding = FragmentAbmBinding.inflate(layoutInflater)
-        dataSource = LoginDataSource(binding.root)
+        dataSource = LoginDataSource()
         loginRepo = LoginRepository(dataSource)
 
         binding.updateUserOptionButton.setOnClickListener {

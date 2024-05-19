@@ -39,15 +39,15 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-        dataSource = LoginDataSource(binding.root)
+        dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
         var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-        var user_categories = resources.getStringArray(R.array.user_categories)
-        val categories_spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, user_categories)
-        categories_spinner.adapter = adapter
+        var userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        categoriesSpinner.adapter = adapter
 
-        categories_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -178,7 +178,7 @@ class RegisterActivity : AppCompatActivity() {
 
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(binding.root))
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this, Observer {
