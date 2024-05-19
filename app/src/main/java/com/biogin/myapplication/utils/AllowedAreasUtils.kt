@@ -1,6 +1,11 @@
 package com.biogin.myapplication.utils
 
+import android.util.Log
 import com.biogin.myapplication.FirebaseMethods
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Transaction
 
 class AllowedAreasUtils() {
     private var firebaseMethods = FirebaseMethods()
@@ -39,11 +44,41 @@ class AllowedAreasUtils() {
         return allowedAreas
     }
 
-//    fun addAreaToInstitute(instituteName: String, area: String) {
-//        if(modulesAssociatedWithInstitutes.containsKey(instituteName)) {
-//            if(!modulesAssociatedWithInstitutes.get(instituteName)?.contains(area)!!) {
-//                modulesAssociatedWithInstitutes.get(instituteName)!!.add(area)
+    fun addAreaToInstitute(instituteName: String, newArea: String) {
+        val db = FirebaseFirestore.getInstance()
+        val docRefInstitute = db.collection("institutos").document(instituteName)
+        docRefInstitute.get()
+            .addOnSuccessListener { instituteDocument ->
+                if (instituteDocument != null) {
+                    val instituteData = instituteDocument.data
+                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+                    areasArray.add(newArea)
+                    docRefInstitute.update("areas", areasArray)
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento del area $instituteName", exception)
+            }
+    }
+
+//    fun addAreaToInstitute2(instituteName: String, area: String): Task<Transaction> {
+//        val db = FirebaseFirestore.getInstance()
+//        val docRefInstitute = db.collection("institutos").document(instituteName)
+//        return db.runTransaction { transaction ->
+//            if(!transaction.get(docRefInstitute).exists()) {
+//                throw FirebaseFirestoreException(
+//                    "El instituto ingresado no existe, compruebe el nombre",
+//                    FirebaseFirestoreException.Code.NOT_FOUND
+//                )
 //            }
+//
+//            val newArea = hashMapOf(
+//                "areas" to area
+//            )
+//
+//            transaction.set(docRefInstitute, newArea)
 //        }
 //    }
 //
