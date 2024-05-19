@@ -73,5 +73,9 @@
         • Verón, Adrián Gustavo
     </string>
     <string name="skip">Skip</string>
+    <string name="lugares_fisicos_ici">Lugares Físicos\ndel ICI</string>
+    <string name="lugares_fisicos_ico">Lugares físicos\ndel ICO</string>
+    <string name="lugares_fisicos_idei">Lugares físicos\ndel IDEI</string>
+    <string name="lugares_fisicos_idh">Lugares físicos\ndel IDH</string>
     >>>>>>> origin/fernando2
 </resources>
