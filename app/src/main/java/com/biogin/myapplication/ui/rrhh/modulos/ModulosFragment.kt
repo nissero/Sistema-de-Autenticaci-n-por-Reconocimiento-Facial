@@ -62,8 +62,9 @@ class ModulosFragment : Fragment() {
             val areas = areasUtils.getAllowedAreas(arr)
             for(area in areas) {
                 popUpText += area
-                popUpText += "\n"
+                popUpText += ", "
             }
+            popUpText = popUpText.subSequence(0, popUpText.length - 2).toString()
             popUpUtil.showPopUp(binding.root.context, popUpText, buttonText)
         } catch(e: NullPointerException) {
             try {
@@ -71,8 +72,9 @@ class ModulosFragment : Fragment() {
                 val areas = areasUtils.getAllowedAreas(arr)
                 for(area in areas) {
                     popUpText += area
-                    popUpText += "\n"
+                    popUpText += ", "
                 }
+                popUpText = popUpText.subSequence(0, popUpText.length - 2).toString()
                 popUpUtil.showPopUp(binding.root.context, popUpText, buttonText)
             } catch(e: Exception) {
                 popUpUtil.showPopUp(binding.root.context,

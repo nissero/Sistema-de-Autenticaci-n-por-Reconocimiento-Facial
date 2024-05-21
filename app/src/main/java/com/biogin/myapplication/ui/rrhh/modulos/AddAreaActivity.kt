@@ -53,24 +53,37 @@ class AddAreaActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            var text = "Se agregó ${input.text} a los siguientes institutos:\n"
+
             if(checkboxICI.isChecked) {
                 areasUtil.addAreaToInstitute("ICI", input.text.toString())
                 checkboxICI.toggle()
+                text += "ICI, "
             }
             if(checkboxICO.isChecked) {
                 areasUtil.addAreaToInstitute("ICO", input.text.toString())
                 checkboxICO.toggle()
+                text += "ICO, "
             }
             if(checkboxIDH.isChecked) {
                 areasUtil.addAreaToInstitute("IDH", input.text.toString())
                 checkboxIDH.toggle()
+                text += "IDH, "
             }
             if(checkboxIDEI.isChecked) {
                 areasUtil.addAreaToInstitute("IDEI", input.text.toString())
                 checkboxIDEI.toggle()
+                text += "IDEI"
             }
+            Thread.sleep(2000)
 
             input.text.clear()
+
+            if(text.endsWith(", ")) {
+                text = text.subSequence(0, text.length - 2).toString()
+            }
+
+            popUpUtil.showPopUp(binding.root.context, text, "Cerrar")
         }
 
     }
