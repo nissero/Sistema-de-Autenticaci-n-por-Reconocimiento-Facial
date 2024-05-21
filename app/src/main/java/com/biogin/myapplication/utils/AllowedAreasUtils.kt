@@ -45,6 +45,8 @@ class AllowedAreasUtils() {
                     if(!areasArray.contains(newArea)) {
                         areasArray.add(newArea)
                         docRefInstitute.update("areas", areasArray)
+                        Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
+                        updateMap()
                     } else {
                         Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
                     }
@@ -59,52 +61,33 @@ class AllowedAreasUtils() {
 
     private fun updateMap() {
         firebaseMethods.readInstitutes("ICI") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
         firebaseMethods.readInstitutes("ICO") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
         firebaseMethods.readInstitutes("IDH") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
         firebaseMethods.readInstitutes("IDEI") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
     }
 
-//    fun addAreaToInstitute2(instituteName: String, area: String): Task<Transaction> {
-//        val db = FirebaseFirestore.getInstance()
-//        val docRefInstitute = db.collection("institutos").document(instituteName)
-//        return db.runTransaction { transaction ->
-//            if(!transaction.get(docRefInstitute).exists()) {
-//                throw FirebaseFirestoreException(
-//                    "El instituto ingresado no existe, compruebe el nombre",
-//                    FirebaseFirestoreException.Code.NOT_FOUND
-//                )
-//            }
-//
-//            val newArea = hashMapOf(
-//                "areas" to area
-//            )
-//
-//            transaction.set(docRefInstitute, newArea)
-//        }
-//    }
-//
-//    fun getAllAreas(): ArrayList<String> {
-//        val allAreas = ArrayList<String>()
-//
-//        for(institute in modulesAssociatedWithInstitutes) {
-//            for(area in institute.value) {
-//                if(!allAreas.contains(area)) {
-//                    allAreas.add(area)
-//                }
-//            }
-//        }
-//
-//        allAreas.sort()
-//
-//        return allAreas
-//    }
+    fun getAllAreas(): ArrayList<String> {
+        val allAreas = ArrayList<String>()
+
+        for(institute in modulesAssociatedWithInstitutes) {
+            for(area in institute.value) {
+                if(!allAreas.contains(area)) {
+                    allAreas.add(area)
+                }
+            }
+        }
+
+        allAreas.sort()
+
+        return allAreas
+    }
 
 }

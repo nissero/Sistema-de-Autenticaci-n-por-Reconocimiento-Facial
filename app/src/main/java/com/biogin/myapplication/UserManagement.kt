@@ -18,6 +18,7 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
+import com.biogin.myapplication.utils.PopUpUtil
 import com.google.firebase.firestore.FirebaseFirestoreException
 
 class UserManagement : AppCompatActivity() {
@@ -27,6 +28,7 @@ class UserManagement : AppCompatActivity() {
     private lateinit var binding: ActivityUserManagementBinding
     private var oldDni : String = ""
     private var validations  = FormValidations()
+    private val popUpUtil = PopUpUtil()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +51,7 @@ class UserManagement : AppCompatActivity() {
         val adapterStates = ArrayAdapter(this, R.layout.simple_spinner_item, userStates)
         userStateSpinner.adapter = adapterStates
 
-        if (intent.getStringExtra("button_option_chosed") == "UpdateUser") {
+        if (intent.getStringExtra("button_option_chosen") == "UpdateUser") {
             binding.updateUserDni.visibility = View.GONE
             binding.duplicateUserButton.visibility = View.GONE
             binding.updateUserButton.visibility = View.VISIBLE
@@ -111,13 +113,16 @@ class UserManagement : AppCompatActivity() {
 
             task.addOnSuccessListener {
                 Log.e("Firebase", "Update usuario exitoso")
-                showPopup("Se actualizó el usuario de forma exitosa", "Salir")
+                popUpUtil.showPopUp(binding.root.context,
+                    "Se actualizó el usuario de forma exitosa", "Salir")
                 finish()
             }.addOnFailureListener {ex ->
                 try {
                     throw ex
                 } catch (e : FirebaseFirestoreException) {
-                    showPopup("Error al modificar el usuario, intente nuevamente", "Reintentar")
+                    popUpUtil.showPopUp(binding.root.context,
+                        "Error al modificar el usuario, intente nuevamente",
+                        "Reintentar")
                 }
             }
         }
@@ -137,16 +142,22 @@ class UserManagement : AppCompatActivity() {
 
             task.addOnSuccessListener {
                 Log.e("Firebase", "Duplicacion usuario/update dni exitoso")
-                showPopup("Se actualizó el dni del usuario de forma exitosa", "Salir")
+                popUpUtil.showPopUp(binding.root.context,
+                    "Se actualizó el dni del usuario de forma exitosa",
+                    "Salir")
                 finish()
             }.addOnFailureListener {ex ->
                 try {
                     throw ex
                 } catch (e : FirebaseFirestoreException) {
                     if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                        showPopup("El DNI ingresado ya existe, compruebe el dato ingresado", "Reintentar")
+                        popUpUtil.showPopUp(binding.root.context,
+                            "El DNI ingresado ya existe, compruebe el dato ingresado",
+                            "Reintentar")
                     } else {
-                        showPopup("Error al modificar el DNI, intente nuevamente", "Reintentar")
+                        popUpUtil.showPopUp(binding.root.context,
+                            "Error al modificar el DNI, intente nuevamente",
+                            "Reintentar")
                     }
                 }
                 Log.e("Firebase", ex.toString())
@@ -294,11 +305,11 @@ class UserManagement : AppCompatActivity() {
         binding.checkboxIDH.visibility = View.INVISIBLE
         binding.checkboxICI.visibility = View.INVISIBLE
     }
-    private fun showPopup(popupText : String, popupButtonText : String) {
-        val intent = Intent(this@UserManagement, Popup::class.java)
-        intent.putExtra("popup_text", popupText)
-        intent.putExtra("text_button", popupButtonText)
-        startActivity(intent)
-    }
+//    private fun showPopup(popupText : String, popupButtonText : String) {
+//        val intent = Intent(this@UserManagement, Popup::class.java)
+//        intent.putExtra("popup_text", popupText)
+//        intent.putExtra("text_button", popupButtonText)
+//        startActivity(intent)
+//    }
 
 }

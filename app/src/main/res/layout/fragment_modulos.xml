@@ -7,6 +7,19 @@
     tools:context=".ui.rrhh.modulos.ModulosFragment">
 
 
+    <TextView
+        android:id="@+id/mensaje_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:text="@string/mensaje_ver_lugares_fisicos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/areas_ici"
         android:layout_width="wrap_content"
@@ -54,4 +67,30 @@
         app:layout_constraintHorizontal_bias="0.850"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/agregar_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="210dp"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:text="@string/mensaje_agregar_lugar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mensaje_text_view" />
+
+    <Button
+        android:id="@+id/agregar_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="@color/blue"
+        android:text="@string/agregar_lugar_fisico"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/agregar_text_view" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

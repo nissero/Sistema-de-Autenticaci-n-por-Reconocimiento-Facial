@@ -7,15 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.biogin.myapplication.Popup
 import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
-import okhttp3.internal.wait
+import com.biogin.myapplication.utils.PopUpUtil
 
 class ModulosFragment : Fragment() {
 
     private var _binding: FragmentModulosBinding? = null
     private val areasUtils = AllowedAreasUtils()
+    private val popUpUtil = PopUpUtil()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -45,6 +45,11 @@ class ModulosFragment : Fragment() {
             getAreas("IDH")
         }
 
+        binding.agregarButton.setOnClickListener {
+            val intent = Intent(binding.root.context, AddAreaActivity::class.java)
+            startActivity(intent)
+        }
+
         return root
     }
 
@@ -59,23 +64,21 @@ class ModulosFragment : Fragment() {
                 popUpText += area
                 popUpText += "\n"
             }
-            popUp(popUpText, buttonText)
+            popUpUtil.showPopUp(binding.root.context, popUpText, buttonText)
         } catch(e: NullPointerException) {
-            Thread.sleep(5000)
-            val areas = areasUtils.getAllowedAreas(arr)
-            for(area in areas) {
-                popUpText += area
-                popUpText += "\n"
+            try {
+                Thread.sleep(5000)
+                val areas = areasUtils.getAllowedAreas(arr)
+                for(area in areas) {
+                    popUpText += area
+                    popUpText += "\n"
+                }
+                popUpUtil.showPopUp(binding.root.context, popUpText, buttonText)
+            } catch(e: Exception) {
+                popUpUtil.showPopUp(binding.root.context,
+                    "No se pudo obtener la información en este momento\npruebe mas tarde", "Cerrar")
             }
-            popUp(popUpText, buttonText)
         }
-    }
-
-    private fun popUp(popUpText: String, buttonText: String) {
-        val intent = Intent(binding.root.context, Popup::class.java)
-        intent.putExtra("popup_text", popUpText)
-        intent.putExtra("text_button", buttonText)
-        startActivity(intent)
     }
 
     override fun onDestroyView() {
