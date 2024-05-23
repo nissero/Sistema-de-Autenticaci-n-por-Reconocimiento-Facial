@@ -47,7 +47,39 @@ class ModulosFragment : Fragment() {
 
         binding.agregarButton.setOnClickListener {
             val intent = Intent(binding.root.context, AddAreaActivity::class.java)
+            intent.putExtra("type", "add")
             startActivity(intent)
+        }
+
+        binding.modificarButton.setOnClickListener {
+            val area = binding.modificarInput.text.toString()
+            if(area.isNotEmpty()) {
+                val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+                if(arrayInstitutes.isNotEmpty()) {
+                    println("Encontre $area entre $arrayInstitutes")
+                    val intent = Intent(binding.root.context, AddAreaActivity::class.java)
+                    intent.putExtra("type", "modify")
+                    intent.putExtra("name", area)
+                    if(arrayInstitutes.contains("ICI"))
+                        intent.putExtra("ICI", true)
+                    else intent.putExtra("ICI", false)
+                    if(arrayInstitutes.contains("ICO"))
+                        intent.putExtra("ICO", true)
+                    else intent.putExtra("ICO", false)
+                    if(arrayInstitutes.contains("IDEI"))
+                        intent.putExtra("IDEI", true)
+                    else intent.putExtra("IDEI", false)
+                    if(arrayInstitutes.contains("IDH"))
+                        intent.putExtra("IDH", true)
+                    else intent.putExtra("IDH", false)
+
+                    startActivity(intent)
+                } else {
+                    return@setOnClickListener
+                }
+            } else {
+                return@setOnClickListener
+            }
         }
 
         return root

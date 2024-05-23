@@ -122,7 +122,11 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    <string name="texto_ayuda">Para agregar un nuevo lugar\nfísico, ingrese un nombre y seleccione\na que institutos pertenece</string>
+    <string name="texto_ayuda_agregar">Para agregar un nuevo lugar\nfísico, ingrese un nombre y seleccione\na que institutos pertenece</string>
+    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\n puede cambiar el nombre y modificar\na que institutos pertenece</string>
+    <string name="texto_ayuda_eliminar">Si no selecciona ningun instituto,\nel lugar físico será eliminado</string>
     <string name="nombre">Nombre</string>
+    <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
+    <string name="mensaje_modificar_lugar">Para modificar un lugar físico, ingrese\nel nombre y luego presione el botón</string>
     >>>>>>> origin/fernando2
 </resources>

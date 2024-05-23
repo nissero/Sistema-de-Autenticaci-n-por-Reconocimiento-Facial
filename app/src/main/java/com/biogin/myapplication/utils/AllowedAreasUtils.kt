@@ -2,10 +2,8 @@ package com.biogin.myapplication.utils
 
 import android.util.Log
 import com.biogin.myapplication.FirebaseMethods
-import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Transaction
 
 class AllowedAreasUtils() {
     private var firebaseMethods = FirebaseMethods()
@@ -24,7 +22,7 @@ class AllowedAreasUtils() {
         updateMap()
     }
     fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
-        updateMap()
+//        updateMap()
         val allowedAreas = mutableSetOf<String>()
         for (institute in institutes) {
             allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
@@ -34,7 +32,7 @@ class AllowedAreasUtils() {
     }
 
     fun addAreaToInstitute(instituteName: String, newArea: String) {
-        updateMap()
+//        updateMap()
         val db = FirebaseFirestore.getInstance()
         val docRefInstitute = db.collection("institutos").document(instituteName)
         docRefInstitute.get()
@@ -46,9 +44,40 @@ class AllowedAreasUtils() {
                         areasArray.add(newArea)
                         docRefInstitute.update("areas", areasArray)
                         Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
-                        updateMap()
+
+                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newArea)
+//                        updateMap()
                     } else {
                         Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+            }
+    }
+
+    fun removeAreaFromInstitute(instituteName: String, areaToRemove: String) {
+//        updateMap()
+        val db = FirebaseFirestore.getInstance()
+        val docRefInstitute = db.collection("institutos").document(instituteName)
+        docRefInstitute.get()
+            .addOnSuccessListener { instituteDocument ->
+                if (instituteDocument != null) {
+                    val instituteData = instituteDocument.data
+                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+                    if(areasArray.contains(areaToRemove)) {
+                        docRefInstitute.update("areas", FieldValue.arrayRemove(areaToRemove))
+                        Log.d("Firebase", "Se eliminó el area $areaToRemove del instituto $instituteName")
+//                        updateMap()
+
+                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(areaToRemove)
+                        println(modulesAssociatedWithInstitutes.get(instituteName))
+                    } else {
+                        Log.d("Firebase", "No existe el area $areaToRemove en el " +
+                                "instituto $instituteName")
                     }
                 } else {
                     Log.d("Firebase", "No existe el documento")
@@ -72,6 +101,18 @@ class AllowedAreasUtils() {
         firebaseMethods.readInstitutes("IDEI") {
             institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
+    }
+
+    fun getInstitutesFromArea(area: String): ArrayList<String> {
+        val institutes = ArrayList<String>()
+
+        for(institute in modulesAssociatedWithInstitutes.keys) {
+            if(modulesAssociatedWithInstitutes[institute]?.contains(area) == true) {
+                institutes.add(institute)
+            }
+        }
+
+        return institutes
     }
 
     fun getAllAreas(): ArrayList<String> {
