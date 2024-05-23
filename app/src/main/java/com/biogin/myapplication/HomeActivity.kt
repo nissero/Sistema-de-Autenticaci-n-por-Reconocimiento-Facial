@@ -37,8 +37,12 @@ class HomeActivity : AppCompatActivity() {
         }
 
         viewBinding.buttonLoginOffline.setOnClickListener{
-            val bd = OfflineDataBaseHelper(this)
-            bd.getApellido("43908111")
+            val db = OfflineDataBaseHelper(this)
+            db.deleteUserByDni("43908111")
+            db.registerUser("43908111", "nissero", "rrhh", true)
+            val intent = Intent(this, OfflineLogInActivity::class.java)
+            intent.putExtra("authenticationType", "rrhh")
+            startActivity(intent)
         }
     }
 }
