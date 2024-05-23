@@ -15,11 +15,16 @@ class PhotoRegisterActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityPhotoRegisterBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
+
+    private var photoCounter = 0
+    private val maxPhotos = 3
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityPhotoRegisterBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         cameraExecutor = Executors.newSingleThreadExecutor()
+
         // Request camera permissions
         if (allPermissionsGranted()) {
             initCamera()
@@ -30,17 +35,23 @@ class PhotoRegisterActivity : AppCompatActivity() {
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.switchCameraButton.setOnClickListener {
-            camera.flipCamera()
-        }
+        viewBinding.switchCameraButton.setOnClickListener { camera.flipCamera() }
     }
 
     private fun initCamera() {
-        camera = CameraHelper(null, this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null,  false)
+        camera = CameraHelper(null, this, null, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, null, false)
         camera.startCamera()
     }
+
     private fun takePhoto() {
-        camera.takePhoto(TAG, FILENAME_FORMAT, this, intent, ::finish)
+        if (photoCounter < maxPhotos) {
+            camera.takePhoto(TAG, FILENAME_FORMAT, this, intent) {
+                photoCounter++
+                if (photoCounter >= maxPhotos) {
+                    finish()
+                }
+            }
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
