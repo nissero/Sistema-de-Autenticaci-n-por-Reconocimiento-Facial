@@ -167,7 +167,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifSecurity(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -180,7 +180,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifRRHH(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "rrhh") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "rrhh") {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -193,7 +193,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifFinDeTurno(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -206,7 +206,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifAny(user: Usuario){
-        if (user.getNombre().isNotEmpty()) {
+        if (user.getNombre().isNotEmpty() && user.getEstado()) {
             this.showAuthorizationMessage(user)
             Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
         } else {
