@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.databinding.ActivityHomeBinding
-import com.biogin.myapplication.ui.login.RegisterActivity
+import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
+import com.biogin.myapplication.utils.ConnectionCheck
+import com.google.android.material.snackbar.Snackbar
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
@@ -22,6 +24,7 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         viewBinding.buttonFaceRecognition.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
@@ -31,6 +34,11 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "rrhh")
             startActivity(intent)
+        }
+
+        viewBinding.buttonLoginOffline.setOnClickListener{
+            val bd = OfflineDataBaseHelper(this)
+            bd.getApellido("43908111")
         }
     }
 }
