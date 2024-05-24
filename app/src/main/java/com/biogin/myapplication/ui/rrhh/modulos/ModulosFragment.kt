@@ -17,7 +17,7 @@ import java.util.Locale
 class ModulosFragment : Fragment() {
 
     private var _binding: FragmentModulosBinding? = null
-    private val areasUtils = AllowedAreasUtils()
+    private var areasUtils = AllowedAreasUtils()
     private val dialogUtil = DialogUtil()
 
     // This property is only valid between onCreateView and
@@ -141,5 +141,10 @@ class ModulosFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        areasUtils = AllowedAreasUtils()
     }
 }
