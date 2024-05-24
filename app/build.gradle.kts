@@ -85,6 +85,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
     val camerax_version = "1.1.0-beta01"
+    implementation("org.apache.commons:commons-csv:1.5")
     implementation("androidx.camera:camera-core:$camerax_version")
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")

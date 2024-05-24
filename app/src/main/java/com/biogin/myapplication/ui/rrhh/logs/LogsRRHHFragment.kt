@@ -11,13 +11,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.R
+import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.databinding.FragmentLogsRrhhBinding
-import com.biogin.myapplication.ui.seguridad.logs.LogsFragment
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 class LogsRRHHFragment : Fragment() {
-
+    private val logsRepository : LogsRepository = LogsRepository()
     private var _binding: FragmentLogsRrhhBinding? = null
 
     // This property is only valid between onCreateView and
@@ -39,45 +39,45 @@ class LogsRRHHFragment : Fragment() {
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.textDashboard
-//        dashboardViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-
-        var registrosString: String =
-            root.context.assets.open("logs").bufferedReader().use { it.readText() }
-
-        var listaRegistros = Json.decodeFromString<List<LogsFragment.Log>>(registrosString)
+        var listaRegistros : List<com.biogin.myapplication.logs.Log>
+        runBlocking {
+            listaRegistros = logsRepository.GetAllLogs()
+        }
 
         var tablaRegistros = root.findViewById<TableLayout>(R.id.tablaRegistrosRRHH)
 
-        for(i in 0..listaRegistros.size-1) {
+        for(registro in listaRegistros) {
             var fila = TableRow(root.context)
 
-            var fecha = TextView(root.context)
-            fecha.gravity = Gravity.CENTER_HORIZONTAL
-            fecha.text = listaRegistros[i].fecha
-            fila.addView(fecha)
+            var fechaHora = TextView(root.context)
+            fechaHora.gravity = Gravity.CENTER_HORIZONTAL
+            fechaHora.text = registro.timestamp
+            fechaHora.textSize = 11.0F
+            fila.addView(fechaHora)
 
-            var hora = TextView(root.context)
-            hora.text = listaRegistros[i].hora
-            hora.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(hora)
+            var logType = TextView(root.context)
+            logType.text = registro.logEventName.name
+            logType.gravity = Gravity.CENTER_HORIZONTAL
+            logType.textSize = 11.0F
+            fila.addView(logType)
 
-            var idAut = TextView(root.context)
-            idAut.text = listaRegistros[i].idAutenticador.toString()
-            idAut.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(idAut)
+            var dniRRHH = TextView(root.context)
+            dniRRHH.text = registro.dniMasterUser
+            dniRRHH.gravity = Gravity.CENTER_HORIZONTAL
+            dniRRHH.textSize = 11.0F
+            fila.addView(dniRRHH)
 
-            var idVis = TextView(root.context)
-            idVis.text = listaRegistros[i].idVisitante.toString()
-            idVis.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(idVis)
+            var dniUserAffected = TextView(root.context)
+            dniUserAffected.text = registro.dniUserAffected
+            dniUserAffected.textSize = 11.0F
+            dniUserAffected.gravity = Gravity.CENTER_HORIZONTAL
+            fila.addView(dniUserAffected)
 
-            var lugar = TextView(root.context)
-            lugar.text = listaRegistros[i].lugarFisico
-            lugar.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(lugar)
+            var category = TextView(root.context)
+            category.text = registro.userCategory
+            category.textSize = 11.0F
+            category.gravity = Gravity.CENTER_HORIZONTAL
+            fila.addView(category)
 
             tablaRegistros.addView(fila)
         }

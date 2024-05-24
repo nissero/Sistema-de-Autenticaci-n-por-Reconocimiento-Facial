@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
-import com.biogin.myapplication.FaceRecognitionActivity
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.databinding.ActivityRegisterBinding
 
