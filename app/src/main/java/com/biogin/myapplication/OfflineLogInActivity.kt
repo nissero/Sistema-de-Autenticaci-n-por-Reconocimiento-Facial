@@ -22,10 +22,11 @@ class OfflineLogInActivity : AppCompatActivity() {
         const val TAG = "OfflineLoginActivity"
     }
 
+    private lateinit var dniMaster: String
     private lateinit var authenticationType: String
     private lateinit var integrator: IntentIntegrator
     private lateinit var database: OfflineDataBaseHelper
-    private lateinit var resultTextView: TextView
+    //private lateinit var resultTextView: TextView
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,10 +37,17 @@ class OfflineLogInActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        resultTextView = findViewById(R.id.result_text_view)
+        //resultTextView = findViewById(R.id.result_text_view)
+
+
 
         database = OfflineDataBaseHelper(this)
+
         authenticationType = intent.getStringExtra("authenticationType").toString()
+        dniMaster = intent.getStringExtra("dniMaster").toString()
+
+        Log.d(TAG, "DNI MASTER INICIO DE TURNO: $dniMaster")
+
         integrator = IntentIntegrator(this@OfflineLogInActivity)
 
         integrator.setPrompt("Acerca el codigo del DNI")
@@ -53,12 +61,12 @@ class OfflineLogInActivity : AppCompatActivity() {
         if (result != null){
             if (result.contents == null){
                 Toast.makeText(this, "Cancelado", Toast.LENGTH_LONG).show()
+                finish()
             } else {
                 val apellido = getDNISurname(result.contents.toString())
                 val dni = getDNINumber(result.contents.toString())
                 when(authenticationType){
                     "seguridad" -> securityScan(dni, apellido)
-                    "rrhh" -> rrhhScan(dni, apellido)
                     "fin" -> finDeTurno(dni, apellido)
                     else -> noCategoryScan(dni, apellido)
                 }
@@ -70,37 +78,38 @@ class OfflineLogInActivity : AppCompatActivity() {
 
     private fun securityScan(dni: String, apellido: String) {
         if (database.checkIfSecurity(dni)){
-            resultTextView.text = "Hola ${apellido}, bienvenido al sistema"
             Log.d(TAG, "ENCONTRADO SEGURIDAD - APELLIDO: $apellido")
             Log.d(TAG, "ENCONTRADO SEGURIDAD - DNI: $dni")
+
+            val intent = Intent(this, SeguridadActivity::class.java)
+            intent.putExtra("dniMaster", dni)
+
+            startActivity(intent)
+
+            finish()
         } else {
-            resultTextView.text = "No se ha encontrado ningun usuario con estos datos"
             Log.e(TAG, "ENCONTRADO - APELLIDO: $apellido")
             Log.e(TAG, "ENCONTRADO - DNI: $dni")
+            finish()
         }
     }
 
-    private fun rrhhScan(dni: String, apellido: String) {
-        if (database.checkIfRRHH(dni)){
-            resultTextView.text = "Hola ${apellido}, bienvenido al sistema"
-            Log.d(TAG, "ENCONTRADO RRHH - APELLIDO: $apellido")
-            Log.d(TAG, "ENCONTRADO RRHH - DNI: $dni")
-        } else {
-            resultTextView.text = "No se ha encontrado ningun usuario con estos datos"
-            Log.e(TAG, "ENCONTRADO RRHH - APELLIDO: $apellido")
-            Log.e(TAG, "ENCONTRADO RRHH - DNI: $dni")
-        }
-    }
-
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun noCategoryScan(dni: String, apellido: String) {
-        if (database.checkInDatabase(dni)) {
-            resultTextView.text = "Hola ${apellido}, bienvenido al sistema"
+        if (database.registerLog("USER_SUCCESSFUL_AUTHENTICATION", dni, dniMaster)) {
             Log.d(TAG, "ENCONTRADO - APELLIDO: $apellido")
+
             Log.d(TAG, "ENCONTRADO - DNI: $dni")
+            Log.d(TAG, "MASTER DNI: $dniMaster")
+
+            Log.d(TAG, "RESULTADO DE TODOS LOS LOGS: ${database.getAllLogs()}")
+            finish()
         } else {
-            resultTextView.text = "No se ha encontrado ningun usuario con estos datos"
+            Log.e(TAG, "USUARIO NO REGISTRADO EN LA BASE DE DATOS")
+
             Log.e(TAG, "ENCONTRADO - APELLIDO: $apellido")
             Log.e(TAG, "ENCONTRADO - DNI: $dni")
+            finish()
         }
     }
 

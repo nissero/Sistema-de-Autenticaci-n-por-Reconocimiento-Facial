@@ -30,6 +30,7 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)
         }
+
         viewBinding.buttonFaceRecognitionRrhh.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "rrhh")
@@ -38,10 +39,11 @@ class HomeActivity : AppCompatActivity() {
 
         viewBinding.buttonLoginOffline.setOnClickListener{
             val db = OfflineDataBaseHelper(this)
-            db.deleteUserByDni("43908111")
-            db.registerUser("43908111", "nissero", "rrhh", true)
+            this.deleteDatabase("OfflineDb")
+            db.registerSecurity("43908111")
+            db.registerUser("43908111")
             val intent = Intent(this, OfflineLogInActivity::class.java)
-            intent.putExtra("authenticationType", "rrhh")
+            intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)
         }
     }

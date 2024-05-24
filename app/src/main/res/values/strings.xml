@@ -26,7 +26,8 @@
     <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial (SEGURIDAD)</string>
     <string name="home_text_enter_face_recognition_rrhh">Ingresar con\nreconocimiento facial (RRHH)</string>
     <string name="home_text_enter_dni_scanner">Ingresar con DNI</string>
-    <string name="face_recognition_visitors">Autenticacion de\nvisitantes</string>
+    <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
+    <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
     <string-array name="user_categories">
         <item>Docente</item>
         <item>No docente</item>
