@@ -8,12 +8,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
+import com.biogin.myapplication.utils.DialogUtil
 import com.biogin.myapplication.utils.PopUpUtil
 
 class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
-    private val popUpUtil = PopUpUtil()
+    private val dialogUtil = DialogUtil()
     private val areasUtil = AllowedAreasUtils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,19 +58,17 @@ class ABMAreaActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val areaName = input.text.toString()
+            val areaName = input.text.toString().uppercase()
             if(areaName.isEmpty()) {
-                popUpUtil.showPopUp(binding.root.context,
-                    "El campo de nombre no puede estar vacío",
-                    "Cerrar")
+                dialogUtil.showDialog(binding.root.context,
+                    "El campo de nombre no puede estar vacío")
                 return@setOnClickListener
             }
 
             if(!checkboxICI.isChecked && !checkboxIDEI.isChecked &&
                 !checkboxICO.isChecked && !checkboxIDH.isChecked) {
-                popUpUtil.showPopUp(binding.root.context,
-                    "Debe seleccionar al menos un instituto",
-                    "Cerrar")
+                dialogUtil.showDialog(binding.root.context,
+                    "Debe seleccionar al menos un instituto")
                 return@setOnClickListener
             }
 
@@ -78,9 +77,9 @@ class ABMAreaActivity : AppCompatActivity() {
                     add(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                         checkboxIDH.isChecked, checkboxIDEI.isChecked)
                 } else {
-                    popUpUtil.showPopUp(binding.root.context,
-                        "Ya existe un lugar físico de " +
-                                "nombre $areaName", "Cerrar")
+                    dialogUtil.showDialog(binding.root.context,
+                        "Ya existe un lugar físico de nombre $areaName, para modificarlo\n" +
+                                "debe ir a la sección previa y seguir las instrucciones")
                     return@setOnClickListener
                 }
             } else if(intent.getStringExtra("type") == "modify") {
