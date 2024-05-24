@@ -10,19 +10,9 @@ class AllowedAreasUtils() {
     private var modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
 
     init {
-//        modulesAssociatedWithInstitutes.set("IDEI", arrayListOf("Módulo 1", "Módulo 3", "Módulo 4","Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-//        modulesAssociatedWithInstitutes.set("ICO", arrayListOf("Módulo 1", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-//        modulesAssociatedWithInstitutes.set("IDH", arrayListOf("Módulo 1", "Módulo 2","Módulo 3", "Módulo 5", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-//        modulesAssociatedWithInstitutes.set("ICI", arrayListOf("Módulo 1", "Módulo 2", "Módulo 3", "Módulo 6", "Módulo 7", "Módulo 9", "Auditorio", "Biblioteca"))
-//
-//        val institutesString: String =
-//            root.context.assets.open("areas").bufferedReader().use { it.readText() }
-//
-//        val institutes = Json.decodeFromString<ArrayList<Institute>>(institutesString)
         updateMap()
     }
     fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
-//        updateMap()
         val allowedAreas = mutableSetOf<String>()
         for (institute in institutes) {
             allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
@@ -32,7 +22,6 @@ class AllowedAreasUtils() {
     }
 
     fun addAreaToInstitute(instituteName: String, newArea: String) {
-//        updateMap()
         val db = FirebaseFirestore.getInstance()
         val docRefInstitute = db.collection("institutos").document(instituteName)
         docRefInstitute.get()
@@ -46,7 +35,6 @@ class AllowedAreasUtils() {
                         Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
 
                         modulesAssociatedWithInstitutes.get(instituteName)?.add(newArea)
-//                        updateMap()
                     } else {
                         Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
                     }
@@ -60,7 +48,6 @@ class AllowedAreasUtils() {
     }
 
     fun removeAreaFromInstitute(instituteName: String, areaToRemove: String) {
-//        updateMap()
         val db = FirebaseFirestore.getInstance()
         val docRefInstitute = db.collection("institutos").document(instituteName)
         docRefInstitute.get()
@@ -71,10 +58,8 @@ class AllowedAreasUtils() {
                     if(areasArray.contains(areaToRemove)) {
                         docRefInstitute.update("areas", FieldValue.arrayRemove(areaToRemove))
                         Log.d("Firebase", "Se eliminó el area $areaToRemove del instituto $instituteName")
-//                        updateMap()
 
                         modulesAssociatedWithInstitutes.get(instituteName)?.remove(areaToRemove)
-                        println(modulesAssociatedWithInstitutes.get(instituteName))
                     } else {
                         Log.d("Firebase", "No existe el area $areaToRemove en el " +
                                 "instituto $instituteName")

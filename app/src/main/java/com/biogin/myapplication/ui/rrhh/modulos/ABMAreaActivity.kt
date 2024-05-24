@@ -1,10 +1,8 @@
 package com.biogin.myapplication.ui.rrhh.modulos
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.set
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
@@ -12,7 +10,7 @@ import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.PopUpUtil
 
-class AddAreaActivity : AppCompatActivity() {
+class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
     private val popUpUtil = PopUpUtil()
@@ -30,8 +28,7 @@ class AddAreaActivity : AppCompatActivity() {
 
         val type = intent.getStringExtra("type").toString()
 
-        val inst1 = binding.instrucciones
-        val inst2 = binding.instruccionesEliminar
+        val instructions = binding.instrucciones
         val button = binding.agregarLugarFisico
         val input = binding.nombreInput
         val checkboxICO = binding.checkboxICO
@@ -54,8 +51,7 @@ class AddAreaActivity : AppCompatActivity() {
                 checkboxIDEI.isChecked = true
             }
 
-            inst1.text = binding.root.context.getString(R.string.texto_ayuda_modificar)
-            inst2.visibility = View.VISIBLE
+            instructions.text = binding.root.context.getString(R.string.texto_ayuda_modificar)
             button.text = binding.root.context.getString(R.string.modificar_lugar_fisico)
 
         }
@@ -69,14 +65,15 @@ class AddAreaActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if(!checkboxICI.isChecked && !checkboxIDEI.isChecked &&
+                !checkboxICO.isChecked && !checkboxIDH.isChecked) {
+                popUpUtil.showPopUp(binding.root.context,
+                    "Debe seleccionar al menos un instituto",
+                    "Cerrar")
+                return@setOnClickListener
+            }
+
             if(intent.getStringExtra("type") == "add") {
-                if(!checkboxICI.isChecked && !checkboxIDEI.isChecked &&
-                    !checkboxICO.isChecked && !checkboxIDH.isChecked) {
-                    popUpUtil.showPopUp(binding.root.context,
-                        "Debe seleccionar al menos un instituto",
-                        "Cerrar")
-                    return@setOnClickListener
-                }
                 if(!checkIfAreaExists(areaName)) {
                     add(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                         checkboxIDH.isChecked, checkboxIDEI.isChecked)
@@ -92,6 +89,7 @@ class AddAreaActivity : AppCompatActivity() {
                 add(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                     checkboxIDH.isChecked, checkboxIDEI.isChecked)
             }
+
 
 //            var text = "Se agregó ${input.text} a los siguientes institutos:\n"
 //

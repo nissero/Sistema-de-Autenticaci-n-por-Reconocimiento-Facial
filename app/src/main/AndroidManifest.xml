@@ -21,7 +21,7 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".ui.rrhh.modulos.AddAreaActivity"
+            android:name=".ui.rrhh.modulos.ABMAreaActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
         <activity

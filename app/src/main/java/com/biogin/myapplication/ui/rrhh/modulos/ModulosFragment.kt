@@ -14,7 +14,7 @@ import com.biogin.myapplication.utils.PopUpUtil
 class ModulosFragment : Fragment() {
 
     private var _binding: FragmentModulosBinding? = null
-    private val areasUtils = AllowedAreasUtils()
+    private lateinit var areasUtils: AllowedAreasUtils
     private val popUpUtil = PopUpUtil()
 
     // This property is only valid between onCreateView and
@@ -28,6 +28,8 @@ class ModulosFragment : Fragment() {
     ): View {
         val notificationsViewModel =
             ViewModelProvider(this).get(ModulosViewModel::class.java)
+
+        areasUtils = AllowedAreasUtils()
 
         _binding = FragmentModulosBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -46,7 +48,7 @@ class ModulosFragment : Fragment() {
         }
 
         binding.agregarButton.setOnClickListener {
-            val intent = Intent(binding.root.context, AddAreaActivity::class.java)
+            val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
             intent.putExtra("type", "add")
             startActivity(intent)
         }
@@ -56,8 +58,7 @@ class ModulosFragment : Fragment() {
             if(area.isNotEmpty()) {
                 val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
                 if(arrayInstitutes.isNotEmpty()) {
-                    println("Encontre $area entre $arrayInstitutes")
-                    val intent = Intent(binding.root.context, AddAreaActivity::class.java)
+                    val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
                     intent.putExtra("type", "modify")
                     intent.putExtra("name", area)
                     if(arrayInstitutes.contains("ICI"))
@@ -74,6 +75,22 @@ class ModulosFragment : Fragment() {
                     else intent.putExtra("IDH", false)
 
                     startActivity(intent)
+                } else {
+                    return@setOnClickListener
+                }
+            } else {
+                return@setOnClickListener
+            }
+        }
+
+        binding.eliminarButton.setOnClickListener {
+            val area = binding.modificarInput.text.toString()
+            if(area.isNotEmpty()) {
+                val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+                if(arrayInstitutes.isNotEmpty()) {
+                    for (institute in arrayInstitutes) {
+                        areasUtils.removeAreaFromInstitute(institute, area)
+                    }
                 } else {
                     return@setOnClickListener
                 }
