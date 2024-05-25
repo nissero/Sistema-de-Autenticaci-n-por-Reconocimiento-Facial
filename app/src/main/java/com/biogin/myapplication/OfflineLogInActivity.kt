@@ -6,9 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -77,19 +75,26 @@ class OfflineLogInActivity : AppCompatActivity() {
     }
 
     private fun securityScan(dni: String, apellido: String) {
-        if (database.checkIfSecurity(dni)){
+        if (!database.checkIfSecurity(dni)){
             Log.d(TAG, "ENCONTRADO SEGURIDAD - APELLIDO: $apellido")
             Log.d(TAG, "ENCONTRADO SEGURIDAD - DNI: $dni")
 
-            val intent = Intent(this, SeguridadActivity::class.java)
-            intent.putExtra("dniMaster", dni)
-
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("dni", dni)
+            intent.putExtra("typeOfLogIn", "security")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("apellido", apellido)
             startActivity(intent)
 
             finish()
         } else {
             Log.e(TAG, "ENCONTRADO - APELLIDO: $apellido")
             Log.e(TAG, "ENCONTRADO - DNI: $dni")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "security")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
             finish()
         }
     }
@@ -103,12 +108,25 @@ class OfflineLogInActivity : AppCompatActivity() {
             Log.d(TAG, "MASTER DNI: $dniMaster")
 
             Log.d(TAG, "RESULTADO DE TODOS LOS LOGS: ${database.getAllLogs()}")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("typeOfLogIn", "visitor")
+            intent.putExtra("dni", dni)
+            intent.putExtra("apellido", apellido)
+
+            startActivity(intent)
+
             finish()
         } else {
             Log.e(TAG, "USUARIO NO REGISTRADO EN LA BASE DE DATOS")
 
             Log.e(TAG, "ENCONTRADO - APELLIDO: $apellido")
             Log.e(TAG, "ENCONTRADO - DNI: $dni")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("authorizationResult", "denied")
+
             finish()
         }
     }
