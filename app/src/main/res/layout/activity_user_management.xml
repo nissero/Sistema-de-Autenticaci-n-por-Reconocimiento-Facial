@@ -62,7 +62,7 @@
         android:layout_marginTop="60dp"
         android:ems="10"
         android:hint="DNI"
-        android:inputType="text"
+        android:inputType="number"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/update_user_name"

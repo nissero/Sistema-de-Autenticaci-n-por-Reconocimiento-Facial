@@ -2,10 +2,7 @@ package com.biogin.myapplication
 
 import android.util.Log
 import com.biogin.myapplication.data.Institute
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.snapshots
-import kotlinx.coroutines.tasks.await
 
 class FirebaseMethods {
 

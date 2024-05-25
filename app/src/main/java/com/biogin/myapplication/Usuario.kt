@@ -1,7 +1,5 @@
 package com.biogin.myapplication
 
-import org.checkerframework.checker.units.qual.A
-
 class Usuario (
     private val nombre: String = "",
     private val apellido: String = "",

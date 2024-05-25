@@ -41,8 +41,8 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-        var userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val userCategories = resources.getStringArray(R.array.user_categories)
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
         categoriesSpinner.adapter = adapter
@@ -55,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-                var categorySelected  = spinner.selectedItem.toString()
+                val categorySelected  = spinner.selectedItem.toString()
 
                 if (categoriesWithNoInstitute.contains(categorySelected)) {
                     disableCheckboxes()
@@ -131,7 +131,7 @@ class RegisterActivity : AppCompatActivity() {
 
         continueButton?.setOnClickListener {
             loadingDialog.startLoadingDialog()
-            var institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
+            val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             dataSource.uploadUserToFirebase(
                 name?.text.toString(),
                 surname?.text.toString(),
@@ -236,10 +236,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkContinueButtonActivation() {
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
 
         val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        var categorySelected  = spinner.selectedItem.toString()
+        val categorySelected  = spinner.selectedItem.toString()
 
         if (formHasNoErrors()) {
             if (!categoriesWithNoInstitute.contains(categorySelected)) {

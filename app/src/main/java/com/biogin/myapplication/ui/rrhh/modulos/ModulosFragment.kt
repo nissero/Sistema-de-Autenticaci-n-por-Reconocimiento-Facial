@@ -56,54 +56,60 @@ class ModulosFragment : Fragment() {
 
         binding.modificarButton.setOnClickListener {
             val area = binding.modificarInput.text.toString().uppercase()
-            if(area.isNotEmpty()) {
-                val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
-                if(arrayInstitutes.isNotEmpty()) {
-                    val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
-                    intent.putExtra("type", "modify")
-                    intent.putExtra("name", area)
-                    if(arrayInstitutes.contains("ICI"))
-                        intent.putExtra("ICI", true)
-                    else intent.putExtra("ICI", false)
-                    if(arrayInstitutes.contains("ICO"))
-                        intent.putExtra("ICO", true)
-                    else intent.putExtra("ICO", false)
-                    if(arrayInstitutes.contains("IDEI"))
-                        intent.putExtra("IDEI", true)
-                    else intent.putExtra("IDEI", false)
-                    if(arrayInstitutes.contains("IDH"))
-                        intent.putExtra("IDH", true)
-                    else intent.putExtra("IDH", false)
 
-                    startActivity(intent)
-                } else {
-                    dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
-                            "de nombre $area")
-                    return@setOnClickListener
-                }
-            } else {
+            if(area.isEmpty()) {
                 dialogUtil.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
+
+            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+
+            if(arrayInstitutes.isEmpty()) {
+                dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
+                        "de nombre $area")
+                return@setOnClickListener
+            }
+
+            val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
+            intent.putExtra("type", "modify")
+            intent.putExtra("name", area)
+            if(arrayInstitutes.contains("ICI"))
+                intent.putExtra("ICI", true)
+            else intent.putExtra("ICI", false)
+            if(arrayInstitutes.contains("ICO"))
+                intent.putExtra("ICO", true)
+            else intent.putExtra("ICO", false)
+            if(arrayInstitutes.contains("IDEI"))
+                intent.putExtra("IDEI", true)
+            else intent.putExtra("IDEI", false)
+            if(arrayInstitutes.contains("IDH"))
+                intent.putExtra("IDH", true)
+            else intent.putExtra("IDH", false)
+
+            startActivity(intent)
         }
 
         binding.eliminarButton.setOnClickListener {
             val area = binding.modificarInput.text.toString().uppercase()
-            if(area.isNotEmpty()) {
-                val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
-                if(arrayInstitutes.isNotEmpty()) {
-                    for (institute in arrayInstitutes) {
-                        areasUtils.removeAreaFromInstitute(institute, area)
-                    }
-                } else {
-                    dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
-                            "de nombre $area")
-                    return@setOnClickListener
-                }
-            } else {
+
+            if(area.isEmpty()) {
                 dialogUtil.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
+
+            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+
+            if(arrayInstitutes.isEmpty()) {
+                dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
+                        "de nombre $area")
+                return@setOnClickListener
+            }
+
+            for (institute in arrayInstitutes) {
+                areasUtils.removeAreaFromInstitute(institute, area)
+            }
+            dialogUtil.showDialog(binding.root.context, "$area ha sido eliminado exitosamente")
+            binding.modificarInput.text.clear()
         }
 
         return root

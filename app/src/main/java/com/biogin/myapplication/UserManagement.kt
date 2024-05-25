@@ -1,6 +1,5 @@
 package com.biogin.myapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -36,18 +35,18 @@ class UserManagement : AppCompatActivity() {
         binding = ActivityUserManagementBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var name = binding.updateUserName
-        var surname = binding.updateUserSurname
-        var email = binding.updateUserEmail
-        var newDni = binding.updateUserDni
-        var categoriesSpinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+        val name = binding.updateUserName
+        val surname = binding.updateUserSurname
+        val email = binding.updateUserEmail
+        val newDni = binding.updateUserDni
+        val categoriesSpinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val userStateSpinner = findViewById<Spinner>(R.id.update_user_state_spinner)
 
-        var userCategories = resources.getStringArray(R.array.user_categories)
+        val userCategories = resources.getStringArray(R.array.user_categories)
         val adapterCategories = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
         categoriesSpinner.adapter = adapterCategories
 
-        var userStates = resources.getStringArray(R.array.user_active_options)
+        val userStates = resources.getStringArray(R.array.user_active_options)
         val adapterStates = ArrayAdapter(this, R.layout.simple_spinner_item, userStates)
         userStateSpinner.adapter = adapterStates
 
@@ -80,7 +79,7 @@ class UserManagement : AppCompatActivity() {
         } else {
             binding.updateUserStateSpinner.setSelection(1)
         }
-        var institutes = ArrayList<String>()
+        val institutes = ArrayList<String>()
         institutes.addAll(intent.getStringArrayListExtra("institutes")!!)
         for (institute in institutes) {
             Log.e("firebase", institute)
@@ -164,7 +163,7 @@ class UserManagement : AppCompatActivity() {
             }
         }
 
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -172,7 +171,7 @@ class UserManagement : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                var categorySelected  = categoriesSpinner.selectedItem.toString()
+                val categorySelected  = categoriesSpinner.selectedItem.toString()
 
                 if (categoriesWithNoInstitute.contains(categorySelected)) {
                     disableCheckboxes()
@@ -240,7 +239,7 @@ class UserManagement : AppCompatActivity() {
             buttonToEnable = findViewById(R.id.duplicate_user_button)
         }
 
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
 
         val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val categorySelected  = spinner.selectedItem.toString()

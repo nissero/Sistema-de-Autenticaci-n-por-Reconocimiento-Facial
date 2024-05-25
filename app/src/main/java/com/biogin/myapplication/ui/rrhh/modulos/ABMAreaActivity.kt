@@ -7,15 +7,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
+import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtil
-import com.biogin.myapplication.utils.PopUpUtil
 
 class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
     private val dialogUtil = DialogUtil()
     private val areasUtil = AllowedAreasUtils()
+    private val loadingUtil = LoadingDialog(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbmAreaBinding.inflate(layoutInflater)
@@ -73,64 +74,54 @@ class ABMAreaActivity : AppCompatActivity() {
             }
 
             if(intent.getStringExtra("type") == "add") {
-                if(!checkIfAreaExists(areaName)) {
-                    add(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
-                        checkboxIDH.isChecked, checkboxIDEI.isChecked)
-                } else {
+                if(checkIfAreaExists(areaName)) {
                     dialogUtil.showDialog(binding.root.context,
                         "Ya existe un lugar físico de nombre $areaName, para modificarlo\n" +
                                 "debe ir a la sección previa y seguir las instrucciones")
                     return@setOnClickListener
                 }
+
+                val message =
+                    addAreaAndReturnMessage(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
+                        checkboxIDH.isChecked, checkboxIDEI.isChecked)
+                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                    finish()
+                }
             } else if(intent.getStringExtra("type") == "modify") {
                 remove(intent.getStringExtra("name").toString())
                 Thread.sleep(2000)
-                add(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
+                addAreaAndReturnMessage(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                     checkboxIDH.isChecked, checkboxIDEI.isChecked)
+                val message = "$areaName ha sido modificado exitosamente"
+                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                    finish()
+                }
             }
-
-
-//            var text = "Se agregó ${input.text} a los siguientes institutos:\n"
-//
-//            if(checkboxICI.isChecked) {
-//                areasUtil.addAreaToInstitute("ICI", input.text.toString())
-//                checkboxICI.toggle()
-//                text += "ICI, "
-//            }
-//            if(checkboxICO.isChecked) {
-//                areasUtil.addAreaToInstitute("ICO", input.text.toString())
-//                checkboxICO.toggle()
-//                text += "ICO, "
-//            }
-//            if(checkboxIDH.isChecked) {
-//                areasUtil.addAreaToInstitute("IDH", input.text.toString())
-//                checkboxIDH.toggle()
-//                text += "IDH, "
-//            }
-//            if(checkboxIDEI.isChecked) {
-//                areasUtil.addAreaToInstitute("IDEI", input.text.toString())
-//                checkboxIDEI.toggle()
-//                text += "IDEI"
-//            }
-//            Thread.sleep(2000)
-//
-//            input.text.clear()
-//
-//            if(text.endsWith(", ")) {
-//                text = text.subSequence(0, text.length - 2).toString()
-//            }
-//
-//            popUpUtil.showPopUp(binding.root.context, text, "Cerrar")
         }
 
     }
 
-    private fun add(name: String, ici: Boolean, ico: Boolean,
-                    idh: Boolean, idei: Boolean) {
-        if (ici) areasUtil.addAreaToInstitute("ICI", name)
-        if (ico) areasUtil.addAreaToInstitute("ICO", name)
-        if (idh) areasUtil.addAreaToInstitute("IDH", name)
-        if (idei) areasUtil.addAreaToInstitute("IDEI", name)
+    private fun addAreaAndReturnMessage(name: String, ici: Boolean, ico: Boolean,
+                                        idh: Boolean, idei: Boolean): String {
+        var text = "$name se agregó a los siguientes institutos:\n"
+        if (ici) {
+            areasUtil.addAreaToInstitute("ICI", name)
+            text += "ICI\n"
+        }
+        if (ico) {
+            areasUtil.addAreaToInstitute("ICO", name)
+            text += "ICO\n"
+        }
+        if (idh) {
+            areasUtil.addAreaToInstitute("IDH", name)
+            text += "IDH\n"
+        }
+        if (idei) {
+            areasUtil.addAreaToInstitute("IDEI", name)
+            text += "IDEI"
+        }
+
+        return text
     }
 
     private fun remove(name: String) {
@@ -143,4 +134,5 @@ class ABMAreaActivity : AppCompatActivity() {
     private fun checkIfAreaExists(area: String): Boolean {
         return areasUtil.getAllAreas().contains(area)
     }
+
 }

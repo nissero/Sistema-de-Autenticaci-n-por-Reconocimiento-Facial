@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.biogin.myapplication.UserManagement
 import com.biogin.myapplication.data.LoginDataSource
@@ -15,7 +14,6 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
-import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.PopUpUtil
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -47,7 +45,7 @@ class ABMFragment : Fragment() {
             var result: Result<LoggedInUser>
             runBlocking {
                 lifecycleScope.launch {
-                    var dni = binding.dniUserToFind.text.toString()
+                    val dni = binding.dniUserToFind.text.toString()
                     result = loginRepo.getUser(dni)
 
                     if (result is Result.Success) {
@@ -64,7 +62,7 @@ class ABMFragment : Fragment() {
             var result: Result<LoggedInUser>
             runBlocking {
                 lifecycleScope.launch {
-                    var dni = binding.dniUserToFind.text.toString()
+                    val dni = binding.dniUserToFind.text.toString()
                     result = loginRepo.getUser(dni)
 
                     if (result is Result.Success) {

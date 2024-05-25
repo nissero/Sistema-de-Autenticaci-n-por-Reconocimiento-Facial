@@ -2,7 +2,6 @@ package com.biogin.myapplication.ui
 
 import android.app.Activity
 import android.app.AlertDialog
-import androidx.fragment.app.Fragment
 import com.biogin.myapplication.R
 
 class LoadingDialog (myActivity : Activity) {
@@ -10,8 +9,8 @@ class LoadingDialog (myActivity : Activity) {
     lateinit var dialog : AlertDialog
 
     fun startLoadingDialog() {
-        var builder = AlertDialog.Builder(activity)
-        var inflater = activity.layoutInflater
+        val builder = AlertDialog.Builder(activity)
+        val inflater = activity.layoutInflater
         builder.setView(inflater.inflate(R.layout.custom_dialog, null))
         builder.setCancelable(false)
 
