@@ -75,7 +75,7 @@ class OfflineLogInActivity : AppCompatActivity() {
     }
 
     private fun securityScan(dni: String, apellido: String) {
-        if (!database.checkIfSecurity(dni)){
+        if (database.checkIfSecurity(dni)){
             Log.d(TAG, "ENCONTRADO SEGURIDAD - APELLIDO: $apellido")
             Log.d(TAG, "ENCONTRADO SEGURIDAD - DNI: $dni")
 
