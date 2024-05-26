@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import com.biogin.myapplication.logs.Log as LogsApp
 
@@ -28,7 +29,8 @@ class LoginDataSource {
         institutesSelected: ArrayList<String>,
     ): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
-        val docRefDni = db.collection("usuarios").document(dni)
+        val colRef = db.collection("usuarios")
+        val docRefDni = colRef.document(dni)
         return db.runTransaction { transaction ->
 
             if (transaction.get(docRefDni).exists()) {
@@ -36,6 +38,15 @@ class LoginDataSource {
                     "El usuario ingresado ya existe, compruebe el dni ingresado",
                     FirebaseFirestoreException.Code.ALREADY_EXISTS
                 )
+            }
+
+            runBlocking {
+                if (existsUserWithGivenEmail(email)) {
+                    throw FirebaseFirestoreException(
+                        "El email ingresado ya existe, compruebe el email ingresado",
+                        FirebaseFirestoreException.Code.ALREADY_EXISTS
+                    )
+                }
             }
 
             val newUser = hashMapOf(
@@ -56,7 +67,15 @@ class LoginDataSource {
         }
     }
 
+    private suspend fun existsUserWithGivenEmail(email : String) : Boolean {
+        val db = FirebaseFirestore.getInstance()
 
+        return db.collection("usuarios")
+            .whereEqualTo("email", email)
+            .get()
+            .await()
+            .size() != 0
+    }
     public fun duplicateUserInFirebase(
         name: String,
         surname: String,

@@ -3,10 +3,7 @@ package com.biogin.myapplication.ui.login
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,11 +14,13 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.PhotoRegisterActivity
-import com.biogin.myapplication.databinding.ActivityRegisterBinding
-
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
+import com.biogin.myapplication.databinding.ActivityRegisterBinding
 import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
@@ -165,7 +164,7 @@ class RegisterActivity : AppCompatActivity() {
                     val builder = AlertDialog.Builder(binding.root.context)
 
                     if(e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                        builder.setMessage("El usuario ingresado ya existe").
+                        builder.setMessage(e.message).
                         setNeutralButton("Reintentar", dialogClickListener).
                         show()
                     } else {
