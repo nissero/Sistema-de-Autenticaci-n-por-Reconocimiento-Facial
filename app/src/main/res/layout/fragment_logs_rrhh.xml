@@ -6,72 +6,72 @@
     android:layout_height="match_parent"
     tools:context=".ui.rrhh.logs.LogsRRHHFragment">
 
-    <TableLayout
-        android:id="@+id/tablaRegistrosRRHH"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp"
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:stretchColumns="1">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TableRow
+        <TableLayout
+            android:id="@+id/tablaRegistrosRRHH"
             android:layout_width="match_parent"
-            android:layout_height="107dp"
-            android:gravity="center"
-            >
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:stretchColumns="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/column_timestamp_log_rrhh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:gravity="center_horizontal"
-                android:padding="10sp"
-                android:text="@string/fechaHora"
-                android:textSize="13sp" />
+            <TableRow>
+                <TextView
+                    android:id="@+id/column_timestamp_log_rrhh"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/fechaHora"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/column_log_type_rrrhh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:gravity="center_horizontal"
-                android:padding="10sp"
-                android:text="@string/log_type"
-                android:textSize="13sp" />
+                <TextView
+                    android:id="@+id/column_log_type_rrrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/log_type"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/column_dni_rrrhh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:gravity="center_horizontal"
-                android:padding="10sp"
-                android:text="@string/dni_rrhh"
-                android:textSize="13sp" />
+                <TextView
+                    android:id="@+id/column_master_user_dni_rrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/dni_rrhh"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/column_dni_user_affected_rrhh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:gravity="center_horizontal"
-                android:padding="10sp"
-                android:text="@string/dni_user_affected"
-                android:textSize="13sp" />
+                <TextView
+                    android:id="@+id/column_dni_user_affected_rrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/dni_user_affected"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/column_user_category_rrrhh"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:gravity="center_horizontal"
-                android:padding="10sp"
-                android:text="@string/categoria"
-                android:textSize="13sp" />
-        </TableRow>
-    </TableLayout>
+                <TextView
+                    android:id="@+id/column_user_category_rrrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/categoria"
+                    android:textSize="13sp" />
+            </TableRow>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewLogs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+            />
+        </TableLayout>
+
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

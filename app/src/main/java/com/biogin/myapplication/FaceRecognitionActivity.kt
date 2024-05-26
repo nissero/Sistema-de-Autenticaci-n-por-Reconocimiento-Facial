@@ -174,14 +174,14 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun ifSecurity(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
-            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, user.getDni(), "", user.getCategoria())
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
                 goToSeguridadActivity()
             }, dialogShowTime)
         } else {
-            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), "", "")
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
         }
@@ -190,14 +190,14 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun ifRRHH(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "rrhh") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
-            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, user.getDni(), "", user.getCategoria())
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.RRHH_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
                 goToRRHHActivity()
             }, dialogShowTime)
         } else {
-            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), "", "")
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.RRHH_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es RRHH")
         }

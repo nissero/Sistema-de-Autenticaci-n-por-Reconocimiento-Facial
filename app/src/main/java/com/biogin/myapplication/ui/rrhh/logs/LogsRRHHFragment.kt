@@ -1,15 +1,13 @@
 package com.biogin.myapplication.ui.rrhh.logs
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.databinding.FragmentLogsRrhhBinding
@@ -23,6 +21,7 @@ class LogsRRHHFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
 
     @Serializable
     data class Log(val fecha: String, val hora: String, val idAutenticador:
@@ -39,51 +38,25 @@ class LogsRRHHFragment : Fragment() {
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        var listaRegistros : List<com.biogin.myapplication.logs.Log>
-        runBlocking {
-            listaRegistros = logsRepository.GetAllLogs()
-        }
-
-        var tablaRegistros = root.findViewById<TableLayout>(R.id.tablaRegistrosRRHH)
-
-        for(registro in listaRegistros) {
-            var fila = TableRow(root.context)
-
-            var fechaHora = TextView(root.context)
-            fechaHora.gravity = Gravity.CENTER_HORIZONTAL
-            fechaHora.text = registro.timestamp
-            fechaHora.textSize = 11.0F
-            fila.addView(fechaHora)
-
-            var logType = TextView(root.context)
-            logType.text = registro.logEventName.name
-            logType.gravity = Gravity.CENTER_HORIZONTAL
-            logType.textSize = 11.0F
-            fila.addView(logType)
-
-            var dniRRHH = TextView(root.context)
-            dniRRHH.text = registro.dniMasterUser
-            dniRRHH.gravity = Gravity.CENTER_HORIZONTAL
-            dniRRHH.textSize = 11.0F
-            fila.addView(dniRRHH)
-
-            var dniUserAffected = TextView(root.context)
-            dniUserAffected.text = registro.dniUserAffected
-            dniUserAffected.textSize = 11.0F
-            dniUserAffected.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(dniUserAffected)
-
-            var category = TextView(root.context)
-            category.text = registro.userCategory
-            category.textSize = 11.0F
-            category.gravity = Gravity.CENTER_HORIZONTAL
-            fila.addView(category)
-
-            tablaRegistros.addView(fila)
-        }
+        setRecyclerView()
 
         return root
     }
+
+
+    fun setRecyclerView() {
+        val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+
+        var listaLogs : List<com.biogin.myapplication.logs.Log>
+        runBlocking {
+            listaLogs = logsRepository.GetAllLogs()
+        }
+        val adapter = LogsAdapter(binding.root.context, listaLogs)
+        recyclerView.adapter = adapter
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

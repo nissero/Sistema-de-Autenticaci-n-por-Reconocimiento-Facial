@@ -7,6 +7,11 @@
         android:title="@string/title_autenticacion" />
 
     <item
+        android:id="@+id/navigation_logs"
+        android:icon="@drawable/logs"
+        android:title="@string/title_logs" />
+
+    <item
         android:id="@+id/navigation_acerca"
         android:icon="@drawable/about"
         android:title="@string/title_Acerca" />

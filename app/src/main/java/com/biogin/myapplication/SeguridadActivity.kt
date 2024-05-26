@@ -25,7 +25,7 @@ class SeguridadActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_autenticacion, R.id.navigation_acerca
+                R.id.navigation_autenticacion,R.id.navigation_logs, R.id.navigation_acerca
             )
         )
 //        setupActionBarWithNavController(navController, appBarConfiguration)

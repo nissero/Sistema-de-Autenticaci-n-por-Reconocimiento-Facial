@@ -90,7 +90,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
     implementation("androidx.camera:camera-video:$camerax_version")
-
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
     implementation("com.google.guava:guava:27.1-android")

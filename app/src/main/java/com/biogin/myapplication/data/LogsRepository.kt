@@ -1,8 +1,9 @@
 package com.biogin.myapplication.data
 
 import com.biogin.myapplication.logs.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -15,7 +16,6 @@ class LogsRepository {
     suspend fun GetAllLogs() : List<Log> {
         val db = FirebaseFirestore.getInstance()
         val logs : ArrayList<Log> = ArrayList()
-        val source = Source.CACHE
 
         val collectionRef = db.collection(LOGS_COLLECTION_NAME)
         var logsObtained = collectionRef.
@@ -29,7 +29,7 @@ class LogsRepository {
                 logs.add(
                     Log(
                     Log.LogEventType.valueOf(document.get("logEventType").toString()),
-                    Log.LogEventName.valueOf(document.get("logEventName").toString()),
+                        Log.getLogEventNameFromValue(document.get("logEventName").toString()),
                     document.get("dniMasterUser").toString(),
                     document.get("dniUserAffected").toString(),
                     document.get("category").toString(),
@@ -39,6 +39,23 @@ class LogsRepository {
         }
 
         return logs
+    }
+
+    fun getSuccesfulAuthentications() : Task<QuerySnapshot> {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection(LOGS_COLLECTION_NAME).
+             whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION")
+            .get()
+
+    }
+
+    fun getUnsuccesfulAuthentications() : Task<QuerySnapshot> {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection(LOGS_COLLECTION_NAME).
+        whereEqualTo("logEventName", "USER UNSUCCESSFUL AUTHENTICATION")
+            .get()
     }
 
     fun LogEventWithTransaction(db : FirebaseFirestore, transaction : Transaction, logEventType : Log.LogEventType, logEventName: Log.LogEventName, dniRRHH : String, dniNewUser : String, categoryNewUser : String) :  Transaction {
@@ -80,7 +97,7 @@ class LogsRepository {
 
         return hashMapOf(
             "logEventType" to log.logEventType,
-            "logEventName" to log.logEventName,
+            "logEventName" to log.logEventName.value,
             "dniMasterUser" to log.dniMasterUser,
             "dniUserAffected" to log.dniUserAffected,
             "timestamp" to dateInString,
