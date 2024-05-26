@@ -73,6 +73,35 @@ class AllowedAreasUtils() {
             }
     }
 
+    fun updateName(instituteName: String, oldName: String, newName: String) {
+        val db = FirebaseFirestore.getInstance()
+        val docRefInstitute = db.collection("institutos").document(instituteName)
+        docRefInstitute.get()
+            .addOnSuccessListener { instituteDocument ->
+                if (instituteDocument != null) {
+                    val instituteData = instituteDocument.data
+                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+                    if(areasArray.contains(oldName)) {
+                        docRefInstitute.update("areas", FieldValue.arrayRemove(oldName))
+                        docRefInstitute.update("areas", FieldValue.arrayUnion(newName))
+                        Log.d("Firebase", "Se actualizó el nombre de $oldName a $newName " +
+                                "en el instituto $instituteName")
+
+                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(oldName)
+                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newName)
+                    } else {
+                        Log.d("Firebase", "No existe el area $newName en el " +
+                                "instituto $instituteName")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+            }
+    }
+
     private fun updateMap() {
         firebaseMethods.readInstitutes("ICI") {
             institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
