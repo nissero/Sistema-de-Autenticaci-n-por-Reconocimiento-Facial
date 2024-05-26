@@ -1,24 +1,22 @@
 package com.biogin.myapplication.data
 
-import android.util.Log
 import com.biogin.myapplication.data.model.LoggedInUser
+import com.biogin.myapplication.data.userSession.MasterUserDataSession
+import com.biogin.myapplication.logs.Log
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import java.io.IOException
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
-
-
+    private var logsRepository: LogsRepository = LogsRepository()
     public fun uploadUserToFirebase(
         name: String,
         surname: String,
@@ -30,7 +28,8 @@ class LoginDataSource {
         val db = FirebaseFirestore.getInstance()
         val docRefDni = db.collection("usuarios").document(dni)
         return db.runTransaction { transaction ->
-            if(transaction.get(docRefDni).exists()) {
+
+            if (transaction.get(docRefDni).exists()) {
                 throw FirebaseFirestoreException(
                     "El usuario ingresado ya existe, compruebe el dni ingresado",
                     FirebaseFirestoreException.Code.ALREADY_EXISTS
@@ -49,8 +48,12 @@ class LoginDataSource {
             )
 
             transaction.set(docRefDni, newUser)
+
+            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_CREATION,
+                MasterUserDataSession.getDniUser(), dni, category)
         }
     }
+
 
     public fun duplicateUserInFirebase(
         name: String,
@@ -88,6 +91,7 @@ class LoginDataSource {
             )
 
             transactionInstance.set(docRefNewDni, newUser)
+            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
         }
     }
 
@@ -99,24 +103,34 @@ class LoginDataSource {
         category: String,
         state: String,
         institutesSelected: ArrayList<String>
-    ): Task<Void> {
+    ): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
-        return db.collection("usuarios").document(dni).update(
-            "nombre", name,
-            "apellido", surname,
-            "email", email,
-            "categoria", category,
-            "estado", state,
-            "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-            "institutos", institutesSelected
-        )
+        val docRefUserUpdated = db.collection("usuarios").document(dni)
+        return db.runTransaction { transaction ->
+            transaction.update(docRefUserUpdated,
+                "nombre", name,
+                "apellido", surname,
+                "email", email,
+                "categoria", category,
+                "estado", state,
+                "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                "institutos", institutesSelected)
 
+            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+        }
     }
 
-    fun deactivateUserFirebase(dni: String) : Task<Transaction> {
+    fun deactivateUserFirebase(dni: String): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
-        val docRefDni = db.collection("usuarios").document(dni)
         return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
             val dniDoc = transaction.get(docRefDni)
             if (!dniDoc.exists()) {
                 throw FirebaseFirestoreException(
@@ -135,6 +149,7 @@ class LoginDataSource {
                 }
             }
             transaction.update(docRefDni, "estado", "Inactivo")
+            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 

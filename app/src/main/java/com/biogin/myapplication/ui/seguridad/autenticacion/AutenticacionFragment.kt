@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.FaceRecognitionActivity
 import com.biogin.myapplication.OfflineLogInActivity
 import com.biogin.myapplication.R
+import com.biogin.myapplication.data.LogsRepository
+import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 
 class AutenticacionFragment : Fragment() {
@@ -24,6 +26,7 @@ class AutenticacionFragment : Fragment() {
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
     private lateinit var dniMaster: String
+    private lateinit var logsRepository : LogsRepository
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -39,11 +42,10 @@ class AutenticacionFragment : Fragment() {
 
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         val bundle = arguments
         dniMaster = bundle?.getString("dniMaster").toString()
-
         Log.d("AUTENTICATIONFRAGMENT", dniMaster)
+        logsRepository = LogsRepository()
 
 //        val textView: TextView = binding.textHome
 //        homeViewModel.text.observe(viewLifecycleOwner) {
@@ -95,6 +97,7 @@ class AutenticacionFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
+                                logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
@@ -114,6 +117,7 @@ class AutenticacionFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
+                                logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
                                 val intent = Intent(root.context, FaceRecognitionActivity::class.java)
                                 intent.putExtra("authenticationType", "fin de turno")
                                 resultLauncher.launch(intent)

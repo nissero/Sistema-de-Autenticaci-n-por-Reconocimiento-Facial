@@ -57,11 +57,11 @@
     <string name="finalizar_turno">Finalizar turno</string>
     <string name="mansaje_inicio_turno">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
     <string name="mensaje_turno_iniciado">Ubique su restro en el centro de la camara</string>
-    <string name="fecha">Fecha</string>
+    <string name="fechaHora">Fecha y \nhora</string>
     <string name="hora">Hora</string>
-    <string name="id_autenticador">ID\nAutenticador</string>
-    <string name="id_visitante">ID\nVisitante</string>
-    <string name="lugar_fisico">Lugar\nFísico</string>
+    <string name="id_autenticador">DNI\nAutenticador</string>
+    <string name="id_visitante">DNI\nVisitante</string>
+    <string name="categoria">Categoria\nvisitante</string>
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
@@ -76,5 +76,11 @@
         • Verón, Adrián Gustavo
     </string>
     <string name="skip">Skip</string>
-    >>>>>>> origin/fernando2
+    <string name="dni_rrhh">DNI\nrrhh</string>
+    <string name="dni_user_affected">DNI user afectado</string>
+    <string name="log_type">Tipo de log</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
+    <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
 </resources>

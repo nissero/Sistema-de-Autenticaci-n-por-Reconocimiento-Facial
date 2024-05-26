@@ -4,48 +4,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.seguridad.logs.LogsFragment">
+    tools:context=".ui.rrhh.logs.LogsRRHHFragment">
 
-    <TableLayout
-        android:id="@+id/tablaRegistrosRRHH"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_margin="20dp"
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="20dp">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TableRow
-            android:gravity="center">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="@string/fecha" />
+        <TableLayout
+            android:id="@+id/tablaRegistrosRRHH"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:stretchColumns="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="@string/hora" />
+            <TableRow>
+                <TextView
+                    android:id="@+id/column_timestamp_log_rrhh"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/fechaHora"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="@string/id_autenticador" />
+                <TextView
+                    android:id="@+id/column_log_type_rrrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/log_type"
+                    android:textSize="13sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="@string/id_visitante" />
+                <TextView
+                    android:id="@+id/column_master_user_dni_rrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/dni_rrhh"
+                    android:textSize="13sp" />
 
-            <TextView
+                <TextView
+                    android:id="@+id/column_dni_user_affected_rrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/dni_user_affected"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/column_user_category_rrrhh"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/categoria"
+                    android:textSize="13sp" />
+            </TableRow>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewLogs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:text="@string/lugar_fisico" />
-        </TableRow>
-    </TableLayout>
+                android:layout_height="match_parent"
+            />
+        </TableLayout>
+
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

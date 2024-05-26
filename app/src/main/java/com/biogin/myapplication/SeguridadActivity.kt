@@ -15,6 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.biogin.myapplication.databinding.ActivitySeguridadBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SeguridadActivity : AppCompatActivity() {
 
@@ -41,7 +42,7 @@ class SeguridadActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_autenticacion, R.id.navigation_logs, R.id.navigation_acerca
+                R.id.navigation_autenticacion,R.id.navigation_logs, R.id.navigation_acerca
             )
         )
 //        setupActionBarWithNavController(navController, appBarConfiguration)

@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.biogin.myapplication.Popup
 import com.biogin.myapplication.UserManagement
@@ -16,16 +15,13 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
-import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ABMFragment : Fragment() {
-
     private var _binding: FragmentAbmBinding? = null
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -82,7 +78,7 @@ class ABMFragment : Fragment() {
             startActivity(Intent(binding.root.context, RegisterActivity::class.java))
         }
 
-        binding.deleteUserOption.setOnClickListener {
+        binding.deactivateUserOption.setOnClickListener {
             dataSource.deactivateUserFirebase(binding.dniUserToFind.text.toString()).
             addOnSuccessListener {
                 openPopupUserSuccessfullyDeleted()
