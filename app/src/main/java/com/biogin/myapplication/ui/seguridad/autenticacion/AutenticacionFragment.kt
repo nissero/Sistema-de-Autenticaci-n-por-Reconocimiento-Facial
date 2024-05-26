@@ -68,6 +68,7 @@ class AutenticacionFragment : Fragment() {
                 if(data?.getBooleanExtra("autenticado", false) == true) {
                     turnoIniciado = false
                     autenticacionButton.visibility = View.INVISIBLE
+                    autenticacionOfflineButton.visibility = View.INVISIBLE
                     turnoButton.text = this.context?.getString(R.string.iniciar_turno)
                     mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
                 }

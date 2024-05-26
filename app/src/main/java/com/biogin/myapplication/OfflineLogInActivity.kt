@@ -130,6 +130,7 @@ class OfflineLogInActivity : AppCompatActivity() {
             val intent = Intent(this, AuthorizationMessageActivity::class.java)
             intent.putExtra("authorizationResult", "denied")
 
+            startActivity(intent)
             finish()
         }
     }
