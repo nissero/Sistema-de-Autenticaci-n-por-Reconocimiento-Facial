@@ -1,7 +1,5 @@
 package com.biogin.myapplication
 
-import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,12 +7,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.biogin.myapplication.databinding.ActivitySeguridadBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SeguridadActivity : AppCompatActivity() {
 

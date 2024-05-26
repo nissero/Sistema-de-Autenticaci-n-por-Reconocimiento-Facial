@@ -1,8 +1,8 @@
 package com.biogin.myapplication.data
 
+
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
-import com.biogin.myapplication.logs.Log
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
@@ -10,10 +10,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
+import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
+
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
     private var logsRepository: LogsRepository = LogsRepository()
@@ -49,7 +51,7 @@ class LoginDataSource {
 
             transaction.set(docRefDni, newUser)
 
-            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_CREATION,
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_CREATION,
                 MasterUserDataSession.getDniUser(), dni, category)
         }
     }
@@ -91,7 +93,7 @@ class LoginDataSource {
             )
 
             transactionInstance.set(docRefNewDni, newUser)
-            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
         }
     }
 
@@ -116,7 +118,7 @@ class LoginDataSource {
                 "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                 "institutos", institutesSelected)
 
-            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
         }
     }
 
@@ -149,7 +151,7 @@ class LoginDataSource {
                 }
             }
             transaction.update(docRefDni, "estado", "Inactivo")
-            logsRepository.LogEventWithTransaction(db, transaction, Log.LogEventType.INFO, Log.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 

@@ -28,8 +28,12 @@ class AutenticacionFragment : Fragment() {
 
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
+    private lateinit var autenticacionButton: Button
+    private lateinit var turnoButton: Button
+    private lateinit var mensaje: TextView
     private lateinit var dniMaster: String
     private lateinit var logsRepository : LogsRepository
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -51,13 +55,21 @@ class AutenticacionFragment : Fragment() {
         Log.d("AUTENTICATIONFRAGMENT", dniMaster)
         logsRepository = LogsRepository()
 
-//        val textView: TextView = binding.textHome
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
+        autenticacionButton = root.findViewById(R.id.button_visitantes)
 
-        val autenticacionButton = root.findViewById<Button>(R.id.button_visitantes)
-        autenticacionButton.visibility = View.INVISIBLE
+        turnoButton = root.findViewById(R.id.button_turno)
+
+
+        mensaje = root.findViewById(R.id.message_main_screen)
+        if(turnoIniciado) {
+            turnoButton.text = this.context?.getString(R.string.finalizar_turno)
+            mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
+            autenticacionButton.visibility = View.VISIBLE
+        } else {
+            turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+            mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
+            autenticacionButton.visibility = View.INVISIBLE
+        }
 
         val autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
         autenticacionOfflineButton.visibility = View.INVISIBLE
@@ -65,6 +77,7 @@ class AutenticacionFragment : Fragment() {
         val turnoButton = root.findViewById<Button>(R.id.button_turno)
 
         val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
+
 
         //metodo para crear una actividad nueva y obtener un resultado
         val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -76,7 +89,7 @@ class AutenticacionFragment : Fragment() {
                     autenticacionButton.visibility = View.INVISIBLE
                     autenticacionOfflineButton.visibility = View.INVISIBLE
                     turnoButton.text = this.context?.getString(R.string.iniciar_turno)
-                    mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
+                    mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
                 }
             }
         }
@@ -105,6 +118,7 @@ class AutenticacionFragment : Fragment() {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
+                                mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
                                 val database = OfflineDataBaseHelper(requireActivity())

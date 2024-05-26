@@ -1,7 +1,6 @@
 package com.biogin.myapplication.data
 
 import com.biogin.myapplication.data.model.LoggedInUser
-import com.biogin.myapplication.utils.AllowedAreasUtils
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -10,7 +9,7 @@ import com.biogin.myapplication.utils.AllowedAreasUtils
 
 class LoginRepository(val dataSource: LoginDataSource) {
     // in-memory cache of the loggedInUser object
-    var user: LoggedInUser? = null
+    private var user: LoggedInUser? = null
         private set
 
     val isLoggedIn: Boolean

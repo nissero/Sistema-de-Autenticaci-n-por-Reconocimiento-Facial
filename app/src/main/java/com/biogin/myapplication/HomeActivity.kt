@@ -13,6 +13,7 @@ import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.utils.ConnectionCheck
 import com.google.android.material.snackbar.Snackbar
 
+
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var firebaseSyncManager: FirebaseSyncService
