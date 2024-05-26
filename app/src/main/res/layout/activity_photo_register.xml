@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".PhotoRegisterActivity">
+    android:layout_height="match_parent">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-    </androidx.camera.view.PreviewView>
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
 
     <com.biogin.myapplication.GraphicOverlay
-        android:id="@+id/graphicOverlay_finder"
+        android:id="@+id/graphicOverlayFinder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_height="match_parent" />
 
     <Button
-        android:id="@+id/image_capture_button"
+        android:id="@+id/imageCaptureButton"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal|bottom"
-        android:text="@string/take_photo"
-        />
+        android:text="@string/take_photo" />
 
     <Button
         android:id="@+id/switch_camera_button"
         android:layout_width="118dp"
         android:layout_height="81dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="10dp"
         android:elevation="10dp"
         android:text="@string/switch_camera"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/imageCaptureButton" />
+
+    <!-- Overlay with message -->
+    <FrameLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/overlayMessage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Gire su cara"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
+    </FrameLayout>
+
+</RelativeLayout>

@@ -52,7 +52,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                    private val graphicOverlay: GraphicOverlay,
                    private val dialogShowTime: Long?,
                    private var withAnalyzer: Boolean
-)  {
+) {
 
     private var imageCapture: ImageCapture? = null
     private lateinit var imageAnalyzer: ImageAnalysis
@@ -62,7 +62,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
     private var lastApiCallTimeMillis = System.currentTimeMillis()
     private var isApiCallInProgress = false
 
-    private lateinit var cameraExecutor : ExecutorService
+    private lateinit var cameraExecutor: ExecutorService
 
     private lateinit var cameraProvider: ProcessCameraProvider
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -103,7 +103,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
     }
 
-    fun flipCamera(){
+    fun flipCamera() {
         cameraProvider.unbindAll()
 
         if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
@@ -117,7 +117,13 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         startCamera()
     }
 
-    fun takePhoto(tag: String, fileNameFormat: String, context: ContextWrapper, intent: Intent, fin: () -> Unit) {
+    fun takePhoto(
+        tag: String,
+        fileNameFormat: String,
+        context: ContextWrapper,
+        intent: Intent,
+        fin: () -> Unit
+    ) {
         val imageCapture = imageCapture ?: return
 
         val name = SimpleDateFormat(fileNameFormat, Locale.US).format(System.currentTimeMillis())
@@ -129,7 +135,11 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
             }
         }
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(context.contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            .Builder(
+                context.contentResolver,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
             .build()
 
         imageCapture.takePicture(
@@ -140,6 +150,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                     Log.e(tag, "Photo capture failed: ${exc.message}", exc)
                     fin()
                 }
+
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     uploadPhotoToFirebase(output.savedUri, intent)
                     output.savedUri?.let {
