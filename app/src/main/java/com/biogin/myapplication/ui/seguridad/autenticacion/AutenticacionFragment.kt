@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.FaceRecognitionActivity
@@ -20,6 +22,7 @@ import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
+import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 
 class AutenticacionFragment : Fragment() {
 
@@ -32,6 +35,7 @@ class AutenticacionFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -102,6 +106,10 @@ class AutenticacionFragment : Fragment() {
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
                                 autenticacionOfflineButton.visibility = View.VISIBLE
+
+                                val database = OfflineDataBaseHelper(requireActivity())
+                                database.startOfShift(dniMaster)
+
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 
@@ -121,6 +129,10 @@ class AutenticacionFragment : Fragment() {
                                 val intent = Intent(root.context, FaceRecognitionActivity::class.java)
                                 intent.putExtra("authenticationType", "fin de turno")
                                 resultLauncher.launch(intent)
+
+                                val database = OfflineDataBaseHelper(requireActivity())
+                                database.endOfShift(dniMaster)
+
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 
