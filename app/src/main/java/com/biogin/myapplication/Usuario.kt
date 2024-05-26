@@ -1,5 +1,6 @@
 package com.biogin.myapplication
 
+
 class Usuario (
     private val nombre: String = "",
     private val apellido: String = "",
@@ -7,6 +8,7 @@ class Usuario (
     private val email: String = "",
     private val area: String = "",
     private val categoria: String = "",
+    private val estado: String = "",
     private val areasPermitidas: ArrayList<String> = ArrayList()
 ){
     fun getNombre(): String {
@@ -19,6 +21,10 @@ class Usuario (
 
     fun getDni(): String {
         return dni
+    }
+
+    fun getEstado(): Boolean {
+        return estado.toLowerCase() == "activo"
     }
 
     fun getEmail(): String {

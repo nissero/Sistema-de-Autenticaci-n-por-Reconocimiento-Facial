@@ -21,9 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ABMFragment : Fragment() {
-
     private var _binding: FragmentAbmBinding? = null
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -80,7 +78,7 @@ class ABMFragment : Fragment() {
             startActivity(Intent(binding.root.context, RegisterActivity::class.java))
         }
 
-        binding.deleteUserOption.setOnClickListener {
+        binding.deactivateUserOption.setOnClickListener {
             dataSource.deactivateUserFirebase(binding.dniUserToFind.text.toString()).
             addOnSuccessListener {
                 openPopupUserSuccessfullyDeleted()

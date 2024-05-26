@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.seguridad.logs.LogsFragment">
+
+
+    <TextView
+        android:id="@+id/title_logs_security"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Datos logs"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.049" />
+
+    <TextView
+        android:id="@+id/data_successful_auths_logs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="20dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/data_unsuccessful_auths_logs"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_logs_security"
+        android:text="@string/text_view_succesful_auth_data_logs" />
+
+    <TextView
+        android:id="@+id/data_unsuccessful_auths_logs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="50dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/data_successful_auths_logs"
+        app:layout_constraintTop_toBottomOf="@+id/title_logs_security"
+        android:text="@string/text_view_unsuccesful_auth_data_logs" />
+
+    <TextView
+        android:id="@+id/data_logs_accesses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="116dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs"
+        app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs"
+        app:layout_constraintTop_toBottomOf="@+id/amount_of_successful_auths"
+        android:text="Cantidad ingresos" />
+
+    <TextView
+        android:id="@+id/data_logs_exits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="116dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_unsuccessful_auths_logs"
+        app:layout_constraintStart_toStartOf="@+id/data_unsuccessful_auths_logs"
+        app:layout_constraintTop_toBottomOf="@+id/amount_of_unsuccessful_auths"
+        android:text="Cantidad egresos" />
+
+    <TextView
+        android:id="@+id/amount_of_successful_auths"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="0"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs"
+        app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs"
+        app:layout_constraintTop_toBottomOf="@+id/data_successful_auths_logs" />
+
+    <TextView
+        android:id="@+id/amount_of_unsuccessful_auths"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="0"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_unsuccessful_auths_logs"
+        app:layout_constraintStart_toStartOf="@+id/data_unsuccessful_auths_logs"
+        app:layout_constraintTop_toBottomOf="@+id/data_unsuccessful_auths_logs" />
+
+    <TextView
+        android:id="@+id/amount_of_accesses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="0"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_logs_accesses"
+        app:layout_constraintStart_toStartOf="@+id/data_logs_accesses"
+        app:layout_constraintTop_toBottomOf="@+id/data_logs_accesses" />
+
+    <TextView
+        android:id="@+id/amount_of_exits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="0"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/data_logs_exits"
+        app:layout_constraintStart_toStartOf="@+id/data_logs_exits"
+        app:layout_constraintTop_toBottomOf="@+id/data_logs_exits" />
+</androidx.constraintlayout.widget.ConstraintLayout>

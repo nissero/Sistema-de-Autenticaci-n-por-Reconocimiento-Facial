@@ -25,6 +25,12 @@
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
         <activity
+            android:name=".AuthorizationMessageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OfflineLogInActivity"
+            android:exported="false" />
+        <activity
             android:name=".Popup"
             android:exported="true" />
         <activity

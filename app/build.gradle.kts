@@ -85,11 +85,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
     val camerax_version = "1.1.0-beta01"
+    implementation("org.apache.commons:commons-csv:1.5")
     implementation("androidx.camera:camera-core:$camerax_version")
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
     implementation("androidx.camera:camera-video:$camerax_version")
-
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
 
     implementation("com.google.guava:guava:27.1-android")
@@ -101,5 +102,8 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    implementation("com.google.zxing:core:3.4.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.2.0")
 
 }

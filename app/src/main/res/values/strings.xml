@@ -23,9 +23,12 @@
     <string name="title_activity_photo_register">PhotoRegister</string>
     <string name="title_main_activity">Main Activity</string>
     <string name="text_view_person_name">[Nombre persona]</string>
-    <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial</string>
+    <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial (SEGURIDAD)</string>
     <string name="home_text_enter_face_recognition_rrhh">Ingresar con\nreconocimiento facial (RRHH)</string>
-    <string name="face_recognition_visitors">Autenticacion de\nvisitantes</string>
+    <string name="home_text_enter_dni_scanner">Ingresar con DNI</string>
+    <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
+    <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
+    <string name="authorization_message_continue_button">OK</string>
     <string-array name="user_categories">
         <item>Docente</item>
         <item>No docente</item>
@@ -54,11 +57,13 @@
     <string name="finalizar_turno">Finalizar turno</string>
     <string name="mansaje_turno_no_iniciado">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
     <string name="mensaje_turno_iniciado">Presione el boton de arriba\npara autenticar visitantes</string>
-    <string name="fecha">Fecha</string>
+    <string name="mansaje_inicio_turno">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
+    <string name="fechaHora">Fecha y \nhora</string>
+
     <string name="hora">Hora</string>
-    <string name="id_autenticador">ID\nAutenticador</string>
-    <string name="id_visitante">ID\nVisitante</string>
-    <string name="lugar_fisico">Lugar\nFísico</string>
+    <string name="id_autenticador">DNI\nAutenticador</string>
+    <string name="id_visitante">DNI\nVisitante</string>
+    <string name="categoria">Categoria\nvisitante</string>
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
@@ -129,4 +134,13 @@
     <string name="eliminar_lugar_fisico">Eliminar\nlugar físico</string>
     <string name="mensaje_modificar_lugar">Para modificar o eliminar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
     >>>>>>> origin/fernando2
+=======
+    <string name="dni_rrhh">DNI\nrrhh</string>
+    <string name="dni_user_affected">DNI user afectado</string>
+    <string name="log_type">Tipo de log</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
+    <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
+>>>>>>> main
 </resources>
