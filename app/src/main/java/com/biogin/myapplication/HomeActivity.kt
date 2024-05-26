@@ -7,16 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityHomeBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
-import com.biogin.myapplication.utils.ConnectionCheck
-import com.google.android.material.snackbar.Snackbar
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var firebaseSyncManager: FirebaseSyncService
-
+    private lateinit var logsRepository : LogsRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MasterUserDataSession.clearUserData()
@@ -28,9 +27,11 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        logsRepository = LogsRepository()
         firebaseSyncManager = FirebaseSyncService(this)
-
+        val sqlDb = OfflineDataBaseHelper(this)
+        Log.e("DB", sqlDb.getAllLogs())
+        logsRepository.syncLogsOfflineWithOnline(sqlDb)
         viewBinding.buttonFaceRecognition.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")

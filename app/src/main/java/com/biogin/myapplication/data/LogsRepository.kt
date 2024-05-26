@@ -1,5 +1,6 @@
 package com.biogin.myapplication.data
 
+import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,6 +40,40 @@ class LogsRepository {
         }
 
         return logs
+    }
+
+    fun syncLogsOfflineWithOnline(sqlDb : OfflineDataBaseHelper) {
+        val logsToUpload = ArrayList<HashMap<String, Any>>()
+        val db = FirebaseFirestore.getInstance()
+        val offlineLogs = sqlDb.getListOfLogs()
+        for (offlineLog in offlineLogs) {
+            val log = createHashmapLog(
+                Log(
+                    Log.LogEventType.INFO,
+                    Log.LogEventName.valueOf(offlineLog.getTipo()),
+                    offlineLog.getDniMaster(),
+                    offlineLog.getDni(),
+                    "",
+                    offlineLog.getTimestamp()
+                )
+            )
+            logsToUpload.add(log)
+        }
+        val colRef = db.collection(LOGS_COLLECTION_NAME)
+        var numberOfLogsSyncronized = 0
+        db.runTransaction {
+            for(log in logsToUpload) {
+                val newDocRef = colRef.document()
+                newDocRef.set(log)
+                numberOfLogsSyncronized++
+            }
+        }.addOnSuccessListener {
+            sqlDb.deleteAllLogs()
+            android.util.Log.e("FIREBASE", "Logs offline sincronizados correctamente! Cantidad de logs sincronizados : $numberOfLogsSyncronized")
+        }.addOnFailureListener {
+            android.util.Log.e("FIREBASE", "Hubo un error al sincronizar los logs offline")
+        }
+
     }
 
     fun getSuccesfulAuthentications() : Task<QuerySnapshot> {
