@@ -27,7 +27,7 @@ class SeguridadActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val dniMaster = intent.getStringExtra("dniMaster").toString()
-        Log.d("SEGURIDAD", dniMaster)
+        Log.d("SEGURIDAD", "DNI MASTER: $dniMaster")
 
         val bundle = Bundle()
         bundle.putString("dniMaster", dniMaster)
