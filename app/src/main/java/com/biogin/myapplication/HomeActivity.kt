@@ -2,6 +2,7 @@ package com.biogin.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -13,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
+    private lateinit var firebaseSyncManager: FirebaseSyncService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +26,8 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        firebaseSyncManager = FirebaseSyncService(this)
 
         viewBinding.buttonFaceRecognition.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
@@ -37,11 +41,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val db = OfflineDataBaseHelper(this)
+
         viewBinding.buttonLoginOffline.setOnClickListener{
-            val db = OfflineDataBaseHelper(this)
-            this.deleteDatabase("OfflineDb")
-            db.registerSecurity("43908111")
-            db.registerUser("43908111")
+            Log.d("HOME", "USERS: ${db.getAllUsers()}")
+            Log.d("HOME", "SECURITY ${db.getAllSecurity()}")
             val intent = Intent(this, OfflineLogInActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)

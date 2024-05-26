@@ -10,19 +10,20 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.toLowerCase
+import com.biogin.myapplication.Registro
 import com.google.zxing.integration.android.IntentIntegrator
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "OfflineDb", null, 1){
     override fun onCreate(db: SQLiteDatabase) {
-        val createBarcodes = "CREATE TABLE IF NOT EXISTS Barcodes(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT)"
         val createUsers = "CREATE TABLE IF NOT EXISTS Users(dni TEXT PRIMARY KEY)"
         val createSecurityMember = "CREATE TABLE IF NOT EXISTS SecurityMember(dni TEXT PRIMARY KEY)"
-        val createOfflineLogs = "CREATE TABLE IF NOT EXISTS OfflineLogs(id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT, dniMaster TEXT, dni TEXT, fecha DATE, hora TIME, FOREIGN KEY (dni) REFERENCES Users(dni), FOREIGN KEY(dniMaster) REFERENCES SecurityMember(dni))"
+        val createOfflineLogs = "CREATE TABLE IF NOT EXISTS OfflineLogs(id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT, dniMaster TEXT, dni TEXT, timestamp TIMESTAMP, FOREIGN KEY (dni) REFERENCES Users(dni), FOREIGN KEY(dniMaster) REFERENCES SecurityMember(dni))"
 
-        db.execSQL(createBarcodes)
-        Log.d(TAG, "Table Barcodes created")
         db.execSQL(createUsers)
         Log.d(TAG, "Table Users created")
         db.execSQL(createSecurityMember)
@@ -33,26 +34,25 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
     }
 
-
     fun registerUser(dni: String): Boolean{
-        if (!checkInDatabase(dni)){
+        return if (!checkInDatabase(dni)){
             saveUserDataToDatabase(dni)
             Log.d(TAG, "GUARDADO EN LA BASE DE DATOS EXITOSAMENTE")
-            return true
+            true
         } else {
             Log.e(TAG, "ERROR AL GUARDAR EN LA BASE DE DATOS")
-            return false
+            false
         }
     }
 
     fun registerSecurity(dni: String): Boolean{
-        if (!checkIfSecurity(dni)){
+        return if (!checkIfSecurity(dni)){
             saveUserDataToSecurity(dni)
             Log.d(TAG, "GUARDADO EN LA BASE DE DATOS COMO SEGURIDAD EXITOSAMENTE")
-            return true
+            true
         } else {
             Log.e(TAG, "ERROR AL GUARDAR EN SEGURIDAD")
-            return false
+            false
         }
     }
 
@@ -101,24 +101,124 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         }
     }
 
+    @SuppressLint("Range")
+    fun getAllUsers(): String {
+        val users = StringBuilder()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Users", null)
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val dni = cursor.getString(cursor.getColumnIndex("dni"))
+
+                users.append("Dni: $dni \n")
+                cursor.moveToNext()
+            }
+        } else {
+            users.append("No hay registros en la tabla Users")
+        }
+        cursor.close()
+        return users.toString()
+    }
+
+    @SuppressLint("Range")
+    fun getAllSecurity(): String {
+        val security = StringBuilder()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM SecurityMember", null)
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val dni = cursor.getString(cursor.getColumnIndex("dni"))
+
+                security.append("Dni: $dni \n")
+                cursor.moveToNext()
+            }
+        } else {
+            security.append("No hay registros en la tabla Security")
+        }
+        cursor.close()
+        return security.toString()
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun registerLog(tipo: String, dni: String, dniMaster: String): Boolean {
+    fun registerAuthenticationLog(dni: String, dniMaster: String): Boolean {
         if (checkInDatabase(dni) && checkIfSecurity(dniMaster)){
             val db = writableDatabase
-            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, fecha, hora) VALUES(?, ?, ?, ?, ?)"
+            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
-            statement.bindString(1, tipo)
+            statement.bindString(1, "USER_SUCCESSFUL_AUTHENTICATION")
             statement.bindString(2, dniMaster)
             statement.bindString(3, dni)
-            statement.bindString(4, currentDate().toString())
-            statement.bindString(5, currentTime().toString())
+            statement.bindString(4, currentTimeStamp())
             statement.executeInsert()
             Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
+            db.close()
             return true
         } else{
+            val db = writableDatabase
+            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+            val statement = db.compileStatement(sql)
+            statement.bindString(1, "USER_UNSUCCESSFUL_AUTHENTICATION")
+            statement.bindString(2, dniMaster)
+            statement.bindString(3, dni)
+            statement.bindString(4, currentTimeStamp())
+            statement.executeInsert()
             Log.e(TAG, "ERROR AL REGISTRAR EL LOG")
+            db.close()
             return false
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun registerSecurityAuthenticationLog(dni: String): Boolean {
+        if (checkIfSecurity(dni)){
+            val db = writableDatabase
+            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+            val statement = db.compileStatement(sql)
+            statement.bindString(1, "USER_SUCCESSFUL_AUTHENTICATION")
+            statement.bindString(2, dni)
+            statement.bindString(3, "")
+            statement.bindString(4, currentTimeStamp())
+            statement.executeInsert()
+            Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
+            db.close()
+            return true
+        } else {
+            val db = writableDatabase
+            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+            val statement = db.compileStatement(sql)
+            statement.bindString(1, "USER_UNSUCCESSFUL_AUTHENTICATION")
+            statement.bindString(2, dni)
+            statement.bindString(3, "")
+            statement.bindString(4, currentTimeStamp())
+            statement.executeInsert()
+            Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
+            db.close()
+            return false
+        }
+    }
+
+    @SuppressLint("Range", "Recycle")
+    fun getListOfLogs(): List<Registro>{
+        val logs = mutableListOf<Registro>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM OfflineLogs", null)
+        if (cursor.moveToFirst()){
+            while (!cursor.isAfterLast){
+                val log: Registro
+                val tipo = cursor.getString(cursor.getColumnIndex("tipo"))
+                val dniMaster = cursor.getString(cursor.getColumnIndex("dniMaster"))
+                val dni = cursor.getString(cursor.getColumnIndex("dni"))
+                val timestamp = cursor.getString(cursor.getColumnIndex("timestamp"))
+
+                log = Registro(tipo, dniMaster, dni, timestamp)
+
+                logs.add(log)
+            }
+        }
+
+        return logs
     }
 
     private fun saveUserDataToDatabase(dni: String) {
@@ -147,10 +247,9 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
                 val tipo = cursor.getString(cursor.getColumnIndex("tipo"))
                 val dniMaster = cursor.getString(cursor.getColumnIndex("dniMaster"))
                 val dni = cursor.getString(cursor.getColumnIndex("dni"))
-                val fecha = cursor.getString(cursor.getColumnIndex("fecha"))
-                val hora = cursor.getString(cursor.getColumnIndex("hora"))
+                val timestamp = cursor.getString(cursor.getColumnIndex("timestamp"))
 
-                logs.append("Tipo: $tipo, Dni Maestro: $dniMaster, Dni: $dni, Fecha: $fecha, Hora: $hora\n")
+                logs.append("Tipo: $tipo, Dni Maestro: $dniMaster, Dni: $dni, Timestamp: $timestamp")
                 cursor.moveToNext()
             }
         } else {
@@ -160,15 +259,11 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         return logs.toString()
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
-    fun currentDate(): LocalDate {
-        return LocalDate.now()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun currentTime(): LocalTime {
-        return LocalTime.now()
+    fun currentTimeStamp(): String {
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+        return current.format(formatter)
     }
 
     companion object {

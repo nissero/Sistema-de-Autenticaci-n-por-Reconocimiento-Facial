@@ -74,8 +74,9 @@ class OfflineLogInActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun securityScan(dni: String, apellido: String) {
-        if (database.checkIfSecurity(dni)){
+        if (database.registerSecurityAuthenticationLog(dni)){
             Log.d(TAG, "ENCONTRADO SEGURIDAD - APELLIDO: $apellido")
             Log.d(TAG, "ENCONTRADO SEGURIDAD - DNI: $dni")
 
@@ -101,7 +102,7 @@ class OfflineLogInActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun noCategoryScan(dni: String, apellido: String) {
-        if (database.registerLog("USER_SUCCESSFUL_AUTHENTICATION", dni, dniMaster)) {
+        if (database.registerAuthenticationLog(dni, dniMaster)) {
             Log.d(TAG, "ENCONTRADO - APELLIDO: $apellido")
 
             Log.d(TAG, "ENCONTRADO - DNI: $dni")
@@ -120,6 +121,8 @@ class OfflineLogInActivity : AppCompatActivity() {
             finish()
         } else {
             Log.e(TAG, "USUARIO NO REGISTRADO EN LA BASE DE DATOS")
+
+            Log.d(TAG, "RESULTADO DE TODOS LOS LOGS: ${database.getAllLogs()}")
 
             Log.e(TAG, "ENCONTRADO - APELLIDO: $apellido")
             Log.e(TAG, "ENCONTRADO - DNI: $dni")
