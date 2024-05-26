@@ -23,16 +23,14 @@ import com.biogin.myapplication.databinding.ActivityRegisterBinding
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.ui.LoadingDialog
-import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 
 class RegisterActivity : AppCompatActivity() {
-    private lateinit var allowedAreasUtils : AllowedAreasUtils
-    private lateinit var institutesUtils : InstitutesUtils
+    private lateinit var institutesUtils: InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
-    private  var dataSource = LoginDataSource()
+    private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
     private var validations  = FormValidations()
     private var loadingDialog = LoadingDialog(this)
@@ -41,15 +39,15 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-        allowedAreasUtils = AllowedAreasUtils()
+        dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-        var user_categories = resources.getStringArray(R.array.user_categories)
-        val categories_spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, user_categories)
-        categories_spinner.adapter = adapter
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        categoriesSpinner.adapter = adapter
 
-        categories_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -57,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-                var categorySelected  = spinner.selectedItem.toString()
+                val categorySelected  = spinner.selectedItem.toString()
 
                 if (categoriesWithNoInstitute.contains(categorySelected)) {
                     disableCheckboxes()
@@ -133,7 +131,7 @@ class RegisterActivity : AppCompatActivity() {
 
         continueButton?.setOnClickListener {
             loadingDialog.startLoadingDialog()
-            var institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
+            val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             dataSource.uploadUserToFirebase(
                 name?.text.toString(),
                 surname?.text.toString(),
@@ -238,10 +236,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkContinueButtonActivation() {
-        var categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
 
         val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        var categorySelected  = spinner.selectedItem.toString()
+        val categorySelected  = spinner.selectedItem.toString()
 
         if (formHasNoErrors()) {
             if (!categoriesWithNoInstitute.contains(categorySelected)) {

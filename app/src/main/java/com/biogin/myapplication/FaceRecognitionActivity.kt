@@ -57,7 +57,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType) {
                 "seguridad" ->
                     viewBinding.skipButton.setOnClickListener {
-                        goToSeguridadActivity()
+                        goToSeguridadActivity("43908111")
                     }
                 "rrhh" -> viewBinding.skipButton.setOnClickListener {
                         goToRRHHActivity()
@@ -92,9 +92,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun goToSeguridadActivity() {
+    private fun goToSeguridadActivity(dniMaster: String) {
         camera.shutdown()
         val intent = Intent(this, SeguridadActivity::class.java)
+        intent.putExtra("dniMaster", dniMaster)
         startActivity(intent)
         finish()
     }
@@ -178,7 +179,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToSeguridadActivity()
+                goToSeguridadActivity(user.getDni())
             }, dialogShowTime)
         } else {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")

@@ -12,6 +12,7 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityHomeBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 
+
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var firebaseSyncManager: FirebaseSyncService

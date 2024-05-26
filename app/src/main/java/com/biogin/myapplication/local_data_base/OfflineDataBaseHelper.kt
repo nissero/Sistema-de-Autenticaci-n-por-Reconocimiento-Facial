@@ -9,6 +9,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.biogin.myapplication.Registro
 import java.sql.SQLException
+
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -141,7 +143,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val db = writableDatabase
             val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
-            statement.bindString(1, "USER_SUCCESSFUL_AUTHENTICATION")
+            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION.value)
             statement.bindString(2, dniMaster)
             statement.bindString(3, dni)
             statement.bindString(4, currentTimeStamp())
@@ -153,7 +155,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val db = writableDatabase
             val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
-            statement.bindString(1, "USER_UNSUCCESSFUL_AUTHENTICATION")
+            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION.value)
             statement.bindString(2, dniMaster)
             statement.bindString(3, dni)
             statement.bindString(4, currentTimeStamp())
@@ -170,7 +172,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val db = writableDatabase
             val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
-            statement.bindString(1, "USER_SUCCESSFUL_AUTHENTICATION")
+            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_SUCCESSFUL_LOGIN.value)
             statement.bindString(2, dni)
             statement.bindString(3, "")
             statement.bindString(4, currentTimeStamp())
@@ -182,7 +184,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val db = writableDatabase
             val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
-            statement.bindString(1, "USER_UNSUCCESSFUL_AUTHENTICATION")
+            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN.value)
             statement.bindString(2, dni)
             statement.bindString(3, "")
             statement.bindString(4, currentTimeStamp())
@@ -191,6 +193,40 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             db.close()
             return false
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun endOfShift(dniMaster: String) {
+        val db = writableDatabase
+        val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+        val statement = db.compileStatement(sql)
+        statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT.value)
+        statement.bindString(2, dniMaster)
+        statement.bindString(3, "")
+        statement.bindString(4, currentTimeStamp())
+        statement.executeInsert()
+
+        db.close()
+
+        Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
+        Log.d(TAG, "TODOS LOS LOGS: ${getAllLogs()}")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun startOfShift(dniMaster: String) {
+        val db = writableDatabase
+        val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+        val statement = db.compileStatement(sql)
+        statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT.value)
+        statement.bindString(2, dniMaster)
+        statement.bindString(3, "")
+        statement.bindString(4, currentTimeStamp())
+        statement.executeInsert()
+
+        db.close()
+
+        Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
+        Log.d(TAG, "TODOS LOS LOGS: ${getAllLogs()}")
     }
 
     @SuppressLint("Range", "Recycle")
