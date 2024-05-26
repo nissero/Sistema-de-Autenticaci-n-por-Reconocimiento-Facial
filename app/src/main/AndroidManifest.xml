@@ -21,6 +21,12 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".AuthorizationMessageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OfflineLogInActivity"
+            android:exported="false" />
+        <activity
             android:name=".Popup"
             android:exported="true" />
         <activity
@@ -57,8 +63,7 @@
             android:name=".FaceRecognitionActivity"
             android:exported="true"
             android:label="@string/title_main_activity"
-            android:theme="@style/Theme.MyApplication">
-        </activity>
+            android:theme="@style/Theme.MyApplication" />
     </application>
 
 </manifest>

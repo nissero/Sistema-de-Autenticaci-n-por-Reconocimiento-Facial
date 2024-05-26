@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.FaceRecognitionActivity
+import com.biogin.myapplication.OfflineLogInActivity
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
@@ -23,7 +25,9 @@ class AutenticacionFragment : Fragment() {
 
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
+    private lateinit var dniMaster: String
     private lateinit var logsRepository : LogsRepository
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -38,7 +42,11 @@ class AutenticacionFragment : Fragment() {
 
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        val bundle = arguments
+        dniMaster = bundle?.getString("dniMaster").toString()
+        Log.d("AUTENTICATIONFRAGMENT", dniMaster)
         logsRepository = LogsRepository()
+
 //        val textView: TextView = binding.textHome
 //        homeViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it
@@ -46,6 +54,9 @@ class AutenticacionFragment : Fragment() {
 
         val autenticacionButton = root.findViewById<Button>(R.id.button_visitantes)
         autenticacionButton.visibility = View.INVISIBLE
+
+        val autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
+        autenticacionOfflineButton.visibility = View.INVISIBLE
 
         val turnoButton = root.findViewById<Button>(R.id.button_turno)
 
@@ -59,6 +70,7 @@ class AutenticacionFragment : Fragment() {
                 if(data?.getBooleanExtra("autenticado", false) == true) {
                     turnoIniciado = false
                     autenticacionButton.visibility = View.INVISIBLE
+                    autenticacionOfflineButton.visibility = View.INVISIBLE
                     turnoButton.text = this.context?.getString(R.string.iniciar_turno)
                     mensaje.text = this.context?.getString(R.string.mansaje_inicio_turno)
                 }
@@ -68,6 +80,13 @@ class AutenticacionFragment : Fragment() {
         autenticacionButton.setOnClickListener {
             val intent = Intent(root.context, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "visitante")
+            startActivity(intent)
+        }
+
+        autenticacionOfflineButton.setOnClickListener{
+            val intent = Intent(root.context, OfflineLogInActivity::class.java)
+            intent.putExtra("authenticationType", "visitante")
+            intent.putExtra("dniMaster", dniMaster)
             startActivity(intent)
         }
 
@@ -82,6 +101,7 @@ class AutenticacionFragment : Fragment() {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
+                                autenticacionOfflineButton.visibility = View.VISIBLE
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 

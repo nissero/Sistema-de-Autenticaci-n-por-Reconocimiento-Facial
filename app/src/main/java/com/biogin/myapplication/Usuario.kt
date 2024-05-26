@@ -1,5 +1,6 @@
 package com.biogin.myapplication
 
+import androidx.compose.ui.text.toLowerCase
 import org.checkerframework.checker.units.qual.A
 
 class Usuario (
@@ -9,6 +10,7 @@ class Usuario (
     private val email: String = "",
     private val area: String = "",
     private val categoria: String = "",
+    private val estado: String = "",
     private val areasPermitidas: ArrayList<String> = ArrayList()
 ){
     fun getNombre(): String {
@@ -21,6 +23,10 @@ class Usuario (
 
     fun getDni(): String {
         return dni
+    }
+
+    fun getEstado(): Boolean {
+        return estado.toLowerCase() == "activo"
     }
 
     fun getEmail(): String {

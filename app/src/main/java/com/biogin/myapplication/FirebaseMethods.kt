@@ -20,9 +20,10 @@ class FirebaseMethods {
                     val email = userData?.get("email") as? String ?: ""
                     val area = userData?.get("area") as? String ?: ""
                     val categoria = userData?.get("categoria") as? String ?: ""
+                    val estado = userData?.get("estado") as? String ?: ""
                     val areasPermitidas = userData?.get("areasPermitidas") as? ArrayList<String> ?: arrayListOf()
 
-                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria,  areasPermitidas)
+                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria, estado, areasPermitidas)
                     callback(usuario)
                 } else {
                     // Usuario no encontrado, devolver objeto Usuario vacío

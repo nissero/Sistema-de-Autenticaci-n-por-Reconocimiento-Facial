@@ -172,7 +172,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifSecurity(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
@@ -188,7 +188,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifRRHH(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "rrhh") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "rrhh") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.RRHH_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
@@ -204,7 +204,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifFinDeTurno(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -217,7 +217,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifAny(user: Usuario){
-        if (user.getNombre().isNotEmpty()) {
+        if (user.getNombre().isNotEmpty() && user.getEstado()) {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), user.getDni(), user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
