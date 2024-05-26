@@ -15,7 +15,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.biogin.myapplication.databinding.ActivitySeguridadBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SeguridadActivity : AppCompatActivity() {
 
