@@ -73,7 +73,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
         val message = when (photoCount) {
             1 -> "Gire su cara a la derecha"
             2 -> "Gire su cara a la izquierda"
-            3 -> "Fotos tomadas exitosamente"
+            3 -> "Usuario registrado exitosamente"
             else -> ""
         }
         if (message.isNotEmpty()) {

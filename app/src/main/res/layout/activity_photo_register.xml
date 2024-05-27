@@ -50,7 +50,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:padding="16dp"
-            android:text="Gire su cara"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp" />
