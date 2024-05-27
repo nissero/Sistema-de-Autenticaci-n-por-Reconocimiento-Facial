@@ -106,4 +106,7 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
     implementation("com.journeyapps:zxing-android-embedded:4.2.0")
 
+    implementation("com.sun.mail:android-mail:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+
 }
