@@ -330,10 +330,10 @@ class UserManagement : AppCompatActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun sendEmailOnDniChange(oldDni: String, newDni: String) {
         println("success")
-        val auth = EmailService.UserPassAuthenticator("fernandoantunez_bioginx@outlook.com",
-            "bioginx2024")
+        val auth = EmailService.UserPassAuthenticator("fernandoivanantunez@hotmail.com",
+            "steveharris40184869")
         val to = listOf(InternetAddress("antunez.fernandoivan.43377@gmail.com"))
-        val from = InternetAddress("fernandoantunez_bioginx@outlook.com")
+        val from = InternetAddress("fernandoivanantunez@hotmail.com")
         val subject = "Aviso de cambio de DNI"
         val body = "Buenas, le enviamos este mail para informarle que al usuario registrado con el " +
                 "DNI $oldDni se le ha modificado el mismo por $newDni.\nLe dejamos un reporte de los " +
