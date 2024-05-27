@@ -36,8 +36,8 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
+        
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
         val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
@@ -54,6 +54,7 @@ class RegisterActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+                
                 val categorySelected  = spinner.selectedItem.toString()
 
                 if (categoriesWithNoInstitute.contains(categorySelected)) {
@@ -65,9 +66,8 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
+                // Do nothing
             }
-
         }
 
         val name = binding.registerName
@@ -80,7 +80,7 @@ class RegisterActivity : AppCompatActivity() {
         val continueButton = binding.registerContinueButton
 
         name?.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                 validations.validateName(name)
                 checkContinueButtonActivation()
                 return@setOnEditorActionListener false
@@ -88,8 +88,8 @@ class RegisterActivity : AppCompatActivity() {
             false
         }
 
-        surname?.setOnEditorActionListener {  _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+        surname?.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                 validations.validateSurname(surname)
                 checkContinueButtonActivation()
                 return@setOnEditorActionListener false
@@ -97,8 +97,8 @@ class RegisterActivity : AppCompatActivity() {
             false
         }
 
-        dni?.setOnEditorActionListener {  _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+        dni?.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                 validations.validateDNI(dni)
                 checkContinueButtonActivation()
                 return@setOnEditorActionListener false
@@ -106,8 +106,8 @@ class RegisterActivity : AppCompatActivity() {
             false
         }
 
-        email?.setOnEditorActionListener {  _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+        email?.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                 validations.validateEmail(email)
                 checkContinueButtonActivation()
                 return@setOnEditorActionListener false
@@ -137,29 +137,27 @@ class RegisterActivity : AppCompatActivity() {
                 dni?.text.toString(),
                 email?.text.toString(),
                 spinner?.selectedItem.toString(),
-                institutesSelected).
-            addOnSuccessListener {
+                institutesSelected
+            ).addOnSuccessListener {
                 loadingDialog.dismissDialog()
                 val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
                 intent.putExtra("name", name?.text.toString())
                 intent.putExtra("surname", surname?.text.toString())
                 intent.putExtra("dni", dni?.text.toString())
                 intent.putExtra("email", email?.text.toString())
-
                 startActivity(intent)
             }.addOnFailureListener { ex ->
                 loadingDialog.dismissDialog()
                 try {
                     throw ex
-                } catch (e : FirebaseFirestoreException) {
+                } catch (e: FirebaseFirestoreException) {
                     Log.e("Firebase", e.message.toString())
-                    val dialogClickListener =
-                        DialogInterface.OnClickListener { _, which ->
-                            when (which) {
-                                DialogInterface.BUTTON_NEUTRAL -> {
-                                }
+                    val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        when (which) {
+                            DialogInterface.BUTTON_NEUTRAL -> {
                             }
                         }
+                    }
 
                     val builder = AlertDialog.Builder(binding.root.context)
 
@@ -168,13 +166,12 @@ class RegisterActivity : AppCompatActivity() {
                         setNeutralButton("Reintentar", dialogClickListener).
                         show()
                     } else {
-                        builder.setMessage("Error al dar de alta el usuario, intente nuevamente").
-                        setNeutralButton("Reintentar", dialogClickListener).
-                        show()
+                        builder.setMessage("Error al dar de alta el usuario, intente nuevamente")
+                            .setNeutralButton("Reintentar", dialogClickListener)
+                            .show()
                     }
                 }
             }
-
         }
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
@@ -200,10 +197,12 @@ class RegisterActivity : AppCompatActivity() {
             loginViewModel.loginDataChanged(
                 name.text.toString(),
                 "",
-               ""
+                ""
             )
         }
-        }
+
+        onResume()
+    }
 
     private fun enableCheckboxes() {
         binding.checkboxIDEI?.isEnabled = true
@@ -271,6 +270,23 @@ class RegisterActivity : AppCompatActivity() {
         val emailHasNoErrors = binding.registerEmail?.error == null
 
         return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
+    }
+
+    private fun clearFields() {
+        binding.registerName?.setText("")
+        binding.registerSurname?.setText("")
+        binding.registerDni?.setText("")
+        binding.registerEmail?.setText("")
+        binding.registerCategoriesSpinner?.setSelection(0)
+        binding.checkboxICO?.isChecked = false
+        binding.checkboxIDH?.isChecked = false
+        binding.checkboxICI?.isChecked = false
+        binding.checkboxIDEI?.isChecked = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        clearFields()
     }
 
 }

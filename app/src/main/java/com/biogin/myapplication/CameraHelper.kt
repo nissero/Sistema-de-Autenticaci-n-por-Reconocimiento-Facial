@@ -52,7 +52,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                    private val graphicOverlay: GraphicOverlay,
                    private val dialogShowTime: Long?,
                    private var withAnalyzer: Boolean
-)  {
+) {
 
     private var imageCapture: ImageCapture? = null
     private lateinit var imageAnalyzer: ImageAnalysis
@@ -62,7 +62,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
     private var lastApiCallTimeMillis = System.currentTimeMillis()
     private var isApiCallInProgress = false
 
-    private lateinit var cameraExecutor : ExecutorService
+    private lateinit var cameraExecutor: ExecutorService
 
     private lateinit var cameraProvider: ProcessCameraProvider
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -70,6 +70,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
 
     val firebaseMethods = FirebaseMethods()
+
+    private var currentPhotoIndex = 0
 
     fun startCamera() {
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -101,7 +103,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
     }
 
-    fun flipCamera(){
+    fun flipCamera() {
         cameraProvider.unbindAll()
 
         if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
@@ -115,21 +117,29 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         startCamera()
     }
 
-    fun takePhoto(tag: String, fileNameFormat: String, context: ContextWrapper, intent: Intent, fin: () -> Unit){
+    fun takePhoto(
+        tag: String,
+        fileNameFormat: String,
+        context: ContextWrapper,
+        intent: Intent,
+        fin: () -> Unit
+    ) {
         val imageCapture = imageCapture ?: return
 
         val name = SimpleDateFormat(fileNameFormat, Locale.US).format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply{
+        val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(context.contentResolver,
+            .Builder(
+                context.contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
+                contentValues
+            )
             .build()
 
         imageCapture.takePicture(
@@ -140,8 +150,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                     Log.e(tag, "Photo capture failed: ${exc.message}", exc)
                     fin()
                 }
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
+
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     uploadPhotoToFirebase(output.savedUri, intent)
                     output.savedUri?.let {
                         sendImageForTraining(it, intent.getStringExtra("dni") ?: "") { result ->
@@ -207,25 +217,19 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
         // Execute the request asynchronously
         val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Failed to make request: ${e.message}")
+                callback(null)
+            }
 
-        // Define the number of times to send the call
-        val numberOfAttempts = 3
-
-        for (i in 1..numberOfAttempts) {
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.e(TAG, "Failed to make request: ${e.message}")
-                    callback(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body?.string()
-                    // Log training result
-                    Log.d(TAG, "Training result: $responseBody")
-                    callback(responseBody)
-                }
-            })
-        }
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                // Log training result
+                Log.d(TAG, "Training result: $responseBody")
+                callback(responseBody)
+            }
+        })
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
