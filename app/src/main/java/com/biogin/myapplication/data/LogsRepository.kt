@@ -47,10 +47,10 @@ class LogsRepository {
         val db = FirebaseFirestore.getInstance()
         val offlineLogs = sqlDb.getListOfLogs()
         for (offlineLog in offlineLogs) {
-            val log = createHashmapLog(
+            val log = createHashmapOfflineLog(
                 Log(
                     Log.LogEventType.INFO,
-                    Log.LogEventName.valueOf(offlineLog.getTipo()),
+                    Log.LogEventName.valueOf(replaceWhitespacesWithUnderscores(offlineLog.getTipo())),
                     offlineLog.getDniMaster(),
                     offlineLog.getDni(),
                     "",
@@ -65,6 +65,7 @@ class LogsRepository {
             for(log in logsToUpload) {
                 val newDocRef = colRef.document()
                 newDocRef.set(log)
+                newDocRef.update("timestamp", log.get("timestamp"))
                 numberOfLogsSyncronized++
             }
         }.addOnSuccessListener {
@@ -76,6 +77,9 @@ class LogsRepository {
 
     }
 
+    fun replaceWhitespacesWithUnderscores(s : String) : String {
+        return s.replace("\\s+".toRegex(), "_")
+    }
     fun getSuccesfulAuthentications() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
@@ -140,6 +144,16 @@ class LogsRepository {
         )
     }
 
+    private fun createHashmapOfflineLog(log : Log): HashMap<String, Any> {
+        return hashMapOf(
+            "logEventType" to log.logEventType,
+            "logEventName" to log.logEventName.value,
+            "dniMasterUser" to log.dniMasterUser,
+            "dniUserAffected" to log.dniUserAffected,
+            "timestamp" to log.timestamp,
+            "category" to log.userCategory
+        )
+    }
     private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
         val formatter = SimpleDateFormat(format, locale)
         return formatter.format(this)
