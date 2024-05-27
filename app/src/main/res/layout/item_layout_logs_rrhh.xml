@@ -10,42 +10,47 @@
     <TableRow>
         <TextView
             android:id="@+id/item_timestamp_log_rrhh"
-            android:layout_width="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:padding="5dp"
             android:layout_column="1"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"/>
 
         <TextView
             android:id="@+id/item_log_type_rrrhh"
-            android:layout_width="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:padding="5dp"
             android:layout_column="2"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:layout_height="match_parent"
+            android:layout_width="120dp"/>
 
         <TextView
             android:id="@+id/item_master_user_dni_rrhh"
-            android:layout_width="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:padding="5dp"
             android:layout_column="3"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"/>
 
         <TextView
             android:id="@+id/item_dni_user_affected_rrhh"
-            android:layout_width="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:padding="5dp"
             android:layout_column="4"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"/>
 
         <TextView
             android:id="@+id/item_user_category_rrrhh"
-            android:layout_width="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:layout_column="5"
             android:padding="5dp"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"/>
     </TableRow>
 </TableLayout>
