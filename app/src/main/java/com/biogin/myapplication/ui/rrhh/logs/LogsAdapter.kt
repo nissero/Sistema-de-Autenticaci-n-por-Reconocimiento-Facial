@@ -22,9 +22,24 @@ class LogsAdapter(val context : Context, val logList : List<Log>): RecyclerView.
             var log = logList.get(position)
             holder.timestamp.text = addLineJumpToStringInSpaces(log.timestamp)
             holder.logEventName.text = addLineJumpToStringInSpaces(log.logEventName.value)
-            holder.dniMasterUser.text = log.dniMasterUser
-            holder.dniUserAffected.text = log.dniUserAffected
-            holder.userCategory.text = addLineJumpToStringInSpaces(log.userCategory)
+            if(log.dniMasterUser.isEmpty()) {
+                holder.dniMasterUser.text = ""
+            } else {
+                holder.dniMasterUser.text = log.dniMasterUser
+            }
+
+            if(log.dniUserAffected.isEmpty()) {
+                holder.dniUserAffected.text = ""
+            } else {
+                holder.dniUserAffected.text = log.dniUserAffected
+            }
+
+            if(log.userCategory.isEmpty()) {
+                holder.userCategory.text = ""
+            } else {
+                holder.userCategory.text = addLineJumpToStringInSpaces(log.userCategory)
+            }
+
         }
     }
     fun addLineJumpToStringInSpaces(s : String) : String {

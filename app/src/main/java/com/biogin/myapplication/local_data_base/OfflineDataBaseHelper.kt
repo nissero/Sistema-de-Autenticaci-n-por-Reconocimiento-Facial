@@ -2,21 +2,16 @@ package com.biogin.myapplication.local_data_base
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteDatabase.openOrCreateDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.text.toLowerCase
 import com.biogin.myapplication.Registro
-import com.google.android.datatransport.cct.internal.LogEvent
-import com.google.zxing.integration.android.IntentIntegrator
-import java.time.Instant
-import java.time.LocalDate
+import java.sql.SQLException
+
+
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "OfflineDb", null, 1){
@@ -250,6 +245,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
                 log = Registro(tipo, dniMaster, dni, timestamp)
 
                 logs.add(log)
+                cursor.moveToNext()
             }
         }
 
@@ -294,6 +290,17 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         return logs.toString()
     }
 
+    fun deleteAllLogs() {
+        val db = writableDatabase
+        val sql = "DELETE FROM OfflineLogs"
+        try {
+            val statement = db.compileStatement(sql)
+            var rowsDeleted = statement.executeUpdateDelete()
+            Log.i("SQLite", "Se borraron exitosamente todos los registros de la tabala OfflineLogs | Registros borrados en total: $rowsDeleted")
+        } catch (e : SQLException) {
+            Log.e("SQLite", "Error al borrar todos los registros de la tabla OfflineLogs")
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun currentTimeStamp(): String {
         val current = LocalDateTime.now()

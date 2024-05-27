@@ -1,5 +1,6 @@
 package com.biogin.myapplication.data
 
+import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
@@ -41,6 +42,44 @@ class LogsRepository {
         return logs
     }
 
+    fun syncLogsOfflineWithOnline(sqlDb : OfflineDataBaseHelper) {
+        val logsToUpload = ArrayList<HashMap<String, Any>>()
+        val db = FirebaseFirestore.getInstance()
+        val offlineLogs = sqlDb.getListOfLogs()
+        for (offlineLog in offlineLogs) {
+            val log = createHashmapOfflineLog(
+                Log(
+                    Log.LogEventType.INFO,
+                    Log.LogEventName.valueOf(replaceWhitespacesWithUnderscores(offlineLog.getTipo())),
+                    offlineLog.getDniMaster(),
+                    offlineLog.getDni(),
+                    "",
+                    offlineLog.getTimestamp()
+                )
+            )
+            logsToUpload.add(log)
+        }
+        val colRef = db.collection(LOGS_COLLECTION_NAME)
+        var numberOfLogsSyncronized = 0
+        db.runTransaction {
+            for(log in logsToUpload) {
+                val newDocRef = colRef.document()
+                newDocRef.set(log)
+                newDocRef.update("timestamp", log.get("timestamp"))
+                numberOfLogsSyncronized++
+            }
+        }.addOnSuccessListener {
+            sqlDb.deleteAllLogs()
+            android.util.Log.e("FIREBASE", "Logs offline sincronizados correctamente! Cantidad de logs sincronizados : $numberOfLogsSyncronized")
+        }.addOnFailureListener {
+            android.util.Log.e("FIREBASE", "Hubo un error al sincronizar los logs offline")
+        }
+
+    }
+
+    fun replaceWhitespacesWithUnderscores(s : String) : String {
+        return s.replace("\\s+".toRegex(), "_")
+    }
     fun getSuccesfulAuthentications() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
@@ -105,6 +144,16 @@ class LogsRepository {
         )
     }
 
+    private fun createHashmapOfflineLog(log : Log): HashMap<String, Any> {
+        return hashMapOf(
+            "logEventType" to log.logEventType,
+            "logEventName" to log.logEventName.value,
+            "dniMasterUser" to log.dniMasterUser,
+            "dniUserAffected" to log.dniUserAffected,
+            "timestamp" to log.timestamp,
+            "category" to log.userCategory
+        )
+    }
     private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
         val formatter = SimpleDateFormat(format, locale)
         return formatter.format(this)
