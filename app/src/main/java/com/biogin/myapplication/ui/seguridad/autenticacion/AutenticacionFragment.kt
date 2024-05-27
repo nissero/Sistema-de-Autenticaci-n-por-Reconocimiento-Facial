@@ -29,6 +29,7 @@ class AutenticacionFragment : Fragment() {
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
     private lateinit var autenticacionButton: Button
+    private lateinit var autenticacionOfflineButton: Button
     private lateinit var turnoButton: Button
     private lateinit var mensaje: TextView
     private lateinit var dniMaster: String
@@ -57,6 +58,8 @@ class AutenticacionFragment : Fragment() {
 
         autenticacionButton = root.findViewById(R.id.button_visitantes)
 
+        autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
+
         turnoButton = root.findViewById(R.id.button_turno)
 
 
@@ -65,18 +68,13 @@ class AutenticacionFragment : Fragment() {
             turnoButton.text = this.context?.getString(R.string.finalizar_turno)
             mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
             autenticacionButton.visibility = View.VISIBLE
+            autenticacionOfflineButton.visibility = View.VISIBLE
         } else {
             turnoButton.text = this.context?.getString(R.string.iniciar_turno)
             mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
             autenticacionButton.visibility = View.INVISIBLE
+            autenticacionOfflineButton.visibility = View.INVISIBLE
         }
-
-        val autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
-        autenticacionOfflineButton.visibility = View.INVISIBLE
-
-        val turnoButton = root.findViewById<Button>(R.id.button_turno)
-
-        val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
 
 
         //metodo para crear una actividad nueva y obtener un resultado
@@ -140,9 +138,14 @@ class AutenticacionFragment : Fragment() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
-                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
-                                intent.putExtra("authenticationType", "fin de turno")
-                                resultLauncher.launch(intent)
+//                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
+//                                intent.putExtra("authenticationType", "fin de turno")
+//                                resultLauncher.launch(intent)
+                                turnoIniciado = false
+                                autenticacionButton.visibility = View.INVISIBLE
+                                autenticacionOfflineButton.visibility = View.INVISIBLE
+                                turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+                                mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
 
                                 val database = OfflineDataBaseHelper(requireActivity())
                                 database.endOfShift(dniMaster)

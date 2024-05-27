@@ -56,4 +56,24 @@ class FirebaseMethods {
                 Log.e("Firestore", "Error al obtener los datos del instituto con nombre $instituteName", e)
             }
     }
+
+    fun getLogsFromDni(dni: String, callback: (String) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("logs").get()
+            .addOnSuccessListener { documents ->
+                var logsString = ""
+                for (document in documents) {
+                    if(document.get("dniMasterUser") == dni || document.get("dniUserAffected") == dni){
+                        logsString += "Timestamp: " + document.get("timestamp") + "\n"
+                        logsString += "DNI usuario maestro: " + document.get("dniMasterUser") + "\n"
+                        logsString += "DNI usuario afectado: " + document.get("dniUserAffected") + "\n"
+                        logsString += "Evento: " + document.get("logEventName") + "\n\n"
+                    }
+
+                }
+                callback(logsString)
+            }.addOnFailureListener { e ->
+            Log.e("Firestore", "Error al obtener los datos del usuario con  $dni", e)
+        }
+    }
 }
