@@ -57,7 +57,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val db = readableDatabase
         val result = db.rawQuery("SELECT 1 FROM Users WHERE dni='$dni'", null)
         val exists = result.moveToFirst()
-        result.close()
+        db.close()
         return exists
     }
 
@@ -65,7 +65,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val db = readableDatabase
         val result = db.rawQuery("SELECT 1 FROM SecurityMember WHERE dni='$dni'", null)
         val exists = result.moveToFirst()
-        result.close()
+        db.close()
         return exists
     }
 
@@ -248,7 +248,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
                 cursor.moveToNext()
             }
         }
-
+        db.close()
         return logs
     }
 
@@ -258,6 +258,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val statement = db.compileStatement(sql)
         statement.bindString(1, dni)
         statement.executeInsert()
+        db.close()
     }
 
     private fun saveUserDataToSecurity(dni: String) {
@@ -266,6 +267,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val statement = db.compileStatement(sql)
         statement.bindString(1, dni)
         statement.executeInsert()
+        db.close()
     }
     @SuppressLint("Range")
     fun getAllLogs(): String {
@@ -286,7 +288,9 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         } else {
             logs.append("No hay registros en la tabla OfflineLogs")
         }
+
         cursor.close()
+        db.close()
         return logs.toString()
     }
 
@@ -297,8 +301,10 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val statement = db.compileStatement(sql)
             var rowsDeleted = statement.executeUpdateDelete()
             Log.i("SQLite", "Se borraron exitosamente todos los registros de la tabala OfflineLogs | Registros borrados en total: $rowsDeleted")
+            db.close()
         } catch (e : SQLException) {
             Log.e("SQLite", "Error al borrar todos los registros de la tabla OfflineLogs")
+            db.close()
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
