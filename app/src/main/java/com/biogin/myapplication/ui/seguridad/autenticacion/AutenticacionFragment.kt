@@ -122,7 +122,7 @@ class AutenticacionFragment : Fragment() {
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.startOfShift(dniMaster)
@@ -143,7 +143,7 @@ class AutenticacionFragment : Fragment() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.endOfShift(dniMaster)
