@@ -3,10 +3,7 @@ package com.biogin.myapplication.face_detection
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.graphics.Rect
-import android.os.Environment
-import android.os.Handler
 import android.util.Log
 import com.biogin.myapplication.BaseImageAnalyzer
 import com.biogin.myapplication.FaceContourGraphic
@@ -16,16 +13,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import okhttp3.*
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.util.concurrent.TimeUnit
-import android.os.Looper
 import androidx.camera.core.CameraSelector
 import com.biogin.myapplication.CameraHelper
-import java.io.File
-import java.io.FileOutputStream
 
 class FaceContourDetectionProcessor(
     private val context: Context,

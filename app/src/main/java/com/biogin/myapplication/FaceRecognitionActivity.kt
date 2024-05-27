@@ -9,31 +9,37 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import com.biogin.myapplication.databinding.ActivityMainBinding
+import android.view.View
 import android.view.Window
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.biogin.myapplication.data.LogsRepository
+import com.biogin.myapplication.data.userSession.MasterUserDataSession
+import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var dialogShowTime = 10000L
+    private var analyzeAgain = 12000L
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
     private lateinit var authenticationType: String
+    private lateinit var logsRepository : LogsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        logsRepository = LogsRepository()
 
         authenticationType = intent.getStringExtra("authenticationType").toString()
 
@@ -51,7 +57,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType) {
                 "seguridad" ->
                     viewBinding.skipButton.setOnClickListener {
-                        goToSeguridadActivity()
+                        goToSeguridadActivity("43908111")
                     }
                 "rrhh" -> viewBinding.skipButton.setOnClickListener {
                         goToRRHHActivity()
@@ -86,9 +92,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun goToSeguridadActivity() {
+    private fun goToSeguridadActivity(dniMaster: String) {
         camera.shutdown()
         val intent = Intent(this, SeguridadActivity::class.java)
+        intent.putExtra("dniMaster", dniMaster)
         startActivity(intent)
         finish()
     }
@@ -115,6 +122,10 @@ class FaceRecognitionActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.textViewName).text = "Nombre: ${usuario.getNombre()}"
         dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
         dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
+        dialog.findViewById<TextView>(R.id.textViewCategoria).text = "Categoria: ${usuario.getCategoria()}"
+        dialog.findViewById<TextView>(R.id.textViewAreasPermitidas).text = "Areas Permitidas: ${usuario.getAreasPermitidas()}"
+
+        Log.d(TAG, usuario.getAreasPermitidas())
 
         val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
         mediaPlayer.start()
@@ -162,33 +173,39 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifSecurity(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
+            MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToSeguridadActivity()
+                goToSeguridadActivity(user.getDni())
             }, dialogShowTime)
         } else {
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
         }
     }
 
     private fun ifRRHH(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "rrhh") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "rrhh") {
+            MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.RRHH_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
                 goToRRHHActivity()
             }, dialogShowTime)
         } else {
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.RRHH_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es RRHH")
         }
     }
 
     private fun ifFinDeTurno(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getCategoria().lowercase() == "seguridad") {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
@@ -201,17 +218,19 @@ class FaceRecognitionActivity : AppCompatActivity() {
     }
 
     private fun ifAny(user: Usuario){
-        if (user.getNombre().isNotEmpty()) {
+        if (user.getNombre().isNotEmpty() && user.getEstado()) {
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), user.getDni(), user.getCategoria())
             this.showAuthorizationMessage(user)
             Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
         } else {
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), "", "")
             this.showAccessDeniedMessage()
             Log.d(TAG, "El usuario no existe en la base de datos")
         }
     }
 
     private fun initCamera(typeOfAuthorization: (Usuario) -> Unit){
-        camera = CameraHelper(typeOfAuthorization, this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, dialogShowTime, true)
+        camera = CameraHelper(typeOfAuthorization, this, this, viewBinding, viewBinding.viewFinder.surfaceProvider, viewBinding.graphicOverlayFinder, analyzeAgain, true)
         camera.startCamera()
     }
 

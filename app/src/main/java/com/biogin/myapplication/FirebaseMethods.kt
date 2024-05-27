@@ -1,6 +1,7 @@
 package com.biogin.myapplication
 
 import android.util.Log
+import com.biogin.myapplication.data.Institute
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseMethods {
@@ -20,8 +21,10 @@ class FirebaseMethods {
                     val email = userData?.get("email") as? String ?: ""
                     val area = userData?.get("area") as? String ?: ""
                     val categoria = userData?.get("categoria") as? String ?: ""
+                    val estado = userData?.get("estado") as? String ?: ""
+                    val areasPermitidas = userData?.get("areasPermitidas") as? ArrayList<String> ?: arrayListOf()
 
-                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria)
+                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria, estado, areasPermitidas)
                     callback(usuario)
                 } else {
                     // Usuario no encontrado, devolver objeto Usuario vacío
@@ -32,6 +35,25 @@ class FirebaseMethods {
                 Log.e("Firestore", "Error al obtener los datos del usuario con DNI $dni", e)
                 // En caso de error, devolver objeto Usuario vacío
                 callback(Usuario())
+            }
+    }
+
+    fun readInstitutes(instituteName: String, callback: (Institute) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val documentReference = db.collection("institutos").document(instituteName)
+
+        documentReference.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val userData = documentSnapshot.data
+                    val areas = userData?.get("areas") as? ArrayList<String> ?: arrayListOf()
+
+                    val institute = Institute(instituteName, areas)
+                    callback(institute)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al obtener los datos del instituto con nombre $instituteName", e)
             }
     }
 }

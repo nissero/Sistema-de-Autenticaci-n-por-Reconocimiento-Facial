@@ -31,6 +31,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="10dp"
         android:elevation="10dp"
+        android:backgroundTint="@color/blue"
         android:text="@string/switch_camera"
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@id/imageCaptureButton" />
