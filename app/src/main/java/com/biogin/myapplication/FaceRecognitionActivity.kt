@@ -214,11 +214,21 @@ class FaceRecognitionActivity : AppCompatActivity() {
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
 
             val intent = Intent(this, AuthorizationMessageActivity::class.java)
-            intent.putExtra("typeOfLogin", "rrhh")
+
+            //USER DATA
+            intent.putExtra("dni", user.getDni())
+            intent.putExtra("apellido", user.getApellido())
+            intent.putExtra("nombre", user.getNombre())
+            intent.putExtra("categoria", user.getCategoria())
+            intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            //LOGIN DATA
+            intent.putExtra("typeOfLogIn", "rrhh")
             intent.putExtra("authorizationResult", "authorized")
             intent.putExtra("connection", "online")
 
             startActivity(intent)
+
             camera.shutdown()
             finish()
         } else {

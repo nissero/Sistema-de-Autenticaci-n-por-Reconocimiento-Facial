@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -65,27 +66,21 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         buttonContinuar.setOnClickListener {
             if (typeOfLogIn == "visitor"){
                 finish()
-            } else if (typeOfLogIn == "security"){
-                if (authorizationResult == "authorized"){
+            } else if (authorizationResult == "authorized"){
+                if (typeOfLogIn == "security"){
                     val dniMaster = intent.getStringExtra("dni")
                     val intent = Intent(this, SeguridadActivity::class.java)
                     intent.putExtra("dniMaster", dniMaster)
                     startActivity(intent)
                     finish()
                 }
-                else{
-                    finish()
-                }
-            } else if (typeOfLogIn == "rrhh"){
-                if (authorizationResult == "authorized"){
+                else if (typeOfLogIn == "rrhh"){
                     val intent = Intent(this, RRHHActivity::class.java)
-
                     startActivity(intent)
                     finish()
                 }
-                else{
-                    finish()
-                }
+            } else {
+                finish()
             }
         }
     }
