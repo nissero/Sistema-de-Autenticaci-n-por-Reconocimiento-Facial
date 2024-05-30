@@ -46,28 +46,6 @@
         android:text="@string/text_view_unsuccesful_auth_data_logs" />
 
     <TextView
-        android:id="@+id/data_logs_accesses"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="116dp"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs"
-        app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs"
-        app:layout_constraintTop_toBottomOf="@+id/amount_of_successful_auths"
-        android:text="Cantidad ingresos" />
-
-    <TextView
-        android:id="@+id/data_logs_exits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="116dp"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/data_unsuccessful_auths_logs"
-        app:layout_constraintStart_toStartOf="@+id/data_unsuccessful_auths_logs"
-        app:layout_constraintTop_toBottomOf="@+id/amount_of_unsuccessful_auths"
-        android:text="Cantidad egresos" />
-
-    <TextView
         android:id="@+id/amount_of_successful_auths"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,25 +67,47 @@
         app:layout_constraintStart_toStartOf="@+id/data_unsuccessful_auths_logs"
         app:layout_constraintTop_toBottomOf="@+id/data_unsuccessful_auths_logs" />
 
-    <TextView
-        android:id="@+id/amount_of_accesses"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="0"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/data_logs_accesses"
-        app:layout_constraintStart_toStartOf="@+id/data_logs_accesses"
-        app:layout_constraintTop_toBottomOf="@+id/data_logs_accesses" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/data_logs_accesses"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="116dp"-->
+    <!--        android:textSize="14sp"-->
+    <!--        app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/amount_of_successful_auths"-->
+    <!--        android:text="Cantidad ingresos" />-->
 
-    <TextView
-        android:id="@+id/amount_of_exits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="0"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/data_logs_exits"
-        app:layout_constraintStart_toStartOf="@+id/data_logs_exits"
-        app:layout_constraintTop_toBottomOf="@+id/data_logs_exits" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/data_logs_exits"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="116dp"-->
+    <!--        android:textSize="14sp"-->
+    <!--        app:layout_constraintEnd_toEndOf="@+id/data_unsuccessful_auths_logs"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/data_unsuccessful_auths_logs"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/amount_of_unsuccessful_auths"-->
+    <!--        android:text="Cantidad egresos" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/amount_of_accesses"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:text="0"-->
+<!--        android:textSize="20sp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/data_logs_accesses"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/data_logs_accesses"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/data_logs_accesses" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/amount_of_exits"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:text="0"-->
+<!--        android:textSize="20sp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/data_logs_exits"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/data_logs_exits"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/data_logs_exits" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>
