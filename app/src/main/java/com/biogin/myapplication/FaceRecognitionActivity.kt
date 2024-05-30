@@ -50,7 +50,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType){
                 "seguridad" -> initCamera(:: ifSecurity)
                 "rrhh" -> initCamera(:: ifRRHH)
-                "fin de turno" -> initCamera(:: ifFinDeTurno)
                 else -> initCamera(:: ifAny)
             }
 
@@ -60,10 +59,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
                         goToSeguridadActivity("43908111")
                     }
                 "rrhh" -> viewBinding.skipButton.setOnClickListener {
-                        goToRRHHActivity()
-                }
-                "fin de turno" -> viewBinding.skipButton.setOnClickListener {
-                    finDeTurno()
+                    goToRRHHActivity()
                 }
                 else -> {
                     viewBinding.skipButton.visibility = View.INVISIBLE
@@ -176,15 +172,38 @@ class FaceRecognitionActivity : AppCompatActivity() {
         if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
-            this.showAuthorizationMessage(user)
+
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                goToSeguridadActivity(user.getDni())
-            }, dialogShowTime)
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+
+            //USER DATA
+            intent.putExtra("dni", user.getDni())
+            intent.putExtra("apellido", user.getApellido())
+            intent.putExtra("nombre", user.getNombre())
+            intent.putExtra("categoria", user.getCategoria())
+            intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            //LOGIN DATA
+            intent.putExtra("typeOfLogIn", "security")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("connection", "online")
+
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         } else {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
-            this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "security")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         }
     }
 
@@ -192,15 +211,27 @@ class FaceRecognitionActivity : AppCompatActivity() {
         if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "rrhh") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.RRHH_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
-            this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                goToRRHHActivity()
-            }, dialogShowTime)
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogin", "rrhh")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("connection", "online")
+
+            startActivity(intent)
+            camera.shutdown()
+            finish()
         } else {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.RRHH_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
-            this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es RRHH")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "rrhh")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         }
     }
 
@@ -220,12 +251,34 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun ifAny(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getEstado()) {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), user.getDni(), user.getCategoria())
-            this.showAuthorizationMessage(user)
             Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("dni", user.getDni())
+            intent.putExtra("apellido", user.getApellido())
+            intent.putExtra("nombre", user.getNombre())
+            intent.putExtra("categoria", user.getCategoria())
+            intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            //LOGIN DATA
+            intent.putExtra("typeOfLogIn", "visitor")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("connection", "online")
+
+            startActivity(intent)
+            camera.shutdown()
+            finish()
         } else {
             logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), "", "")
-            this.showAccessDeniedMessage()
             Log.d(TAG, "El usuario no existe en la base de datos")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "visitor")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         }
     }
 

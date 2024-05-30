@@ -295,41 +295,30 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
-    fun canAnalize(): Boolean{
-        return System.currentTimeMillis() - lastApiCallTimeMillis >= apiCallIntervalMillis
-    }
 
-    fun isAnalyzing(): Boolean{
+    fun isSomeoneAnalyzing(): Boolean{
         return isApiCallInProgress
     }
-    fun analyzing(){
+
+    fun iAmAnalyzing(){
         isApiCallInProgress = true
     }
 
-    fun stopAnalyzing(){
+    fun continueAnalyzing(){
         isApiCallInProgress = false
     }
 
-    fun wasAnalyzed(){
-        imageAnalyzer.clearAnalyzer()
-
-        if (dialogShowTime != null) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                seleccionarAnalizador(true)
-            }, dialogShowTime)
-        }
-    }
-
-    fun setLasApiCallTime(){
-        lastApiCallTimeMillis = System.currentTimeMillis()
-    }
-
     fun verifyUser(dni: String){
+        Log.d("LOGIN", "SE LLAMO A FIREBASE")
         firebaseMethods.readData(dni){ usuario ->
             typeOfAuthorization?.let { it(usuario) }
         }
     }
+    fun clearAnalyzer(){
+        imageAnalyzer.clearAnalyzer()
+    }
     fun shutdown(){
+        imageAnalyzer.clearAnalyzer()
         cameraExecutor.shutdown()
     }
 
