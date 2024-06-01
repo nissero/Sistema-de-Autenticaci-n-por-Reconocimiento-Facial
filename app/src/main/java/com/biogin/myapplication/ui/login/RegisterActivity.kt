@@ -1,8 +1,10 @@
 package com.biogin.myapplication.ui.login
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,26 +28,48 @@ import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
+import java.util.Calendar
+
 
 class RegisterActivity : AppCompatActivity() {
+    private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var institutesUtils: InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var fechaDesdeEditText: EditText
+    private lateinit var fechaHastaEditText: EditText
     private var validations  = FormValidations()
     private var loadingDialog = LoadingDialog(this)
+    private var fechaDesde = ""
+    private var fechaHasta = ""
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute =
+            resources.getStringArray(R.array.user_categories_with_no_institute)
         val userCategories = resources.getStringArray(R.array.user_categories)
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
         categoriesSpinner.adapter = adapter
+
+        fechaDesdeEditText = findViewById<EditText>(R.id.register_fecha_desde)
+        fechaHastaEditText = findViewById<EditText>(R.id.register_fecha_hasta)
+
+        fechaDesdeEditText.setOnClickListener{
+            mostrarDatePickerDialog(fechaDesdeEditText)
+            fechaHastaEditText.visibility = View.VISIBLE
+        }
+        fechaHastaEditText.setOnClickListener {
+            mostrarDatePickerDialog(fechaHastaEditText)
+        }
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -62,6 +87,14 @@ class RegisterActivity : AppCompatActivity() {
                 } else {
                     enableCheckboxes()
                 }
+
+                if (categorySelected == "Externo"){
+                    fechaDesdeEditText.visibility = View.VISIBLE
+                } else {
+                    fechaDesdeEditText.visibility = View.INVISIBLE
+                    fechaHastaEditText.visibility = View.INVISIBLE
+                }
+
                 checkContinueButtonActivation()
             }
 
@@ -128,7 +161,18 @@ class RegisterActivity : AppCompatActivity() {
             checkContinueButtonActivation()
         }
 
+
+
         continueButton?.setOnClickListener {
+
+            fechaDesde = formatDate(fechaDesdeEditText.text.toString())
+            fechaHasta = formatDate(fechaHastaEditText.text.toString())
+
+
+            Log.d("REGISTERACTIVITY", fechaDesde)
+            Log.d("REGISTERACTIVITY", fechaHasta)
+
+
             loadingDialog.startLoadingDialog()
             val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             dataSource.uploadUserToFirebase(
@@ -137,7 +181,9 @@ class RegisterActivity : AppCompatActivity() {
                 dni?.text.toString(),
                 email?.text.toString(),
                 spinner?.selectedItem.toString(),
-                institutesSelected
+                institutesSelected,
+                fechaDesde,
+                fechaHasta
             ).addOnSuccessListener {
                 loadingDialog.dismissDialog()
                 val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
@@ -203,6 +249,50 @@ class RegisterActivity : AppCompatActivity() {
 
         onResume()
     }
+
+    private fun formatDate(date: String): String {
+        val splitText = date.split("/")
+
+        return "${splitText[2]}/${splitText[1]}/${splitText[0]}"
+    }
+
+    private fun mostrarDatePickerDialog(targetEditText: EditText?) {
+        val calendar = Calendar.getInstance()
+        val actualYear = calendar.get(Calendar.YEAR)
+        val actualMonth = calendar.get(Calendar.MONTH)
+        val actualDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+        datePickerDialog = DatePickerDialog(this,
+            { _, year, monthOfYear, dayOfMonth ->
+                val formattedDay = String.format("%02d", dayOfMonth) // Add leading zero for day
+                val formattedMonth = String.format("%02d", monthOfYear + 1) // Add leading zero for month
+                val fechaSeleccionada = "$formattedDay/$formattedMonth/$year"
+                targetEditText?.setText(fechaSeleccionada)
+            },
+            actualYear,
+            actualMonth,
+            actualDay
+        )
+
+        if (targetEditText == fechaHastaEditText){
+            datePickerDialog.datePicker.minDate = fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis
+        } else {
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis()
+        }
+        datePickerDialog.show()
+    }
+
+    private fun String.toCalendarDate(): Calendar {
+        val splitDate = split("/")
+        val year = splitDate[2].toInt()
+        val month = splitDate[1].toInt() - 1 // Month in Calendar is 0-based
+        val day = splitDate[0].toInt()
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, day)
+        return calendar
+    }
+
 
     private fun enableCheckboxes() {
         binding.checkboxIDEI?.isEnabled = true

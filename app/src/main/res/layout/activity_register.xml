@@ -102,12 +102,43 @@
         android:id="@+id/register_categories_spinner"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="200dp"
+        app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_dni" />
+
+    <EditText
+        android:id="@+id/register_fecha_desde"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Trabajara desde"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner"
+        app:layout_constraintVertical_bias="0.104"
+        android:visibility="invisible"/>
+
+    <EditText
+        android:id="@+id/register_fecha_hasta"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Trabajara hasta"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_dni" />
+        app:layout_constraintTop_toBottomOf="@+id/register_fecha_desde"
+        app:layout_constraintVertical_bias="0.0"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/register_continue_button"
@@ -127,9 +158,9 @@
         android:layout_height="41dp"
         android:layout_marginTop="30dp"
         app:layout_constraintBottom_toTopOf="@+id/register_continue_button"
-        app:layout_constraintEnd_toEndOf="@+id/register_categories_spinner"
-        app:layout_constraintStart_toStartOf="@+id/register_categories_spinner"
-        app:layout_constraintTop_toBottomOf="@+id/register_categories_spinner">
+        app:layout_constraintEnd_toEndOf="@+id/register_fecha_trabajara_hasta"
+        app:layout_constraintStart_toStartOf="@+id/register_fecha_trabajara_hasta"
+        app:layout_constraintTop_toBottomOf="@+id/register_fecha_trabajara_hasta">
 
         <CheckBox
             android:id="@+id/checkbox_ICO"
