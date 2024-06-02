@@ -65,6 +65,7 @@ class RegisterActivity : AppCompatActivity() {
 
         fechaDesdeEditText.setOnClickListener{
             mostrarDatePickerDialog(fechaDesdeEditText)
+            fechaHastaEditText.setText("")
             fechaHastaEditText.visibility = View.VISIBLE
         }
         fechaHastaEditText.setOnClickListener {
