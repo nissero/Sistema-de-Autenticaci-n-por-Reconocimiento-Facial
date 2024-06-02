@@ -341,7 +341,15 @@ class UserManagement : AppCompatActivity() {
         val email = EmailService.Email(auth, to, from, subject, body)
 
         GlobalScope.launch {
-            emailService.send(email)
+            try {
+                emailService.send(email)
+            } catch (e: Exception) {
+                try {
+                    emailService.send(email)
+                } catch (e: Exception) {
+                    println(e.stackTrace)
+                }
+            }
         }
     }
 
