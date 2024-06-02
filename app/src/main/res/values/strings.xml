@@ -143,5 +143,8 @@
     <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
     <string name="title_categorias">Categorías</string>
+    <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
+    <string name="consultar_categorias">Consultar categorías</string>
+    <string name="info_agregar_categoria">Para agregar una nueva categoría,\npresione el botón de abajo</string>
     >>>>>>> main
 </resources>

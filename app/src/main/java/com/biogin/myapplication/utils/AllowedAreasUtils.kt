@@ -22,84 +22,17 @@ class AllowedAreasUtils() {
     }
 
     fun addAreaToInstitute(instituteName: String, newArea: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(!areasArray.contains(newArea)) {
-                        areasArray.add(newArea)
-                        docRefInstitute.update("areas", areasArray)
-                        Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
+        val success = firebaseMethods.addAreaToInstitute(instituteName, newArea)
 
-                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newArea)
-                    } else {
-                        Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
-                    }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
-            }
+        if(success)
+            modulesAssociatedWithInstitutes.get(instituteName)?.add(newArea)
     }
 
     fun removeAreaFromInstitute(instituteName: String, areaToRemove: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(areasArray.contains(areaToRemove)) {
-                        docRefInstitute.update("areas", FieldValue.arrayRemove(areaToRemove))
-                        Log.d("Firebase", "Se eliminó el area $areaToRemove del instituto $instituteName")
+        val success = firebaseMethods.removeAreaFromInstitute(instituteName, areaToRemove)
 
-                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(areaToRemove)
-                    } else {
-                        Log.d("Firebase", "No existe el area $areaToRemove en el " +
-                                "instituto $instituteName")
-                    }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
-            }
-    }
-
-    fun updateName(instituteName: String, oldName: String, newName: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(areasArray.contains(oldName)) {
-                        docRefInstitute.update("areas", FieldValue.arrayRemove(oldName))
-                        docRefInstitute.update("areas", FieldValue.arrayUnion(newName))
-                        Log.d("Firebase", "Se actualizó el nombre de $oldName a $newName " +
-                                "en el instituto $instituteName")
-
-                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(oldName)
-                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newName)
-                    } else {
-                        Log.d("Firebase", "No existe el area $newName en el " +
-                                "instituto $instituteName")
-                    }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
-            }
+        if(success)
+            modulesAssociatedWithInstitutes.get(instituteName)?.remove(areaToRemove)
     }
 
     private fun updateMap() {
@@ -144,5 +77,34 @@ class AllowedAreasUtils() {
 
         return allAreas
     }
+
+//    fun updateName(instituteName: String, oldName: String, newName: String) {
+//        val db = FirebaseFirestore.getInstance()
+//        val docRefInstitute = db.collection("institutos").document(instituteName)
+//        docRefInstitute.get()
+//            .addOnSuccessListener { instituteDocument ->
+//                if (instituteDocument != null) {
+//                    val instituteData = instituteDocument.data
+//                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+//                    if(areasArray.contains(oldName)) {
+//                        docRefInstitute.update("areas", FieldValue.arrayRemove(oldName))
+//                        docRefInstitute.update("areas", FieldValue.arrayUnion(newName))
+//                        Log.d("Firebase", "Se actualizó el nombre de $oldName a $newName " +
+//                                "en el instituto $instituteName")
+//
+//                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(oldName)
+//                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newName)
+//                    } else {
+//                        Log.d("Firebase", "No existe el area $newName en el " +
+//                                "instituto $instituteName")
+//                    }
+//                } else {
+//                    Log.d("Firebase", "No existe el documento")
+//                }
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+//            }
+//    }
 
 }

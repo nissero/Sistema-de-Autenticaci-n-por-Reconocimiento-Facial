@@ -40,10 +40,13 @@ class RegisterActivity : AppCompatActivity() {
         
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-        val userCategories = resources.getStringArray(R.array.user_categories)
+//        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+//        val userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
+        val temporaryCategories = intent.getStringArrayListExtra("temporary categories")
+        val userCategories = intent.getStringArrayListExtra("categories")
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        val adapter = userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapter
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -57,10 +60,12 @@ class RegisterActivity : AppCompatActivity() {
                 
                 val categorySelected  = spinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                } else {
-                    enableCheckboxes()
+                if (categoriesWithNoInstitute != null) {
+                    if (categoriesWithNoInstitute.contains(categorySelected)) {
+                        disableCheckboxes()
+                    } else {
+                        enableCheckboxes()
+                    }
                 }
                 checkContinueButtonActivation()
             }

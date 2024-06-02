@@ -7,4 +7,49 @@
     tools:context=".ui.rrhh.categorias.CategoriasFragment">
 
 
+    <TextView
+        android:id="@+id/mensaje_consultar_categorias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:text="@string/info_consulta_categorias"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_consultar_categorias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/consultar_categorias"
+        android:backgroundTint="@color/blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mensaje_consultar_categorias" />
+
+    <TextView
+        android:id="@+id/mensaje_agregar_categorias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:text="@string/info_agregar_categoria"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_consultar_categorias" />
+
+    <Button
+        android:id="@+id/button_agregar_categoria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="@color/blue"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mensaje_agregar_categorias" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,9 @@
 package com.biogin.myapplication
 
 import android.util.Log
+import com.biogin.myapplication.data.Category
 import com.biogin.myapplication.data.Institute
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseMethods {
@@ -57,13 +59,117 @@ class FirebaseMethods {
             }
     }
 
+    fun addAreaToInstitute(instituteName: String, newArea: String): Boolean {
+        var success = false
+        val db = FirebaseFirestore.getInstance()
+        val docRefInstitute = db.collection("institutos").document(instituteName)
+        docRefInstitute.get()
+            .addOnSuccessListener { instituteDocument ->
+                if (instituteDocument != null) {
+                    val instituteData = instituteDocument.data
+                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+                    if(!areasArray.contains(newArea)) {
+                        areasArray.add(newArea)
+                        docRefInstitute.update("areas", areasArray)
+                        Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
+
+                        success = true
+                    } else {
+                        Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+            }
+
+        return success
+    }
+
+    fun removeAreaFromInstitute(instituteName: String, areaToRemove: String): Boolean {
+        var success = false
+        val db = FirebaseFirestore.getInstance()
+        val docRefInstitute = db.collection("institutos").document(instituteName)
+        docRefInstitute.get()
+            .addOnSuccessListener { instituteDocument ->
+                if (instituteDocument != null) {
+                    val instituteData = instituteDocument.data
+                    val areasArray = instituteData?.get("areas") as ArrayList<String>
+                    if(areasArray.contains(areaToRemove)) {
+                        docRefInstitute.update("areas", FieldValue.arrayRemove(areaToRemove))
+                        Log.d("Firebase", "Se eliminó el area $areaToRemove del instituto $instituteName")
+
+                        success = true
+                    } else {
+                        Log.d("Firebase", "No existe el area $areaToRemove en el " +
+                                "instituto $instituteName")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+            }
+
+        return success
+    }
+
+    fun getCategories(callback: (ArrayList<Category>) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val documentReference = db.collection("categorias")
+
+        documentReference.get()
+            .addOnSuccessListener { documents ->
+                val categories = ArrayList<Category>()
+                for(document in documents) {
+                    val name: String = document.data.get("nombre") as String
+                    val isTemporary = document.data.get("temporal") as Boolean
+                    val allowsInstitutes = document.data.get("permite institutos") as Boolean
+                    val active = document.data.get("activo") as Boolean
+                    categories.add(Category(name, isTemporary, allowsInstitutes, active))
+                }
+
+                callback(categories)
+
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "No se pudo leer la colección Categorias", e)
+            }
+    }
+
+    fun addCategory(newCategory: Category): Boolean {
+        var success = false
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("categorias").document(newCategory.name)
+
+        val category = hashMapOf(
+            "nombre" to newCategory.name,
+            "temporal" to newCategory.isTemporary,
+            "permite institutos" to newCategory.allowsInstitutes,
+            "activo" to newCategory.active
+        )
+
+        docRef.set(category)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Se ha creado la categoría $category.nombre correctamente")
+                success = true
+            }.addOnFailureListener {
+                e -> Log.w("Firebase", "Error al crear categoría", e)
+            }
+
+        return success
+    }
+
     fun getLogsFromDni(dni: String, callback: (String) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         db.collection("logs").get()
             .addOnSuccessListener { documents ->
                 var logsString = ""
                 for (document in documents) {
-                    if(document.get("dniMasterUser") == dni || document.get("dniUserAffected") == dni){
+                    if(document.get("dniMasterUser") == dni || document.get("dniUserAffected") == dni) {
                         logsString += "Timestamp: " + document.get("timestamp") + "\n"
                         logsString += "DNI usuario maestro: " + document.get("dniMasterUser") + "\n"
                         logsString += "DNI usuario afectado: " + document.get("dniUserAffected") + "\n"

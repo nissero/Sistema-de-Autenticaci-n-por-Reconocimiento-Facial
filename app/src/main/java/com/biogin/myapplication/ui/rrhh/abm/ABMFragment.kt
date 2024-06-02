@@ -15,6 +15,7 @@ import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
+import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtil
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
@@ -29,6 +30,8 @@ class ABMFragment : Fragment() {
     private lateinit var loginRepo: LoginRepository
     private lateinit var dataSource : LoginDataSource
     private val popUpUtil = PopUpUtil()
+    private var categoriesUtils = CategoriesUtils()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,7 +78,11 @@ class ABMFragment : Fragment() {
         }
 
         binding.registerUserOptionButton.setOnClickListener {
-            startActivity(Intent(binding.root.context, RegisterActivity::class.java))
+            val intent = Intent(binding.root.context, RegisterActivity::class.java)
+            intent.putStringArrayListExtra("categories", categoriesUtils.getCategories())
+            intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+            intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
+            startActivity(intent)
         }
 
         binding.deactivateUserOption.setOnClickListener {
@@ -149,5 +156,10 @@ class ABMFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        categoriesUtils = CategoriesUtils()
     }
 }

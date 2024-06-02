@@ -9,12 +9,12 @@ import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
-import com.biogin.myapplication.utils.DialogUtil
+import com.biogin.myapplication.utils.DialogUtils
 
 class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
-    private val dialogUtil = DialogUtil()
+    private val dialogUtils = DialogUtils()
     private val areasUtil = AllowedAreasUtils()
     private val loadingUtil = LoadingDialog(this)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,21 +61,21 @@ class ABMAreaActivity : AppCompatActivity() {
         button.setOnClickListener {
             val areaName = input.text.toString().uppercase()
             if(areaName.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context,
+                dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")
                 return@setOnClickListener
             }
 
             if(!checkboxICI.isChecked && !checkboxIDEI.isChecked &&
                 !checkboxICO.isChecked && !checkboxIDH.isChecked) {
-                dialogUtil.showDialog(binding.root.context,
+                dialogUtils.showDialog(binding.root.context,
                     "Debe seleccionar al menos un instituto")
                 return@setOnClickListener
             }
 
             if(intent.getStringExtra("type") == "add") {
                 if(checkIfAreaExists(areaName)) {
-                    dialogUtil.showDialog(binding.root.context,
+                    dialogUtils.showDialog(binding.root.context,
                         "Ya existe un lugar físico de nombre $areaName, para modificarlo\n" +
                                 "debe ir a la sección previa y seguir las instrucciones")
                     return@setOnClickListener
@@ -84,7 +84,7 @@ class ABMAreaActivity : AppCompatActivity() {
                 val message =
                     addAreaAndReturnMessage(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                         checkboxIDH.isChecked, checkboxIDEI.isChecked)
-                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                dialogUtils.showDialogWithFunctionOnClose(binding.root.context, message) {
                     finish()
                 }
             } else if(intent.getStringExtra("type") == "modify") {
@@ -92,7 +92,7 @@ class ABMAreaActivity : AppCompatActivity() {
                     checkboxICI.isChecked, checkboxICO.isChecked,
                     checkboxIDH.isChecked, checkboxIDEI.isChecked)
                 val message = "$areaName ha sido modificado exitosamente"
-                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                dialogUtils.showDialogWithFunctionOnClose(binding.root.context, message) {
                     finish()
                 }
             }

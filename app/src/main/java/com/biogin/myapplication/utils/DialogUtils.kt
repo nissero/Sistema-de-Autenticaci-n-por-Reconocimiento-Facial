@@ -7,7 +7,7 @@ import android.content.DialogInterface
 
 
 
-class DialogUtil {
+class DialogUtils {
     fun showDialog(context: Context, text: String) {
         val builder = AlertDialog.Builder(context)
         builder.setMessage(text)
