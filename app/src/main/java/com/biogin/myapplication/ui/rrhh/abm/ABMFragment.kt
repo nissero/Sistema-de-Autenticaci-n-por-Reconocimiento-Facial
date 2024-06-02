@@ -51,7 +51,7 @@ class ABMFragment : Fragment() {
 
                     if (result is Result.Success) {
                         val userData = (result as Result.Success<LoggedInUser>).data
-                        startActitivyUserManagement(userData, false)
+                        startActivityUserManagement(userData, false)
                     } else {
                         openPopupUserNotFound()
                     }
@@ -69,7 +69,7 @@ class ABMFragment : Fragment() {
                     if (result is Result.Success) {
                         val userData = (result as Result.Success<LoggedInUser>).data
                         Log.e("data", userData.toString())
-                        startActitivyUserManagement(userData, true)
+                        startActivityUserManagement(userData, true)
                     } else {
                         openPopupUserNotFound()
                     }
@@ -109,32 +109,20 @@ class ABMFragment : Fragment() {
         popUpUtil.showPopUp(binding.root.context,
             "El usuario no existe para el DNI ingresado",
             "Reintentar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "El usuario no existe para el DNI ingresado")
-//        intent.putExtra("text_button", "Reintentar")
-//        startActivity(intent)
     }
 
     private fun openPopupUserAlreadyDeactivated() {
         popUpUtil.showPopUp(binding.root.context,
             "El usuario ya se encuentra inactivo",
             "Continuar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "El usuario ya se encuentra eliminado")
-//        intent.putExtra("text_button", "Continuar")
-//        startActivity(intent)
     }
 
     private fun openPopupUserSuccessfullyDeleted() {
         popUpUtil.showPopUp(binding.root.context,
             "Usuario desactivado de forma exitosa",
             "Continuar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "Usuario eliminado de forma exitosa")
-//        intent.putExtra("text_button", "Continuar")
-//        startActivity(intent)
     }
-    private fun startActitivyUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {
+    private fun startActivityUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {
         val intent = Intent(binding.root.context, UserManagement::class.java)
         intent.putExtra("dni", userData.dni)
         intent.putExtra("name", userData.name)
@@ -143,6 +131,10 @@ class ABMFragment : Fragment() {
         intent.putExtra("state", userData.state)
         intent.putExtra("category", userData.category)
         intent.putStringArrayListExtra("institutes", userData.institutes)
+
+        intent.putStringArrayListExtra("categories", categoriesUtils.getCategories())
+        intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+        intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
 
         if (hasDNIUpdate) {
             intent.putExtra("button_option_chosen", "UpdateDNI")

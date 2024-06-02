@@ -38,7 +38,7 @@ class CategoriasFragment : Fragment() {
         }
 
         binding.buttonAgregarCategoria.setOnClickListener {
-            categoriesUtils.addCategory("docente", false, true, true)
+
         }
 
         return root

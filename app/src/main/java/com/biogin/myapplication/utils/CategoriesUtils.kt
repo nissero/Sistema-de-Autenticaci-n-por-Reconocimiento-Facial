@@ -1,7 +1,9 @@
 package com.biogin.myapplication.utils
 
+import androidx.compose.ui.text.capitalize
 import com.biogin.myapplication.FirebaseMethods
 import com.biogin.myapplication.data.Category
+import java.util.Locale
 
 class CategoriesUtils {
     private val firebaseMethods = FirebaseMethods()
@@ -15,7 +17,8 @@ class CategoriesUtils {
 
     fun addCategory(name: String, isTemporary: Boolean, allowsInstitutes: Boolean,
                     active: Boolean) {
-        val newCategory = Category(name.uppercase(), isTemporary, allowsInstitutes, active)
+        val actualName = name.lowercase().replaceFirstChar(Char::titlecase)
+        val newCategory = Category(actualName, isTemporary, allowsInstitutes, active)
         val success = firebaseMethods.addCategory(newCategory)
 
         if(success)

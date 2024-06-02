@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
+import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
@@ -50,9 +51,12 @@ class UserManagement : AppCompatActivity() {
         val categoriesSpinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val userStateSpinner = findViewById<Spinner>(R.id.update_user_state_spinner)
 
-        val userCategories = resources.getStringArray(R.array.user_categories)
-        val adapterCategories = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        val userCategories = intent.getStringArrayListExtra("categories")
+        val adapterCategories =
+            userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapterCategories
+
+        val temporaryCategories = intent.getStringArrayListExtra("temporary categories")
 
         val userStates = resources.getStringArray(R.array.user_active_options)
         val adapterStates = ArrayAdapter(this, R.layout.simple_spinner_item, userStates)
@@ -79,14 +83,17 @@ class UserManagement : AppCompatActivity() {
         }
 
 
-        val categories: Array<out String> = resources.getStringArray(R.array.user_categories)
-        val categoryIndex = categories.indexOfFirst { it == intent.getStringExtra("category") }
+//        val categories: Array<out String> = resources.getStringArray(R.array.user_categories)
+        val categories: ArrayList<String>? = intent.getStringArrayListExtra("categories")
+        val categoryIndex = categories?.indexOfFirst { it == intent.getStringExtra("category") }
 
         binding.updateUserName.setText(intent.getStringExtra("name"))
         binding.updateUserSurname.setText(intent.getStringExtra("surname"))
         binding.updateUserEmail.setText(intent.getStringExtra("email"))
         binding.updateUserDni.setText(intent.getStringExtra("dni"))
-        binding.updateUserCategoriesSpinner.setSelection(categoryIndex)
+        if (categoryIndex != null) {
+            binding.updateUserCategoriesSpinner.setSelection(categoryIndex)
+        }
         if (intent.getStringExtra("state").equals("Activo")) {
             binding.updateUserStateSpinner.setSelection(0)
         } else {
@@ -185,7 +192,8 @@ class UserManagement : AppCompatActivity() {
             }
         }
 
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+//        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -195,10 +203,12 @@ class UserManagement : AppCompatActivity() {
             ) {
                 val categorySelected  = categoriesSpinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                } else {
-                    enableCheckboxes()
+                if (categoriesWithNoInstitute != null) {
+                    if (categoriesWithNoInstitute.contains(categorySelected)) {
+                        disableCheckboxes()
+                    } else {
+                        enableCheckboxes()
+                    }
                 }
                 checkUpdateButtonActivation()
             }
@@ -255,7 +265,7 @@ class UserManagement : AppCompatActivity() {
     private fun checkUpdateButtonActivation() {
         lateinit var buttonToEnable : Button
 
-        if (intent.getStringExtra("button_option_chosen") == "UpdateUser") {
+        if(intent.getStringExtra("button_option_chosen") == "UpdateUser") {
             buttonToEnable = findViewById(R.id.update_user_button)
         } else {
             buttonToEnable = findViewById(R.id.duplicate_user_button)
