@@ -29,4 +29,19 @@ class DialogUtils {
         val alert: AlertDialog = builder.create()
         alert.show()
     }
+
+    fun showDialogWithTwoFunctionOnClose(context: Context, text: String, onYesFunction: () -> Unit,
+                                         onNoFunction: () -> Unit) {
+        val builder = AlertDialog.Builder(context)
+        builder.setMessage(text)
+            .setCancelable(false)
+            .setPositiveButton("Si", DialogInterface.OnClickListener { dialog, id ->
+                onYesFunction()
+            })
+            .setNegativeButton("No") { dialog, id ->
+                onNoFunction()
+            }
+        val alert: AlertDialog = builder.create()
+        alert.show()
+    }
 }

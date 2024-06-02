@@ -117,19 +117,21 @@ class FirebaseMethods {
         return success
     }
 
-    fun getCategories(callback: (ArrayList<Category>) -> Unit) {
+    fun getCategories(callback: (HashMap<String, Category>) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val documentReference = db.collection("categorias")
 
         documentReference.get()
             .addOnSuccessListener { documents ->
-                val categories = ArrayList<Category>()
+                val categories = HashMap<String, Category>()
                 for(document in documents) {
                     val name: String = document.data.get("nombre") as String
                     val isTemporary = document.data.get("temporal") as Boolean
                     val allowsInstitutes = document.data.get("permite institutos") as Boolean
                     val active = document.data.get("activo") as Boolean
-                    categories.add(Category(name, isTemporary, allowsInstitutes, active))
+
+                    val category = Category(name, isTemporary, allowsInstitutes, active)
+                    categories.set(name, category)
                 }
 
                 callback(categories)
@@ -158,6 +160,66 @@ class FirebaseMethods {
                 success = true
             }.addOnFailureListener {
                 e -> Log.w("Firebase", "Error al crear categoría", e)
+            }
+
+        return success
+    }
+
+    fun deactivateCategory(name: String): Boolean {
+        var success = false
+
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("categorias").document(name)
+
+        docRef.get()
+            .addOnSuccessListener { categoryDocument ->
+                if (categoryDocument != null) {
+                    val categoryData = categoryDocument.data
+                    val status = categoryData?.get("activo") as Boolean
+                    if(status) {
+                        docRef.update("activo", false)
+                        Log.d("Firebase", "Se inactivó la categoría $name")
+
+                        success = true
+                    } else {
+                        Log.d("Firebase", "La categoría $name ya se encuentra inactivada")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento de la categoría $name", exception)
+            }
+
+        return success
+    }
+
+    fun activateCategory(name: String): Boolean {
+        var success = false
+
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("categorias").document(name)
+
+        docRef.get()
+            .addOnSuccessListener { categoryDocument ->
+                if (categoryDocument != null) {
+                    val categoryData = categoryDocument.data
+                    val status = categoryData?.get("activo") as Boolean
+                    if(!status) {
+                        docRef.update("activo", true)
+                        Log.d("Firebase", "Se inactivó la categoría $name")
+
+                        success = true
+                    } else {
+                        Log.d("Firebase", "La categoría $name ya se encuentra activada")
+                    }
+                } else {
+                    Log.d("Firebase", "No existe el documento")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Firebase", "Se fallo al obtener el documento de la categoría $name", exception)
             }
 
         return success

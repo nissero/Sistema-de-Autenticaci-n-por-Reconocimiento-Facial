@@ -128,17 +128,14 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="texto_ayuda_agregar">Para agregar un nuevo lugar\nfísico, ingrese un nombre y seleccione\na que institutos pertenece</string>
-    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\n puede cambiar el nombre y modificar\na que institutos pertenece</string>
+    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\npuede cambiar el nombre y modificar\na que institutos pertenece</string>
     <string name="nombre">Nombre</string>
     <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
     <string name="eliminar_lugar_fisico">Eliminar\nlugar físico</string>
     <string name="mensaje_modificar_lugar">Para modificar o eliminar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
-    >>>>>>> origin/fernando2
-    =======
     <string name="dni_rrhh">DNI\nrrhh</string>
     <string name="dni_user_affected">DNI user afectado</string>
     <string name="log_type">Tipo de log</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
@@ -146,5 +143,8 @@
     <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
     <string name="consultar_categorias">Consultar categorías</string>
     <string name="info_agregar_categoria">Para agregar una nueva categoría,\npresione el botón de abajo</string>
-    >>>>>>> main
+    <string name="texto_ayuda_categorias">Para crear una nueva categoría,\ningrese el nombre y complete los\ncampos correspondiente</string>
+    <string name="texto_ayuda__modificacion_categorias">Para modificar una categoría existente,\ncambie los campos correspondientes\ny presione al botón</string>
+    <string name="ayuda_categoria_temporal">Tilde la siguiente opción si las\npersonas que tengan asignada esta\ncategoría tendrán permitido el acceso\ndurante un plazo determinado</string>
+    <string name="ayuda_categoria__institutos">Tilde la siguiente opcioón si las\npersonas que tengan asignada esta\ncategoría tendrán institutos a los\nque pertenecen</string>
 </resources>

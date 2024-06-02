@@ -1,4 +1,4 @@
 package com.biogin.myapplication.data
 
-data class Category(val name: String, val isTemporary: Boolean,
-                    val allowsInstitutes: Boolean, val active: Boolean)
+data class Category(var name: String, var isTemporary: Boolean,
+                    var allowsInstitutes: Boolean, var active: Boolean)

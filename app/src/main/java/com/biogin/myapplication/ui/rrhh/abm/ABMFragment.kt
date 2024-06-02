@@ -79,7 +79,7 @@ class ABMFragment : Fragment() {
 
         binding.registerUserOptionButton.setOnClickListener {
             val intent = Intent(binding.root.context, RegisterActivity::class.java)
-            intent.putStringArrayListExtra("categories", categoriesUtils.getCategories())
+            intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
             intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
             intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
             startActivity(intent)
@@ -132,7 +132,7 @@ class ABMFragment : Fragment() {
         intent.putExtra("category", userData.category)
         intent.putStringArrayListExtra("institutes", userData.institutes)
 
-        intent.putStringArrayListExtra("categories", categoriesUtils.getCategories())
+        intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
         intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
         intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
 

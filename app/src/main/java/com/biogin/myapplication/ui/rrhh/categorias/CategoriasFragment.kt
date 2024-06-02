@@ -1,5 +1,6 @@
 package com.biogin.myapplication.ui.rrhh.categorias
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,14 +32,18 @@ class CategoriasFragment : Fragment() {
 
         binding.buttonConsultarCategorias.setOnClickListener {
             var text = "Las categorías son:\n"
-            for(category in categoriesUtils.getCategories()) {
+            for(category in categoriesUtils.getActiveCategories()) {
                 text += category + "\n"
             }
             dialogUtils.showDialog(binding.root.context, text)
         }
 
         binding.buttonAgregarCategoria.setOnClickListener {
+            val intent = Intent(root.context, ABMCategoryActivity::class.java)
 
+            intent.putExtra("type", "add")
+
+            startActivity(intent)
         }
 
         return root

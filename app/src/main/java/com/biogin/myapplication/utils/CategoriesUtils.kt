@@ -1,34 +1,45 @@
 package com.biogin.myapplication.utils
 
-import androidx.compose.ui.text.capitalize
 import com.biogin.myapplication.FirebaseMethods
 import com.biogin.myapplication.data.Category
-import java.util.Locale
 
 class CategoriesUtils {
     private val firebaseMethods = FirebaseMethods()
-    private val categoriesList = ArrayList<Category>()
+    private lateinit var categoriesList: HashMap<String, Category>
     
     init {
         firebaseMethods.getCategories { 
-            categories -> categoriesList.addAll(categories)
+            categories -> categoriesList = categories
         }
     }
 
     fun addCategory(name: String, isTemporary: Boolean, allowsInstitutes: Boolean,
                     active: Boolean) {
-        val actualName = name.lowercase().replaceFirstChar(Char::titlecase)
-        val newCategory = Category(actualName, isTemporary, allowsInstitutes, active)
+        val newCategory = Category(name, isTemporary, allowsInstitutes, active)
         val success = firebaseMethods.addCategory(newCategory)
 
         if(success)
-            categoriesList.add(newCategory)
+            categoriesList.set(name, newCategory)
     }
 
-    fun getCategories(): ArrayList<String> {
+    fun deactivateCategory(name: String) {
+        val success = firebaseMethods.deactivateCategory(name)
+        if(success) {
+            categoriesList.get(name)?.active = false
+        }
+    }
+
+    fun activateCategory(name: String) {
+        val success = firebaseMethods.activateCategory(name)
+        if(success) {
+            categoriesList.get(name)?.active = true
+        }
+    }
+
+    fun getActiveCategories(): ArrayList<String> {
         val cat = ArrayList<String>()
 
-        for(category in categoriesList) {
+        for(category in categoriesList.values) {
             if(category.active)
                 cat.add(category.name)
         }
@@ -39,7 +50,7 @@ class CategoriesUtils {
     fun getTemporaryCategories(): ArrayList<String> {
         val cat = ArrayList<String>()
 
-        for(category in categoriesList) {
+        for(category in categoriesList.values) {
             if(category.active && category.isTemporary)
                 cat.add(category.name)
         }
@@ -50,7 +61,7 @@ class CategoriesUtils {
     fun getNoInstitutesCategories(): ArrayList<String> {
         val cat = ArrayList<String>()
 
-        for(category in categoriesList) {
+        for(category in categoriesList.values) {
             if(category.active && !category.allowsInstitutes)
                 cat.add(category.name)
         }
@@ -61,7 +72,7 @@ class CategoriesUtils {
     fun getInactiveCategories(): ArrayList<String> {
         val cat = ArrayList<String>()
 
-        for(category in categoriesList) {
+        for(category in categoriesList.values) {
             if(!category.active)
                 cat.add(category.name)
         }
