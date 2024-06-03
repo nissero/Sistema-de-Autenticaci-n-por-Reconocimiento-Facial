@@ -43,12 +43,18 @@ class LogsFragment : Fragment() {
         val textViewAmountOfUnsuccessfulAuths =
             root.findViewById<TextView>(R.id.amount_of_unsuccessful_auths)
 
-        logsRepository.getSuccesfulAuthentications().addOnSuccessListener { queryResult ->
+        logsRepository.getSuccesfulAuthenticationsOfDay().addOnSuccessListener { queryResult ->
+            android.util.Log.e("Firebase", "Autenticaciones exitosas del dia: ${queryResult.size()}")
             textViewAmountOfSuccessfulAuths.text = queryResult.size().toString()
+        }.addOnFailureListener { ex ->
+            android.util.Log.e("Firebase", ex.toString())
         }
 
-        logsRepository.getUnsuccesfulAuthentications().addOnSuccessListener { queryResult ->
+        logsRepository.getUnsuccesfulAuthenticationsOfDay().addOnSuccessListener { queryResult ->
+            android.util.Log.e("Firebase", "Autenticaciones fallidas del dia: ${queryResult.size()}")
             textViewAmountOfUnsuccessfulAuths.text = queryResult.size().toString()
+        }.addOnFailureListener { ex ->
+            android.util.Log.e("Firebase", ex.toString())
         }
 
 
