@@ -67,6 +67,7 @@
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
+    <string name="title_lugares">Lugares</string>
     <string name="integrantes_biogin">
         <b>Nuestro Equipo:\n</b>
         • Antúnez, Fernando Iván\n
@@ -131,8 +132,8 @@
     <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\npuede cambiar el nombre y modificar\na que institutos pertenece</string>
     <string name="nombre">Nombre</string>
     <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
-    <string name="eliminar_lugar_fisico">Eliminar\nlugar físico</string>
-    <string name="mensaje_modificar_lugar">Para modificar o eliminar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+    <string name="desactivar_lugar_fisico">Desactivar\nlugar físico</string>
+    <string name="mensaje_modificar_lugar">Para modificar o desactivar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
     <string name="dni_rrhh">DNI\nrrhh</string>
     <string name="dni_user_affected">DNI user afectado</string>
     <string name="log_type">Tipo de log</string>

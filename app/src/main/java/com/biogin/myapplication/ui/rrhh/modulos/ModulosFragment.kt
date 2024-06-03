@@ -52,18 +52,36 @@ class ModulosFragment : Fragment() {
         }
 
         binding.modificarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().uppercase()
+            val area = binding.modificarInput.text.toString().lowercase().replaceFirstChar(Char::titlecase)
 
             if(area.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
 
-            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+            val arrayInstitutes = areasUtils.getInstitutesFromActiveArea(area)
+            val areaIsInactive = areasUtils.getAllInactiveAreas().contains(area)
 
-            if(arrayInstitutes.isEmpty()) {
+            if(arrayInstitutes.isEmpty() && !areaIsInactive) {
                 dialogUtils.showDialog(binding.root.context, "No existe un lugar físico\n" +
                         "de nombre $area")
+                return@setOnClickListener
+            }
+
+            if(areaIsInactive) {
+                val onYesFunction = {
+                    areasUtils.activateArea(area)
+                    dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
+                        "Lugar físico $area restaurado") {
+                    }
+                }
+                val onNoFunction = {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Elija otro nombre")
+                }
+                dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                    "Ya existe un lugar físico de nombre $area que se encuentra " +
+                            "inactivo, desea restaurarlo?", onYesFunction, onNoFunction)
                 return@setOnClickListener
             }
 
@@ -87,26 +105,26 @@ class ModulosFragment : Fragment() {
         }
 
         binding.eliminarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().uppercase()
+            val area = binding.modificarInput.text.toString().lowercase().replaceFirstChar(Char::titlecase)
 
             if(area.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
 
-            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+            val areas = areasUtils.getAllActiveAreas()
 
-            if(arrayInstitutes.isEmpty()) {
+            if(!areas.contains(area)) {
                 dialogUtils.showDialog(binding.root.context, "No existe un lugar físico\n" +
                         "de nombre $area")
                 return@setOnClickListener
             }
 
-            for (institute in arrayInstitutes) {
-                areasUtils.removeAreaFromInstitute(institute, area)
-            }
+            areasUtils.deactivateArea(area)
+
             dialogUtils.showDialog(binding.root.context, "$area ha sido eliminado exitosamente")
             binding.modificarInput.text.clear()
+            areasUtils = AllowedAreasUtils()
         }
 
         return root

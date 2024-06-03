@@ -19,6 +19,6 @@
     <item
         android:id="@+id/navigation_modulos"
         android:icon="@drawable/module"
-        android:title="@string/title_modulos" />
+        android:title="@string/title_lugares" />
 
 </menu>

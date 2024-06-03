@@ -15,7 +15,7 @@ class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
     private val dialogUtils = DialogUtils()
-    private val areasUtil = AllowedAreasUtils()
+    private val areasUtils = AllowedAreasUtils()
     private val loadingUtil = LoadingDialog(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +59,7 @@ class ABMAreaActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val areaName = input.text.toString().uppercase()
+            val areaName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
             if(areaName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")
@@ -78,6 +78,24 @@ class ABMAreaActivity : AppCompatActivity() {
                     dialogUtils.showDialog(binding.root.context,
                         "Ya existe un lugar físico de nombre $areaName, para modificarlo\n" +
                                 "debe ir a la sección previa y seguir las instrucciones")
+                    return@setOnClickListener
+                }
+
+                if(checkIfAreaIsInactive(areaName)) {
+                    val onYesFunction = {
+                        areasUtils.activateArea(areaName)
+                        dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
+                            "Lugar físico $areaName restaurado") {
+                            finish()
+                        }
+                    }
+                    val onNoFunction = {
+                        dialogUtils.showDialog(binding.root.context,
+                            "Elija otro nombre")
+                    }
+                    dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                        "Ya existe un lugar físico de nombre $areaName que se encuentra " +
+                                "inactivo, desea restaurarlo?", onYesFunction, onNoFunction)
                     return@setOnClickListener
                 }
 
@@ -103,82 +121,101 @@ class ABMAreaActivity : AppCompatActivity() {
     private fun addAreaAndReturnMessage(name: String, ici: Boolean, ico: Boolean,
                                         idh: Boolean, idei: Boolean): String {
         var text = "$name se agregó a los siguientes institutos:\n"
-        if (ici) {
-            areasUtil.addAreaToInstitute("ICI", name)
-            text += "ICI\n"
-        }
-        if (ico) {
-            areasUtil.addAreaToInstitute("ICO", name)
-            text += "ICO\n"
-        }
-        if (idh) {
-            areasUtil.addAreaToInstitute("IDH", name)
-            text += "IDH\n"
-        }
-        if (idei) {
-            areasUtil.addAreaToInstitute("IDEI", name)
-            text += "IDEI"
-        }
+//        if (ici) {
+//            areasUtil.addAreaToInstitute("ICI", name)
+//            text += "ICI\n"
+//        }
+//        if (ico) {
+//            areasUtil.addAreaToInstitute("ICO", name)
+//            text += "ICO\n"
+//        }
+//        if (idh) {
+//            areasUtil.addAreaToInstitute("IDH", name)
+//            text += "IDH\n"
+//        }
+//        if (idei) {
+//            areasUtil.addAreaToInstitute("IDEI", name)
+//            text += "IDEI"
+//        }
+        if (ici) text += "ICI\n"
+        if (ico) text += "ICO\n"
+        if (idh) text += "IDH\n"
+        if (idei) text += "IDEI"
+
+        areasUtils.addArea(name, ici, ico, idei, idh)
 
         return text
-    }
-
-    private fun remove(name: String) {
-        areasUtil.removeAreaFromInstitute("ICI", name)
-        areasUtil.removeAreaFromInstitute("ICO", name)
-        areasUtil.removeAreaFromInstitute("IDH", name)
-        areasUtil.removeAreaFromInstitute("IDEI", name)
     }
 
     private fun modify(oldName: String, newName: String, ici: Boolean, ico: Boolean,
                        idh: Boolean, idei: Boolean) {
         if(oldName != newName) {
-            if(ici) {
-                areasUtil.addAreaToInstitute("ICI", newName)
-            }
-
-            if(ico) {
-                areasUtil.addAreaToInstitute("ICO", newName)
-            }
-
-            if(idh) {
-                areasUtil.addAreaToInstitute("IDH", newName)
-            }
-
-            if(idei) {
-                areasUtil.addAreaToInstitute("IDEI", newName)
-            }
-
-            remove(oldName)
+            areasUtils.addArea(newName, ici, ico, idei, idh)
+            areasUtils.deactivateArea(oldName)
         } else {
-            if(!intent.getBooleanExtra("ICI", false) && ici) {
-                areasUtil.addAreaToInstitute("ICI", newName)
-            } else if(intent.getBooleanExtra("ICI", false) && !ici) {
-                areasUtil.removeAreaFromInstitute("ICI", newName)
-            }
-
-            if(!intent.getBooleanExtra("ICO", false) && ico) {
-                areasUtil.addAreaToInstitute("ICO", newName)
-            } else if(intent.getBooleanExtra("ICO", false) && !ico) {
-                areasUtil.removeAreaFromInstitute("ICO", newName)
-            }
-
-            if(!intent.getBooleanExtra("IDH", false) && idh) {
-                areasUtil.addAreaToInstitute("IDH", newName)
-            } else if(intent.getBooleanExtra("IDH", false) && !idh) {
-                areasUtil.removeAreaFromInstitute("IDH", newName)
-            }
-
-            if(!intent.getBooleanExtra("IDEI", false) && idei) {
-                areasUtil.addAreaToInstitute("IDEI", newName)
-            } else if(intent.getBooleanExtra("IDEI", false) && !idei) {
-                areasUtil.removeAreaFromInstitute("IDEI", newName)
-            }
+            areasUtils.modifyArea(newName, ici, ico, idei, idh)
         }
     }
 
     private fun checkIfAreaExists(area: String): Boolean {
-        return areasUtil.getAllAreas().contains(area)
+        return areasUtils.getAllActiveAreas().contains(area)
     }
 
+    private fun checkIfAreaIsInactive(area: String): Boolean {
+        return areasUtils.getAllInactiveAreas().contains(area)
+    }
+
+//    private fun modify2(oldName: String, newName: String, ici: Boolean, ico: Boolean,
+//                       idh: Boolean, idei: Boolean) {
+//        if(oldName != newName) {
+//            if(ici) {
+//                areasUtils.addAreaToInstitute("ICI", newName)
+//            }
+//
+//            if(ico) {
+//                areasUtils.addAreaToInstitute("ICO", newName)
+//            }
+//
+//            if(idh) {
+//                areasUtils.addAreaToInstitute("IDH", newName)
+//            }
+//
+//            if(idei) {
+//                areasUtils.addAreaToInstitute("IDEI", newName)
+//            }
+//
+//            remove(oldName)
+//        } else {
+//            if(!intent.getBooleanExtra("ICI", false) && ici) {
+//                areasUtils.addAreaToInstitute("ICI", newName)
+//            } else if(intent.getBooleanExtra("ICI", false) && !ici) {
+//                areasUtils.removeAreaFromInstitute("ICI", newName)
+//            }
+//
+//            if(!intent.getBooleanExtra("ICO", false) && ico) {
+//                areasUtils.addAreaToInstitute("ICO", newName)
+//            } else if(intent.getBooleanExtra("ICO", false) && !ico) {
+//                areasUtils.removeAreaFromInstitute("ICO", newName)
+//            }
+//
+//            if(!intent.getBooleanExtra("IDH", false) && idh) {
+//                areasUtils.addAreaToInstitute("IDH", newName)
+//            } else if(intent.getBooleanExtra("IDH", false) && !idh) {
+//                areasUtils.removeAreaFromInstitute("IDH", newName)
+//            }
+//
+//            if(!intent.getBooleanExtra("IDEI", false) && idei) {
+//                areasUtils.addAreaToInstitute("IDEI", newName)
+//            } else if(intent.getBooleanExtra("IDEI", false) && !idei) {
+//                areasUtils.removeAreaFromInstitute("IDEI", newName)
+//            }
+//        }
+//    }
+//
+//    private fun remove(name: String) {
+//        areasUtils.removeAreaFromInstitute("ICI", name)
+//        areasUtils.removeAreaFromInstitute("ICO", name)
+//        areasUtils.removeAreaFromInstitute("IDH", name)
+//        areasUtils.removeAreaFromInstitute("IDEI", name)
+//    }
 }

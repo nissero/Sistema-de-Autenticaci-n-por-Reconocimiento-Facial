@@ -1,14 +1,13 @@
 package com.biogin.myapplication.utils
 
-import com.biogin.myapplication.FirebaseMethods
 import com.biogin.myapplication.data.Category
 
 class CategoriesUtils {
-    private val firebaseMethods = FirebaseMethods()
+    private val firebaseCategoryMethods = FirebaseCategoryMethods()
     private lateinit var categoriesList: HashMap<String, Category>
     
     init {
-        firebaseMethods.getCategories { 
+        firebaseCategoryMethods.getCategories {
             categories -> categoriesList = categories
         }
     }
@@ -16,21 +15,21 @@ class CategoriesUtils {
     fun addCategory(name: String, isTemporary: Boolean, allowsInstitutes: Boolean,
                     active: Boolean) {
         val newCategory = Category(name, isTemporary, allowsInstitutes, active)
-        val success = firebaseMethods.addCategory(newCategory)
+        val success = firebaseCategoryMethods.addCategory(newCategory)
 
         if(success)
             categoriesList.set(name, newCategory)
     }
 
     fun deactivateCategory(name: String) {
-        val success = firebaseMethods.deactivateCategory(name)
+        val success = firebaseCategoryMethods.deactivateCategory(name)
         if(success) {
             categoriesList.get(name)?.active = false
         }
     }
 
     fun activateCategory(name: String) {
-        val success = firebaseMethods.activateCategory(name)
+        val success = firebaseCategoryMethods.activateCategory(name)
         if(success) {
             categoriesList.get(name)?.active = true
         }
