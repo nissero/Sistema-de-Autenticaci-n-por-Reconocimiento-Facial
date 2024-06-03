@@ -33,7 +33,7 @@ class HomeActivity : AppCompatActivity() {
         val sqlDb = OfflineDataBaseHelper(this)
         Log.e("DB", sqlDb.getAllLogs())
         logsRepository.syncLogsOfflineWithOnline(sqlDb)
-        viewBinding.buttonFaceRecognition.setOnClickListener {
+        viewBinding.buttonFaceRecognitionSecurity.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)
@@ -52,6 +52,12 @@ class HomeActivity : AppCompatActivity() {
             Log.d("HOME", "SECURITY ${db.getAllSecurity()}")
             val intent = Intent(this, OfflineLogInActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
+            startActivity(intent)
+        }
+
+        viewBinding.buttonFaceRecognitionAdmin.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "admin")
             startActivity(intent)
         }
     }
