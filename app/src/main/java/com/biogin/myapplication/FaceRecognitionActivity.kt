@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityMainBinding
+import com.biogin.myapplication.ui.admin.AdminActivity
 import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -51,6 +52,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
                 "seguridad" -> initCamera(:: ifSecurity)
                 "rrhh" -> initCamera(:: ifRRHH)
                 "fin de turno" -> initCamera(:: ifFinDeTurno)
+                "admin" -> initCamera {:: ifAdmin }
                 else -> initCamera(:: ifAny)
             }
 
@@ -64,6 +66,9 @@ class FaceRecognitionActivity : AppCompatActivity() {
                 }
                 "fin de turno" -> viewBinding.skipButton.setOnClickListener {
                     finDeTurno()
+                }
+                "admin" -> viewBinding.skipButton.setOnClickListener {
+                    goToAdminActivity()
                 }
                 else -> {
                     viewBinding.skipButton.visibility = View.INVISIBLE
@@ -100,6 +105,12 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun goToAdminActivity() {
+        camera.shutdown()
+        val intent = Intent(this, AdminActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
     private fun finDeTurno() {
         camera.shutdown()
         val intent = Intent(this@FaceRecognitionActivity,
@@ -168,6 +179,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
         when(authenticationType){
             "seguridad" -> initCamera(:: ifSecurity)
             "rrhh" -> initCamera(:: ifRRHH)
+            "admin" -> initCamera(:: ifAdmin)
             else -> initCamera(:: ifAny)
         }
     }
@@ -198,9 +210,25 @@ class FaceRecognitionActivity : AppCompatActivity() {
                 goToRRHHActivity()
             }, dialogShowTime)
         } else {
-            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.RRHH_UNSUCCESSFUL_LOGIN, MasterUserDataSession.getDniUser(), "", "")
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.RRHH_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es RRHH")
+        }
+    }
+
+    private fun ifAdmin(user: Usuario){
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "admin") {
+            MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
+            this.showAuthorizationMessage(user)
+            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+            Handler(Looper.getMainLooper()).postDelayed({
+                goToAdminActivity()
+            }, dialogShowTime)
+        } else {
+            logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
+            this.showAccessDeniedMessage()
+            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Admin")
         }
     }
 

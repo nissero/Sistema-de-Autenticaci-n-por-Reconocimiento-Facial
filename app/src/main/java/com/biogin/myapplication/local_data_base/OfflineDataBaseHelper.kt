@@ -2,21 +2,16 @@ package com.biogin.myapplication.local_data_base
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteDatabase.openOrCreateDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.text.toLowerCase
 import com.biogin.myapplication.Registro
-import com.google.android.datatransport.cct.internal.LogEvent
-import com.google.zxing.integration.android.IntentIntegrator
-import java.time.Instant
-import java.time.LocalDate
+import java.sql.SQLException
+
+
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "OfflineDb", null, 1){
@@ -62,7 +57,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val db = readableDatabase
         val result = db.rawQuery("SELECT 1 FROM Users WHERE dni='$dni'", null)
         val exists = result.moveToFirst()
-        result.close()
+        db.close()
         return exists
     }
 
@@ -70,7 +65,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val db = readableDatabase
         val result = db.rawQuery("SELECT 1 FROM SecurityMember WHERE dni='$dni'", null)
         val exists = result.moveToFirst()
-        result.close()
+        db.close()
         return exists
     }
 
@@ -250,9 +245,10 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
                 log = Registro(tipo, dniMaster, dni, timestamp)
 
                 logs.add(log)
+                cursor.moveToNext()
             }
         }
-
+        db.close()
         return logs
     }
 
@@ -262,6 +258,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val statement = db.compileStatement(sql)
         statement.bindString(1, dni)
         statement.executeInsert()
+        db.close()
     }
 
     private fun saveUserDataToSecurity(dni: String) {
@@ -270,6 +267,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         val statement = db.compileStatement(sql)
         statement.bindString(1, dni)
         statement.executeInsert()
+        db.close()
     }
     @SuppressLint("Range")
     fun getAllLogs(): String {
@@ -290,10 +288,25 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         } else {
             logs.append("No hay registros en la tabla OfflineLogs")
         }
+
         cursor.close()
+        db.close()
         return logs.toString()
     }
 
+    fun deleteAllLogs() {
+        val db = writableDatabase
+        val sql = "DELETE FROM OfflineLogs"
+        try {
+            val statement = db.compileStatement(sql)
+            var rowsDeleted = statement.executeUpdateDelete()
+            Log.i("SQLite", "Se borraron exitosamente todos los registros de la tabala OfflineLogs | Registros borrados en total: $rowsDeleted")
+            db.close()
+        } catch (e : SQLException) {
+            Log.e("SQLite", "Error al borrar todos los registros de la tabla OfflineLogs")
+            db.close()
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun currentTimeStamp(): String {
         val current = LocalDateTime.now()

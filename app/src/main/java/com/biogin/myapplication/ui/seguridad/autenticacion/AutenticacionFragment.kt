@@ -23,16 +23,20 @@ import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
+import com.biogin.myapplication.utils.ConnectionCheck
+import java.net.ConnectException
 
 class AutenticacionFragment : Fragment() {
 
     private var _binding: FragmentAutenticacionBinding? = null
     private var turnoIniciado = false
     private lateinit var autenticacionButton: Button
+    private lateinit var autenticacionOfflineButton: Button
     private lateinit var turnoButton: Button
     private lateinit var mensaje: TextView
     private lateinit var dniMaster: String
     private lateinit var logsRepository : LogsRepository
+    private lateinit var ConnectionCheck: ConnectionCheck
 
 
     // This property is only valid between onCreateView and
@@ -57,26 +61,24 @@ class AutenticacionFragment : Fragment() {
 
         autenticacionButton = root.findViewById(R.id.button_visitantes)
 
+        autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
+
         turnoButton = root.findViewById(R.id.button_turno)
 
+        ConnectionCheck = ConnectionCheck(requireActivity())
 
         mensaje = root.findViewById(R.id.message_main_screen)
         if(turnoIniciado) {
             turnoButton.text = this.context?.getString(R.string.finalizar_turno)
             mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
             autenticacionButton.visibility = View.VISIBLE
+            autenticacionOfflineButton.visibility = View.VISIBLE
         } else {
             turnoButton.text = this.context?.getString(R.string.iniciar_turno)
             mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
             autenticacionButton.visibility = View.INVISIBLE
+            autenticacionOfflineButton.visibility = View.INVISIBLE
         }
-
-        val autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
-        autenticacionOfflineButton.visibility = View.INVISIBLE
-
-        val turnoButton = root.findViewById<Button>(R.id.button_turno)
-
-        val mensaje = root.findViewById<TextView>(R.id.message_main_screen)
 
 
         //metodo para crear una actividad nueva y obtener un resultado
@@ -112,18 +114,19 @@ class AutenticacionFragment : Fragment() {
             if(!turnoIniciado) {
                 val dialogClickListener =
                     DialogInterface.OnClickListener { dialog, which ->
-                        when (which) {
-                            DialogInterface.BUTTON_POSITIVE -> {
-                                logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
+                        when (which) {DialogInterface.BUTTON_POSITIVE -> {
                                 turnoIniciado = true
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
                                 mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
-                                val database = OfflineDataBaseHelper(requireActivity())
-                                database.startOfShift(dniMaster)
-
+                                if (ConnectionCheck.isOnlineNet()){
+                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                } else {
+                                    val database = OfflineDataBaseHelper(requireActivity())
+                                    database.startOfShift(dniMaster)
+                                }
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 
@@ -139,14 +142,20 @@ class AutenticacionFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT,MasterUserDataSession.getDniUser(), "", MasterUserDataSession.getCategoryUser())
-                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
-                                intent.putExtra("authenticationType", "fin de turno")
-                                resultLauncher.launch(intent)
-
-                                val database = OfflineDataBaseHelper(requireActivity())
-                                database.endOfShift(dniMaster)
-
+                                if (ConnectionCheck.isOnlineNet()){
+                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                } else {
+                                    val database = OfflineDataBaseHelper(requireActivity())
+                                    database.endOfShift(dniMaster)
+                                }
+//                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
+//                                intent.putExtra("authenticationType", "fin de turno")
+//                                resultLauncher.launch(intent)
+                                turnoIniciado = false
+                                autenticacionButton.visibility = View.INVISIBLE
+                                autenticacionOfflineButton.visibility = View.INVISIBLE
+                                turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+                                mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
                             }
                             DialogInterface.BUTTON_NEGATIVE -> {
 

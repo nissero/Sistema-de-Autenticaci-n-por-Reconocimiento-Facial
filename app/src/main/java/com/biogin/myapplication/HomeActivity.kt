@@ -7,17 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityHomeBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
-import com.biogin.myapplication.utils.ConnectionCheck
-import com.google.android.material.snackbar.Snackbar
 
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var firebaseSyncManager: FirebaseSyncService
-
+    private lateinit var logsRepository: LogsRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MasterUserDataSession.clearUserData()
@@ -29,10 +28,12 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        logsRepository = LogsRepository()
         firebaseSyncManager = FirebaseSyncService(this)
-
-        viewBinding.buttonFaceRecognition.setOnClickListener {
+        val sqlDb = OfflineDataBaseHelper(this)
+        Log.e("DB", sqlDb.getAllLogs())
+        logsRepository.syncLogsOfflineWithOnline(sqlDb)
+        viewBinding.buttonFaceRecognitionSecurity.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)
@@ -46,11 +47,17 @@ class HomeActivity : AppCompatActivity() {
 
         val db = OfflineDataBaseHelper(this)
 
-        viewBinding.buttonLoginOffline.setOnClickListener{
+        viewBinding.buttonLoginOffline.setOnClickListener {
             Log.d("HOME", "USERS: ${db.getAllUsers()}")
             Log.d("HOME", "SECURITY ${db.getAllSecurity()}")
             val intent = Intent(this, OfflineLogInActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
+            startActivity(intent)
+        }
+
+        viewBinding.buttonFaceRecognitionAdmin.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "admin")
             startActivity(intent)
         }
     }

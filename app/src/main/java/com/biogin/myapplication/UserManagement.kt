@@ -15,19 +15,27 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
+import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.biogin.myapplication.utils.PopUpUtil
 import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import javax.mail.internet.InternetAddress
 
 class UserManagement : AppCompatActivity() {
     private var dataSource = LoginDataSource()
     private var loginRepo = LoginRepository(dataSource)
-    private var insitutesUtils = InstitutesUtils()
+    private var institutesUtils = InstitutesUtils()
     private lateinit var binding: ActivityUserManagementBinding
     private var oldDni : String = ""
     private var validations  = FormValidations()
     private val popUpUtil = PopUpUtil()
+    private val emailService = EmailService("smtp-mail.outlook.com", 587)
+    private val firebaseMethods = FirebaseMethods()
+    private lateinit var oldDniLogs: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +66,11 @@ class UserManagement : AppCompatActivity() {
             params.endToEnd = binding.linearLayout.id
         } else {
             oldDni = intent.getStringExtra("dni").toString()
+
+            firebaseMethods.getLogsFromDni(oldDni) {
+                    logs -> oldDniLogs = logs
+            }
+
             binding.updateUserDni.visibility = View.VISIBLE
             binding.duplicateUserButton.visibility = View.VISIBLE
             binding.updateUserButton.visibility = View.GONE
@@ -99,7 +112,7 @@ class UserManagement : AppCompatActivity() {
 
         binding.updateUserButton.setOnClickListener {
             val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedIstitutes = insitutesUtils.getInstitutesSelected(checkboxes)
+            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
             val task = dataSource.modifyUserFirebase(
                 binding.updateUserName.text.toString(),
                 binding.updateUserSurname.text.toString(),
@@ -107,7 +120,7 @@ class UserManagement : AppCompatActivity() {
                 binding.updateUserEmail.text.toString(),
                 binding.updateUserCategoriesSpinner.selectedItem.toString(),
                 binding.updateUserStateSpinner.selectedItem.toString(),
-                selectedIstitutes
+                selectedInstitutes
             )
 
             task.addOnSuccessListener {
@@ -126,9 +139,13 @@ class UserManagement : AppCompatActivity() {
             }
         }
 
+        binding.buttonTest.setOnClickListener {
+            sendEmailOnDniChange(oldDni, binding.updateUserDni.text.toString())
+        }
+
         binding.duplicateUserButton.setOnClickListener {
             val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedIstitutes = insitutesUtils.getInstitutesSelected(checkboxes)
+            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
             val task = dataSource.duplicateUserInFirebase(
                 binding.updateUserName.text.toString(),
                 binding.updateUserSurname.text.toString(),
@@ -136,7 +153,7 @@ class UserManagement : AppCompatActivity() {
                 binding.updateUserDni.text.toString(),
                 binding.updateUserEmail.text.toString(),
                 binding.updateUserCategoriesSpinner.selectedItem.toString(),
-                selectedIstitutes
+                selectedInstitutes
             )
 
             task.addOnSuccessListener {
@@ -144,6 +161,11 @@ class UserManagement : AppCompatActivity() {
                 popUpUtil.showPopUp(binding.root.context,
                     "Se actualizó el dni del usuario de forma exitosa",
                     "Salir")
+                intent.getStringExtra("dni")?.let { it1 ->
+                    sendEmailOnDniChange(
+                        it1,
+                        binding.updateUserDni.text.toString())
+                }
                 finish()
             }.addOnFailureListener {ex ->
                 try {
@@ -233,7 +255,7 @@ class UserManagement : AppCompatActivity() {
     private fun checkUpdateButtonActivation() {
         lateinit var buttonToEnable : Button
 
-        if (intent.getStringExtra("button_option_chosed") == "UpdateUser") {
+        if (intent.getStringExtra("button_option_chosen") == "UpdateUser") {
             buttonToEnable = findViewById(R.id.update_user_button)
         } else {
             buttonToEnable = findViewById(R.id.duplicate_user_button)
@@ -304,11 +326,23 @@ class UserManagement : AppCompatActivity() {
         binding.checkboxIDH.visibility = View.INVISIBLE
         binding.checkboxICI.visibility = View.INVISIBLE
     }
-//    private fun showPopup(popupText : String, popupButtonText : String) {
-//        val intent = Intent(this@UserManagement, Popup::class.java)
-//        intent.putExtra("popup_text", popupText)
-//        intent.putExtra("text_button", popupButtonText)
-//        startActivity(intent)
-//    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun sendEmailOnDniChange(oldDni: String, newDni: String) {
+        println("success")
+        val auth = EmailService.UserPassAuthenticator("fernandoivanantunez@hotmail.com",
+            "steveharris40184869")
+        val to = listOf(InternetAddress("antunez.fernandoivan.43377@gmail.com"))
+        val from = InternetAddress("fernandoivanantunez@hotmail.com")
+        val subject = "Aviso de cambio de DNI"
+        val body = "Buenas, le enviamos este mail para informarle que al usuario registrado con el " +
+                "DNI $oldDni se le ha modificado el mismo por $newDni.\nLe dejamos un reporte de los " +
+                "registros del DNI previo:\n$oldDniLogs"
+        val email = EmailService.Email(auth, to, from, subject, body)
+
+        GlobalScope.launch {
+            emailService.send(email)
+        }
+    }
 
 }
