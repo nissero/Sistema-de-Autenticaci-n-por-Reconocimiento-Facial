@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E6E6E6"
+    tools:context=".ui.admin.AdminActivity">
+
+    <TextView
+        android:id="@+id/admin_view_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Configuración"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/admin_save_config_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="Guardar"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="@color/blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_routing_opts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:orientation="horizontal"
+        app:chipSpacing="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/admin_save_config_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/admin_view_title"
+        app:layout_constraintVertical_bias="0.281"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/firebase_config_option"
+            style="@style/CloudChipOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Firebase" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/back4apps_config_option"
+            style="@style/CloudChipOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back4Apps" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/title_cloud_routing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Ruteo cloud"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/chip_group_routing_opts"
+        app:layout_constraintEnd_toEndOf="@+id/chip_group_routing_opts"
+        app:layout_constraintStart_toStartOf="@+id/chip_group_routing_opts" />
+</androidx.constraintlayout.widget.ConstraintLayout>
