@@ -70,7 +70,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
     private lateinit var cameraProvider: ProcessCameraProvider
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var cameraNumber: Int = 1
-    private var cloudOption = "Back4Apps"
+    private var cloudOption = "Firebase"
 
     val firebaseMethods = FirebaseMethods()
 
