@@ -26,7 +26,6 @@
         <activity
             android:name=".ui.admin.AdminActivity"
             android:exported="true" />
-
         <meta-data
             android:name="com.parse.SERVER_URL"
             android:value="@string/back4app_server_url" />
@@ -36,7 +35,9 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
-
+        <activity
+            android:name=".ui.rrhh.TempUserSuspensionActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.rrhh.modulos.ABMAreaActivity"
             android:exported="false"
