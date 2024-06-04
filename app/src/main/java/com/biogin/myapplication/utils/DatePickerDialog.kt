@@ -39,5 +39,11 @@ class DatePickerDialog {
         datePickerDialog.show()
     }
 
+    fun formatDate(date: String): String {
+        val splitText = date.split("/")
+
+        return "${splitText[2]}/${splitText[1]}/${splitText[0]}"
+    }
+
 
 }

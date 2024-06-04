@@ -2,6 +2,7 @@ package com.biogin.myapplication.data
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
@@ -56,7 +57,7 @@ class LoginDataSource {
                 }
             }
 
-            if (category == "Externo"){
+            if (category == "Externo" || category == "Temporal"){
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                 if (trabajaDesdeDate.isAfter(today)){
@@ -285,6 +286,18 @@ class LoginDataSource {
 
             logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun ifSuspensionDateEqualsToday(fechaDesde: String, dni: String): Boolean {
+        val today = LocalDate.now()
+        val suspensionDesde = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        if (suspensionDesde.isEqual(today)) {
+            Log.d("LOGINDATASOURCE", "FECHA HOY")
+            deactivateUserFirebase(dni)
+            return true
+        }
+        return false
     }
 
 }
