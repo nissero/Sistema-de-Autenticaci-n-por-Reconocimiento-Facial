@@ -274,8 +274,8 @@ class LoginDataSource {
 
             val data = dniDoc.data
             val nuevosAtributos = mapOf(
-                "fechaDesde" to fechaDesde,
-                "fechaHasta" to fechaHasta
+                "suspendidoDesde" to fechaDesde,
+                "suspendidoHasta" to fechaHasta
             )
             val dataActualizada = data?.plus(nuevosAtributos)
 
