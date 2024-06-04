@@ -1,6 +1,7 @@
 package com.biogin.myapplication.data
 
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -8,14 +9,18 @@ import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
@@ -60,6 +65,10 @@ class LoginDataSource {
             if (category == "Externo" || category == "Temporal"){
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
+
                 if (trabajaDesdeDate.isAfter(today)){
                     val newUser = hashMapOf(
                         "nombre" to name,
@@ -70,8 +79,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Inactivo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
 
                     transaction.set(docRefDni, newUser)
@@ -86,8 +95,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Activo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
                     transaction.set(docRefDni, newUser)
                 }
@@ -273,10 +282,13 @@ class LoginDataSource {
                 )
             }
 
+            val fechaDesdeTimeStamp = convertStringToTimestamp(fechaDesde)
+            val fechaHastaTimeStamp = convertStringToTimestamp(fechaHasta)
+
             val data = dniDoc.data
             val nuevosAtributos = mapOf(
-                "suspendidoDesde" to fechaDesde,
-                "suspendidoHasta" to fechaHasta
+                "suspendidoDesde" to fechaDesdeTimeStamp,
+                "suspendidoHasta" to fechaHastaTimeStamp
             )
             val dataActualizada = data?.plus(nuevosAtributos)
 
@@ -298,6 +310,22 @@ class LoginDataSource {
             return true
         }
         return false
+    }
+
+
+    @SuppressLint("SimpleDateFormat")
+    private fun convertStringToTimestamp(dateString: String): Timestamp {
+        val formatter = SimpleDateFormat("yyyy/MM/dd")
+        val parsedDate = formatter.parse(dateString) ?: return Timestamp.now() // Handle invalid format
+
+        val calendar = Calendar.getInstance()
+        calendar.time = parsedDate
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        return Timestamp(calendar.timeInMillis / 1000, 0)
     }
 
 }
