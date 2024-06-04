@@ -90,7 +90,7 @@ class RegisterActivity : AppCompatActivity() {
                     enableCheckboxes()
                 }
 
-                if (categorySelected == "Externo"){
+                if (categorySelected == "Externo" || categorySelected == "Temporal"){
                     fechaDesdeEditText.visibility = View.VISIBLE
                 } else {
                     fechaDesdeEditText.visibility = View.INVISIBLE
@@ -167,8 +167,8 @@ class RegisterActivity : AppCompatActivity() {
 
         continueButton?.setOnClickListener {
 
-            fechaDesde = formatDate(fechaDesdeEditText.text.toString())
-            fechaHasta = formatDate(fechaHastaEditText.text.toString())
+            fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+            fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
 
 
             Log.d("REGISTERACTIVITY", fechaDesde)
@@ -252,11 +252,7 @@ class RegisterActivity : AppCompatActivity() {
         onResume()
     }
 
-    private fun formatDate(date: String): String {
-        val splitText = date.split("/")
 
-        return "${splitText[2]}/${splitText[1]}/${splitText[0]}"
-    }
 
     private fun String.toCalendarDate(): Calendar {
         val splitDate = split("/")
