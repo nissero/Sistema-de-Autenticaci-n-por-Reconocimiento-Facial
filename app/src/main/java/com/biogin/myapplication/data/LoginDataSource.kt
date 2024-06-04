@@ -1,6 +1,8 @@
 package com.biogin.myapplication.data
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
@@ -11,6 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
@@ -20,13 +24,16 @@ import com.biogin.myapplication.logs.Log as LogsApp
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
     private var logsRepository: LogsRepository = LogsRepository()
-    public fun uploadUserToFirebase(
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun uploadUserToFirebase(
         name: String,
         surname: String,
         dni: String,
         email: String,
         category: String,
         institutesSelected: ArrayList<String>,
+        fechaDesde: String,
+        fechaHasta: String
     ): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
         val colRef = db.collection("usuarios")
@@ -49,18 +56,54 @@ class LoginDataSource {
                 }
             }
 
-            val newUser = hashMapOf(
-                "nombre" to name,
-                "apellido" to surname,
-                "dni" to dni,
-                "email" to email,
-                "categoria" to category,
-                "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                "institutos" to institutesSelected,
-                "estado" to "Activo"
-            )
+            if (category == "Externo"){
+                val today = LocalDate.now()
+                val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                if (trabajaDesdeDate.isAfter(today)){
+                    val newUser = hashMapOf(
+                        "nombre" to name,
+                        "apellido" to surname,
+                        "dni" to dni,
+                        "email" to email,
+                        "categoria" to category,
+                        "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos" to institutesSelected,
+                        "estado" to "Inactivo",
+                        "trabajaDesde" to fechaDesde,
+                        "trabajaHasta" to fechaHasta
+                    )
 
-            transaction.set(docRefDni, newUser)
+                    transaction.set(docRefDni, newUser)
+                }
+                if (trabajaDesdeDate.isEqual(today)){
+                    val newUser = hashMapOf(
+                        "nombre" to name,
+                        "apellido" to surname,
+                        "dni" to dni,
+                        "email" to email,
+                        "categoria" to category,
+                        "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos" to institutesSelected,
+                        "estado" to "Activo",
+                        "trabajaDesde" to fechaDesde,
+                        "trabajaHasta" to fechaHasta
+                    )
+                    transaction.set(docRefDni, newUser)
+                }
+            } else{
+                val newUser = hashMapOf(
+                    "nombre" to name,
+                    "apellido" to surname,
+                    "dni" to dni,
+                    "email" to email,
+                    "categoria" to category,
+                    "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                    "institutos" to institutesSelected,
+                    "estado" to "Activo"
+                )
+
+                transaction.set(docRefDni, newUser)
+            }
 
             logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_CREATION,
                 MasterUserDataSession.getDniUser(), dni, category)
@@ -76,7 +119,7 @@ class LoginDataSource {
             .await()
             .size() != 0
     }
-    public fun duplicateUserInFirebase(
+    fun duplicateUserInFirebase(
         name: String,
         surname: String,
         oldDni: String,
@@ -203,7 +246,45 @@ class LoginDataSource {
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
     }
 
+
+
     fun logout() {
         // TODO: revoke authentication
     }
+
+    fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
+        val db = FirebaseFirestore.getInstance()
+        return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
+            val dniDoc = transaction.get(docRefDni)
+
+            if (!dniDoc.exists()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val data = dniDoc.data
+            val nuevosAtributos = mapOf(
+                "suspendidoDesde" to fechaDesde,
+                "suspendidoHasta" to fechaHasta
+            )
+            val dataActualizada = data?.plus(nuevosAtributos)
+
+            if (dataActualizada != null) {
+                transaction.update(docRefDni, dataActualizada)
+            }
+
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+        }
+    }
+
 }

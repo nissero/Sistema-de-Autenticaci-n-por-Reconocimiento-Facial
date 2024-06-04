@@ -61,22 +61,18 @@ class FaceContourDetectionProcessor(
                 //Log.d(TAG, "se detecto una cara")
                 val faceBitmap = apiManager.extractFaceBitmap(rect)
 
-                if (camera.canAnalize() && !camera.isAnalyzing()){
-                    camera.analyzing()
-
-                    Log.d(TAG, "SE LLAMO A LA API")
+                if (!camera.isSomeoneAnalyzing()){
+                    camera.iAmAnalyzing()
+                    Log.d("LOGIN", "SE LLAMO A LA API")
                     apiManager.sendImageForRecognition(faceBitmap) { faceDetected ->
                         if (faceDetected != "null") {
-                            Log.d(TAG, "CARA DETECTADA: $faceDetected")
+                            Log.d("LOGIN", "CARA DETECTADA: $faceDetected")
                             camera.verifyUser(faceDetected)
-                            camera.wasAnalyzed()
                         } else {
-                            Log.e(TAG, "ERROR EN LA API")
+                            Log.e("LOGIN", "ERROR EN LA API")
+                            camera.continueAnalyzing()
                         }
                     }
-
-                    camera.setLasApiCallTime()
-                    camera.stopAnalyzing()
                 }
             }
 
