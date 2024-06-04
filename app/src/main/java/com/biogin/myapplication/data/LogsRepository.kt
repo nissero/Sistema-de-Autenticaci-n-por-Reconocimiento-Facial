@@ -3,6 +3,7 @@ package com.biogin.myapplication.data
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Transaction
@@ -80,20 +81,25 @@ class LogsRepository {
     fun replaceWhitespacesWithUnderscores(s : String) : String {
         return s.replace("\\s+".toRegex(), "_")
     }
-    fun getSuccesfulAuthentications() : Task<QuerySnapshot> {
+
+    fun getSuccesfulAuthenticationsOfDay() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection(LOGS_COLLECTION_NAME).
-             whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION")
-            .get()
+            whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION").
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
+            whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+                .get()
 
     }
 
-    fun getUnsuccesfulAuthentications() : Task<QuerySnapshot> {
+    fun getUnsuccesfulAuthenticationsOfDay() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection(LOGS_COLLECTION_NAME).
-        whereEqualTo("logEventName", "USER UNSUCCESSFUL AUTHENTICATION")
+            whereEqualTo("logEventName", "USER UNSUCCESSFUL AUTHENTICATION").
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
+            whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
             .get()
     }
 
@@ -105,7 +111,7 @@ class LogsRepository {
                 dniRRHH,
                 dniNewUser,
                 categoryNewUser,
-                Calendar.getInstance().time.toString()
+                ""
             )
         )
 
@@ -123,7 +129,7 @@ class LogsRepository {
                 dniMasterUser,
                 dniNewUser,
                 categoryNewUser,
-                Calendar.getInstance().time.toString()
+                ""
             )
         )
 
@@ -131,26 +137,26 @@ class LogsRepository {
     }
 
     private fun createHashmapLog(log : Log): HashMap<String, Any> {
-        val date = getCurrentDateTime()
-        val dateInString = date.toString("yyyy/MM/dd HH:mm:ss")
-
         return hashMapOf(
             "logEventType" to log.logEventType,
             "logEventName" to log.logEventName.value,
             "dniMasterUser" to log.dniMasterUser,
             "dniUserAffected" to log.dniUserAffected,
-            "timestamp" to dateInString,
+            "timestamp" to Timestamp(Calendar.getInstance().time).toDate(),
             "category" to log.userCategory
         )
     }
 
     private fun createHashmapOfflineLog(log : Log): HashMap<String, Any> {
+        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        val date =  Timestamp(formatter.parse(log.timestamp)!!).toDate()
+
         return hashMapOf(
             "logEventType" to log.logEventType,
             "logEventName" to log.logEventName.value,
             "dniMasterUser" to log.dniMasterUser,
             "dniUserAffected" to log.dniUserAffected,
-            "timestamp" to log.timestamp,
+            "timestamp" to date,
             "category" to log.userCategory
         )
     }
@@ -163,4 +169,24 @@ class LogsRepository {
         return android.icu.util.Calendar.getInstance().time
     }
 
+    private fun getStartOfDay() : Calendar {
+        val startOfDay: Calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return startOfDay
+    }
+
+
+    private fun getEndOfDay() : Calendar {
+        val endOfDay: Calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        return endOfDay
+    }
 }

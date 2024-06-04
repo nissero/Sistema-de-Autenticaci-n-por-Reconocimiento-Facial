@@ -16,7 +16,7 @@ import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 class HomeActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityHomeBinding
     private lateinit var firebaseSyncManager: FirebaseSyncService
-    private lateinit var logsRepository : LogsRepository
+    private lateinit var logsRepository: LogsRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MasterUserDataSession.clearUserData()
@@ -33,7 +33,7 @@ class HomeActivity : AppCompatActivity() {
         val sqlDb = OfflineDataBaseHelper(this)
         Log.e("DB", sqlDb.getAllLogs())
         logsRepository.syncLogsOfflineWithOnline(sqlDb)
-        viewBinding.buttonFaceRecognition.setOnClickListener {
+        viewBinding.buttonFaceRecognitionSecurity.setOnClickListener {
             val intent = Intent(this, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
             startActivity(intent)
@@ -47,11 +47,17 @@ class HomeActivity : AppCompatActivity() {
 
         val db = OfflineDataBaseHelper(this)
 
-        viewBinding.buttonLoginOffline.setOnClickListener{
+        viewBinding.buttonLoginOffline.setOnClickListener {
             Log.d("HOME", "USERS: ${db.getAllUsers()}")
             Log.d("HOME", "SECURITY ${db.getAllSecurity()}")
             val intent = Intent(this, OfflineLogInActivity::class.java)
             intent.putExtra("authenticationType", "seguridad")
+            startActivity(intent)
+        }
+
+        viewBinding.buttonFaceRecognitionAdmin.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "admin")
             startActivity(intent)
         }
     }

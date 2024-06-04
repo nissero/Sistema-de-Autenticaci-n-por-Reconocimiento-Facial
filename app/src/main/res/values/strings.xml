@@ -133,8 +133,6 @@
     <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
     <string name="eliminar_lugar_fisico">Eliminar\nlugar físico</string>
     <string name="mensaje_modificar_lugar">Para modificar o eliminar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
-    >>>>>>> origin/fernando2
-    =======
     <string name="dni_rrhh">DNI\nrrhh</string>
     <string name="dni_user_affected">DNI user afectado</string>
     <string name="log_type">Tipo de log</string>
@@ -142,5 +140,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
-    >>>>>>> main
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">ZIalbZmTNhF7KsEZhq6iGJS1F970qM7A4csbNIEn</string>
+    <string name="back4app_client_key">P22gWwIeukQA3yiFIBohWEDDjFkqS1zEUTZPjgBG</string>
+    <string name="home_text_enter_face_recognition_admin">Ingresar con reconocimiento facial (ADMIN)</string>
 </resources>
