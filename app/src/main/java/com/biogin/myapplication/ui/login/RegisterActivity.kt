@@ -1,7 +1,6 @@
 package com.biogin.myapplication.ui.login
 
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
@@ -32,17 +31,18 @@ import java.util.Calendar
 
 
 class RegisterActivity : AppCompatActivity() {
-    private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var institutesUtils: InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var fechaDesdeEditText: EditText
     private lateinit var fechaHastaEditText: EditText
+    private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
     private var validations  = FormValidations()
     private var loadingDialog = LoadingDialog(this)
     private var fechaDesde = ""
     private var fechaHasta = ""
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -60,16 +60,17 @@ class RegisterActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
         categoriesSpinner.adapter = adapter
 
-        fechaDesdeEditText = findViewById<EditText>(R.id.register_fecha_desde)
-        fechaHastaEditText = findViewById<EditText>(R.id.register_fecha_hasta)
+        fechaDesdeEditText = findViewById(R.id.register_fecha_desde)
+        fechaHastaEditText = findViewById(R.id.register_fecha_hasta)
+
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
+
 
         fechaDesdeEditText.setOnClickListener{
-            mostrarDatePickerDialog(fechaDesdeEditText)
-            fechaHastaEditText.setText("")
-            fechaHastaEditText.visibility = View.VISIBLE
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {checkContinueButtonActivation()}
         }
         fechaHastaEditText.setOnClickListener {
-            mostrarDatePickerDialog(fechaHastaEditText)
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {checkContinueButtonActivation()}
         }
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -255,32 +256,6 @@ class RegisterActivity : AppCompatActivity() {
         val splitText = date.split("/")
 
         return "${splitText[2]}/${splitText[1]}/${splitText[0]}"
-    }
-
-    private fun mostrarDatePickerDialog(targetEditText: EditText?) {
-        val calendar = Calendar.getInstance()
-        val actualYear = calendar.get(Calendar.YEAR)
-        val actualMonth = calendar.get(Calendar.MONTH)
-        val actualDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-        datePickerDialog = DatePickerDialog(this,
-            { _, year, monthOfYear, dayOfMonth ->
-                val formattedDay = String.format("%02d", dayOfMonth) // Add leading zero for day
-                val formattedMonth = String.format("%02d", monthOfYear + 1) // Add leading zero for month
-                val fechaSeleccionada = "$formattedDay/$formattedMonth/$year"
-                targetEditText?.setText(fechaSeleccionada)
-            },
-            actualYear,
-            actualMonth,
-            actualDay
-        )
-
-        if (targetEditText == fechaHastaEditText){
-            datePickerDialog.datePicker.minDate = fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis
-        } else {
-            datePickerDialog.datePicker.minDate = System.currentTimeMillis()
-        }
-        datePickerDialog.show()
     }
 
     private fun String.toCalendarDate(): Calendar {

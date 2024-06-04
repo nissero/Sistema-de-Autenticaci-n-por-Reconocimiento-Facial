@@ -246,7 +246,45 @@ class LoginDataSource {
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
     }
 
+
+
     fun logout() {
         // TODO: revoke authentication
     }
+
+    fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
+        val db = FirebaseFirestore.getInstance()
+        return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
+            val dniDoc = transaction.get(docRefDni)
+
+            if (!dniDoc.exists()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val data = dniDoc.data
+            val nuevosAtributos = mapOf(
+                "fechaDesde" to fechaDesde,
+                "fechaHasta" to fechaHasta
+            )
+            val dataActualizada = data?.plus(nuevosAtributos)
+
+            if (dataActualizada != null) {
+                transaction.update(docRefDni, dataActualizada)
+            }
+
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+        }
+    }
+
 }
