@@ -3,10 +3,8 @@ package com.biogin.myapplication
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.CheckBox
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
@@ -36,6 +34,7 @@ class UserManagement : AppCompatActivity() {
     private val emailService = EmailService("smtp-mail.outlook.com", 587)
     private val firebaseMethods = FirebaseMethods()
     private lateinit var oldDniLogs: String
+    private var areAllFieldsValid = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,30 +110,53 @@ class UserManagement : AppCompatActivity() {
         }
 
         binding.updateUserButton.setOnClickListener {
-            val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
-            val task = dataSource.modifyUserFirebase(
-                binding.updateUserName.text.toString(),
-                binding.updateUserSurname.text.toString(),
-                binding.updateUserDni.text.toString(),
-                binding.updateUserEmail.text.toString(),
-                binding.updateUserCategoriesSpinner.selectedItem.toString(),
-                binding.updateUserStateSpinner.selectedItem.toString(),
-                selectedInstitutes
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
+            areAllFieldsValid = validations.isFormValid(
+                binding.root.context,
+                name,
+                surname,
+                newDni,
+                email,
+                categorySelected,
+                getCheckboxesArray()
             )
 
-            task.addOnSuccessListener {
-                Log.e("Firebase", "Update usuario exitoso")
-                popUpUtil.showPopUp(binding.root.context,
-                    "Se actualizó el usuario de forma exitosa", "Salir")
-                finish()
-            }.addOnFailureListener {ex ->
-                try {
-                    throw ex
-                } catch (e : FirebaseFirestoreException) {
-                    popUpUtil.showPopUp(binding.root.context,
-                        "Error al modificar el usuario, intente nuevamente",
-                        "Reintentar")
+            if(areAllFieldsValid) {
+                val checkboxes = arrayListOf(
+                    binding.checkboxICI,
+                    binding.checkboxICO,
+                    binding.checkboxIDEI,
+                    binding.checkboxIDH
+                )
+                val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val task = dataSource.modifyUserFirebase(
+                    binding.updateUserName.text.toString(),
+                    binding.updateUserSurname.text.toString(),
+                    binding.updateUserDni.text.toString(),
+                    binding.updateUserEmail.text.toString(),
+                    binding.updateUserCategoriesSpinner.selectedItem.toString(),
+                    binding.updateUserStateSpinner.selectedItem.toString(),
+                    selectedInstitutes
+                )
+
+                task.addOnSuccessListener {
+                    Log.e("Firebase", "Update usuario exitoso")
+                    popUpUtil.showPopUp(
+                        binding.root.context,
+                        "Se actualizó el usuario de forma exitosa", "Salir"
+                    )
+                    finish()
+                }.addOnFailureListener { ex ->
+                    try {
+                        throw ex
+                    } catch (e: FirebaseFirestoreException) {
+                        popUpUtil.showPopUp(
+                            binding.root.context,
+                            "Error al modificar el usuario, intente nuevamente",
+                            "Reintentar"
+                        )
+                    }
                 }
             }
         }
@@ -144,44 +166,69 @@ class UserManagement : AppCompatActivity() {
         }
 
         binding.duplicateUserButton.setOnClickListener {
-            val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
-            val task = dataSource.duplicateUserInFirebase(
-                binding.updateUserName.text.toString(),
-                binding.updateUserSurname.text.toString(),
-                oldDni,
-                binding.updateUserDni.text.toString(),
-                binding.updateUserEmail.text.toString(),
-                binding.updateUserCategoriesSpinner.selectedItem.toString(),
-                selectedInstitutes
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
+            areAllFieldsValid = validations.isFormValid(
+                binding.root.context,
+                name,
+                surname,
+                newDni,
+                email,
+                categorySelected,
+                getCheckboxesArray()
             )
+            if (areAllFieldsValid) {
+                val checkboxes = arrayListOf(
+                    binding.checkboxICI,
+                    binding.checkboxICO,
+                    binding.checkboxIDEI,
+                    binding.checkboxIDH
+                )
+                val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val task = dataSource.duplicateUserInFirebase(
+                    binding.updateUserName.text.toString(),
+                    binding.updateUserSurname.text.toString(),
+                    oldDni,
+                    binding.updateUserDni.text.toString(),
+                    binding.updateUserEmail.text.toString(),
+                    binding.updateUserCategoriesSpinner.selectedItem.toString(),
+                    selectedInstitutes
+                )
 
-            task.addOnSuccessListener {
-                Log.e("Firebase", "Duplicacion usuario/update dni exitoso")
-                popUpUtil.showPopUp(binding.root.context,
-                    "Se actualizó el dni del usuario de forma exitosa",
-                    "Salir")
-                intent.getStringExtra("dni")?.let { it1 ->
-                    sendEmailOnDniChange(
-                        it1,
-                        binding.updateUserDni.text.toString())
-                }
-                finish()
-            }.addOnFailureListener {ex ->
-                try {
-                    throw ex
-                } catch (e : FirebaseFirestoreException) {
-                    if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                        popUpUtil.showPopUp(binding.root.context,
-                            "El DNI ingresado ya existe, compruebe el dato ingresado",
-                            "Reintentar")
-                    } else {
-                        popUpUtil.showPopUp(binding.root.context,
-                            "Error al modificar el DNI, intente nuevamente",
-                            "Reintentar")
+                task.addOnSuccessListener {
+                    Log.e("Firebase", "Duplicacion usuario/update dni exitoso")
+                    popUpUtil.showPopUp(
+                        binding.root.context,
+                        "Se actualizó el dni del usuario de forma exitosa",
+                        "Salir"
+                    )
+                    intent.getStringExtra("dni")?.let { it1 ->
+                        sendEmailOnDniChange(
+                            it1,
+                            binding.updateUserDni.text.toString()
+                        )
                     }
+                    finish()
+                }.addOnFailureListener { ex ->
+                    try {
+                        throw ex
+                    } catch (e: FirebaseFirestoreException) {
+                        if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
+                            popUpUtil.showPopUp(
+                                binding.root.context,
+                                "El DNI ingresado ya existe, compruebe el dato ingresado",
+                                "Reintentar"
+                            )
+                        } else {
+                            popUpUtil.showPopUp(
+                                binding.root.context,
+                                "Error al modificar el DNI, intente nuevamente",
+                                "Reintentar"
+                            )
+                        }
+                    }
+                    Log.e("Firebase", ex.toString())
                 }
-                Log.e("Firebase", ex.toString())
             }
         }
 
@@ -197,10 +244,11 @@ class UserManagement : AppCompatActivity() {
 
                 if (categoriesWithNoInstitute.contains(categorySelected)) {
                     disableCheckboxes()
+                    disableAlertCheckAtLeastOneInstitute()
                 } else {
                     enableCheckboxes()
+                    enableAlertCheckAtLeastOneInstitute()
                 }
-                checkUpdateButtonActivation()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -209,85 +257,24 @@ class UserManagement : AppCompatActivity() {
 
         }
 
-        binding.checkboxIDH.setOnCheckedChangeListener { _, _ ->
-            checkUpdateButtonActivation()
-        }
-        binding.checkboxICI.setOnCheckedChangeListener { _, _ ->
-            checkUpdateButtonActivation()
-        }
-        binding.checkboxICO.setOnCheckedChangeListener { _, _ ->
-            checkUpdateButtonActivation()
-        }
-        binding.checkboxIDEI.setOnCheckedChangeListener { _, _ ->
-            checkUpdateButtonActivation()
+        name.setOnFocusChangeListener { _, _ ->
+            validations.validateName(name)
         }
 
-        name.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateName(name)
-                checkUpdateButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
-        }
-
-        surname.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+        surname.setOnFocusChangeListener { _, _ ->
                 validations.validateSurname(surname)
-                checkUpdateButtonActivation()
-                return@setOnEditorActionListener false
+        }
+
+        email.setOnFocusChangeListener { _, _ ->
+            validations.validateEmail(email)
+        }
+
+        if (intent.getStringExtra("button_option_chosen") != "UpdateUser") {
+            binding.updateUserDni.setOnFocusChangeListener { _, _ ->
+                validations.validateDNI(binding.updateUserDni)
             }
-            false
         }
 
-        email.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateEmail(email)
-                checkUpdateButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
-        }
-
-
-    }
-
-    private fun checkUpdateButtonActivation() {
-        lateinit var buttonToEnable : Button
-
-        if (intent.getStringExtra("button_option_chosen") == "UpdateUser") {
-            buttonToEnable = findViewById(R.id.update_user_button)
-        } else {
-            buttonToEnable = findViewById(R.id.duplicate_user_button)
-        }
-
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-
-        val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
-        val categorySelected  = spinner.selectedItem.toString()
-
-        if (formHasNoErrors()) {
-            if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
-                    buttonToEnable?.isEnabled = true
-                } else {
-                    buttonToEnable?.isEnabled = false
-                }
-            } else {
-                buttonToEnable?.isEnabled = true
-            }
-        } else {
-            buttonToEnable?.isEnabled = false
-        }
-    }
-
-    private fun formHasNoErrors() : Boolean{
-        val nameHasNoErrors = binding.updateUserName.error == null
-        val surnameHasNoErrors = binding.updateUserSurname.error == null
-        val dniHasNoErrors = binding.updateUserDni.error == null
-        val emailHasNoErrors = binding.updateUserEmail.error == null
-
-        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
     }
 
     private fun getCheckboxesArray() : ArrayList<CheckBox> {
@@ -325,6 +312,14 @@ class UserManagement : AppCompatActivity() {
         binding.checkboxICO.visibility = View.INVISIBLE
         binding.checkboxIDH.visibility = View.INVISIBLE
         binding.checkboxICI.visibility = View.INVISIBLE
+    }
+
+    private fun enableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedUpdate.visibility = View.VISIBLE
+    }
+
+    private fun disableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedUpdate.visibility = View.INVISIBLE
     }
 
     @OptIn(DelicateCoroutinesApi::class)

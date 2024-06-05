@@ -31,44 +31,22 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
-    private var validations  = FormValidations()
+    private var validations = FormValidations()
     private var loadingDialog = LoadingDialog(this)
+    private var areAllFieldsValid = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute =
+            resources.getStringArray(R.array.user_categories_with_no_institute)
         val userCategories = resources.getStringArray(R.array.user_categories)
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
         categoriesSpinner.adapter = adapter
-
-        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-                
-                val categorySelected  = spinner.selectedItem.toString()
-
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                } else {
-                    enableCheckboxes()
-                }
-                checkContinueButtonActivation()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Do nothing
-            }
-        }
 
         val name = binding.registerName
         val surname = binding.registerSurname
@@ -79,101 +57,105 @@ class RegisterActivity : AppCompatActivity() {
         val spinner = binding.registerCategoriesSpinner
         val continueButton = binding.registerContinueButton
 
-        name?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateName(name)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
+        categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+
+                val categorySelected  = spinner.selectedItem.toString()
+
+                if (categoriesWithNoInstitute.contains(categorySelected)) {
+                    disableCheckboxes()
+                    disableAlertCheckAtLeastOneInstitute()
+                } else {
+                    enableCheckboxes()
+                    enableAlertCheckAtLeastOneInstitute()
+                }
             }
-            false
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
         }
 
-        surname?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateSurname(surname)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
+        name?.setOnFocusChangeListener { _, _ ->
+            validations.validateName(name)
+        }
+
+        surname?.setOnFocusChangeListener { _, _ ->
+            validations.validateSurname(surname)
+        }
+
+        dni?.setOnFocusChangeListener { _, _ ->
+            validations.validateDNI(dni)
         }
 
         dni?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
                 validations.validateDNI(dni)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
+                return@setOnEditorActionListener true
             }
             false
         }
 
-        email?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateEmail(email)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
+        email?.setOnFocusChangeListener { _, _ ->
+            validations.validateEmail(email)
         }
 
-        binding.checkboxIDH?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxICI?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxICO?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxIDEI?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
 
         continueButton?.setOnClickListener {
-            loadingDialog.startLoadingDialog()
-            val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
-            dataSource.uploadUserToFirebase(
-                name?.text.toString(),
-                surname?.text.toString(),
-                dni?.text.toString(),
-                email?.text.toString(),
-                spinner?.selectedItem.toString(),
-                institutesSelected
-            ).addOnSuccessListener {
-                loadingDialog.dismissDialog()
-                val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                intent.putExtra("name", name?.text.toString())
-                intent.putExtra("surname", surname?.text.toString())
-                intent.putExtra("dni", dni?.text.toString())
-                intent.putExtra("email", email?.text.toString())
-                startActivity(intent)
-            }.addOnFailureListener { ex ->
-                loadingDialog.dismissDialog()
-                try {
-                    throw ex
-                } catch (e: FirebaseFirestoreException) {
-                    Log.e("Firebase", e.message.toString())
-                    val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                        when (which) {
-                            DialogInterface.BUTTON_NEUTRAL -> {
+            val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
+            areAllFieldsValid = validations.isFormValid(binding.root.context, name!!, surname!!, dni!!, email!!,categorySelected, getCheckboxesArray())
+            if (areAllFieldsValid) {
+                loadingDialog.startLoadingDialog()
+                val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
+                dataSource.uploadUserToFirebase(
+                    name?.text.toString(),
+                    surname?.text.toString(),
+                    dni?.text.toString(),
+                    email?.text.toString(),
+                    spinner?.selectedItem.toString(),
+                    institutesSelected
+                ).addOnSuccessListener {
+                    loadingDialog.dismissDialog()
+                    val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+                    intent.putExtra("name", name?.text.toString())
+                    intent.putExtra("surname", surname?.text.toString())
+                    intent.putExtra("dni", dni?.text.toString())
+                    intent.putExtra("email", email?.text.toString())
+                    startActivity(intent)
+                }.addOnFailureListener { ex ->
+                    loadingDialog.dismissDialog()
+                    try {
+                        throw ex
+                    } catch (e: FirebaseFirestoreException) {
+                        Log.e("Firebase", e.message.toString())
+                        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                            when (which) {
+                                DialogInterface.BUTTON_NEUTRAL -> {
+                                }
                             }
                         }
-                    }
 
-                    val builder = AlertDialog.Builder(binding.root.context)
+                        val builder = AlertDialog.Builder(binding.root.context)
 
-                    if(e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                        builder.setMessage(e.message).
-                        setNeutralButton("Reintentar", dialogClickListener).
-                        show()
-                    } else {
-                        builder.setMessage("Error al dar de alta el usuario, intente nuevamente")
-                            .setNeutralButton("Reintentar", dialogClickListener)
-                            .show()
+                        if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
+                            builder.setMessage(e.message)
+                                .setNeutralButton("Reintentar", dialogClickListener).show()
+                        } else {
+                            builder.setMessage("Error al dar de alta el usuario, intente nuevamente")
+                                .setNeutralButton("Reintentar", dialogClickListener)
+                                .show()
+                        }
                     }
                 }
             }
         }
-
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
@@ -233,43 +215,20 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxICI?.visibility = View.INVISIBLE
     }
 
-    private fun checkContinueButtonActivation() {
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-
-        val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val categorySelected  = spinner.selectedItem.toString()
-
-        if (formHasNoErrors()) {
-            if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
-                    binding.registerContinueButton?.isEnabled = true
-                } else {
-                    binding.registerContinueButton?.isEnabled = false
-                }
-            } else {
-                binding.registerContinueButton?.isEnabled = true
-            }
-        } else {
-            binding.registerContinueButton?.isEnabled = false
-        }
-
+    private fun enableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedRegister?.visibility = View.VISIBLE
     }
 
-    private fun getCheckboxesArray() : ArrayList<CheckBox> {
+    private fun disableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedRegister?.visibility = View.INVISIBLE
+    }
+
+    private fun getCheckboxesArray(): ArrayList<CheckBox> {
         val checkboxICO = findViewById<CheckBox>(R.id.checkbox_ICO)
         val checkboxICI = findViewById<CheckBox>(R.id.checkbox_ICI)
         val checkboxIDH = findViewById<CheckBox>(R.id.checkbox_IDH)
         val checkboxIDEI = findViewById<CheckBox>(R.id.checkbox_IDEI)
         return arrayListOf(checkboxICO, checkboxICI, checkboxIDH, checkboxIDEI)
-    }
-
-    private fun formHasNoErrors() : Boolean{
-        val nameHasNoErrors = binding.registerName?.error == null
-        val surnameHasNoErrors = binding.registerSurname?.error == null
-        val dniHasNoErrors = binding.registerDni?.error == null
-        val emailHasNoErrors = binding.registerEmail?.error == null
-
-        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
     }
 
     private fun clearFields() {
