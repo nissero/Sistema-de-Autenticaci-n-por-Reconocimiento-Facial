@@ -40,8 +40,6 @@ class RegisterActivity : AppCompatActivity() {
         
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-//        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
-//        val userCategories = resources.getStringArray(R.array.user_categories)
         val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
         val temporaryCategories = intent.getStringArrayListExtra("temporary categories")
         val userCategories = intent.getStringArrayListExtra("categories")
@@ -246,11 +244,7 @@ class RegisterActivity : AppCompatActivity() {
 
         if (formHasNoErrors()) {
             if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
-                    binding.registerContinueButton?.isEnabled = true
-                } else {
-                    binding.registerContinueButton?.isEnabled = false
-                }
+                binding.registerContinueButton?.isEnabled = validations.isAnyInstituteSelected(getCheckboxesArray())
             } else {
                 binding.registerContinueButton?.isEnabled = true
             }

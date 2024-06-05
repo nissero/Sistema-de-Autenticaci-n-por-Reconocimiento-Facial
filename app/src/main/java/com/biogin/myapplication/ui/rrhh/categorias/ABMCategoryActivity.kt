@@ -26,29 +26,40 @@ class ABMCategoryActivity : AppCompatActivity() {
             insets
         }
 
-        var initialInstructions = binding.instrucciones
+        val initialInstructions = binding.instrucciones
         val input = binding.nombreInput
         val checkboxTemporary = binding.checkboxTemporal
         val checkboxInstitute = binding.checkboxInstituto
         val button = binding.agregarCategoria
 
-//        if(intent.getStringExtra("type") == "modify") {
-//            initialInstructions.text = binding.root.context.getString(R.string.texto_ayuda__modificacion_categorias)
-//            input.setText(intent.getStringExtra("name"))
-//            if(intent.getBooleanExtra("temporary", false)) {
-//                checkboxTemporary.isChecked = true
-//            }
-//            if(intent.getBooleanExtra("institute", false)) {
-//                checkboxInstitute.isChecked = true
-//            }
-//            button.setText("Modificar categoría")
-//        }
+        if(intent.getStringExtra("type") == "modify") {
+            initialInstructions.text = binding.root.context.getString(R.string.texto_ayuda_modificacion_categorias)
+            input.setText(intent.getStringExtra("name"))
+
+            checkboxTemporary.isChecked = intent.getBooleanExtra("temporary", false)
+            checkboxInstitute.isChecked = intent.getBooleanExtra("institute", false)
+
+            checkboxTemporary.isEnabled = false
+            checkboxInstitute.isEnabled = false
+
+            button.text = binding.root.context.getString(R.string.modificar_categoria)
+        }
 
         button.setOnClickListener {
             val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
             if(categoryName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")
+                return@setOnClickListener
+            }
+
+            if(categoryName == "Seguridad" || categoryName == "Administrador" ||
+                categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh" ||
+                categoryName == "Jerárquico" || categoryName == "Rr.hh" ||
+                categoryName == "Recursos humanos") {
+                dialogUtils.showDialog(binding.root.context,
+                    "No es posible crear categorías con los siguientes nombres" +
+                            ":\nAdministrador\nSeguridad\nJerarquico\nRRHH")
                 return@setOnClickListener
             }
 
@@ -61,20 +72,7 @@ class ABMCategoryActivity : AppCompatActivity() {
                 }
 
                 if(checkIfCategoryIsInactive(categoryName)) {
-                    val onYesFunction = {
-                        categoriesUtils.activateCategory(categoryName)
-                        dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
-                            "Categoría $categoryName restaurada") {
-                            finish()
-                        }
-                    }
-                    val onNoFunction = {
-                        dialogUtils.showDialog(binding.root.context,
-                            "Elija otro nombre")
-                    }
-                    dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
-                        "Ya existe una categoría de nombre $categoryName que se encuentra " +
-                                "inactiva, desea restaurarla?", onYesFunction, onNoFunction)
+                    inactiveCategoryNameFound(categoryName)
                     return@setOnClickListener
                 }
 
@@ -86,12 +84,60 @@ class ABMCategoryActivity : AppCompatActivity() {
                         "categoría $categoryName") {
                     finish()
                 }
+            } else if(intent.getStringExtra("type") == "modify") {
+                val oldName = intent.getStringExtra("name")
+
+                if(checkIfCategoryExists(categoryName) && oldName != categoryName) {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Ya existe una categoría de nombre $categoryName, para modificarla\n" +
+                                "debe ir a la sección previa y seguir las instrucciones")
+                    return@setOnClickListener
+                }
+
+                if(checkIfCategoryIsInactive(categoryName) && oldName != categoryName) {
+                    inactiveCategoryNameFound(categoryName)
+                    return@setOnClickListener
+                }
+
+                if(oldName == categoryName) {
+                    dialogUtils.showDialog(binding.root.context,
+                        "El nombre de la categoría ingresado en el campo de texto es el mismo " +
+                                "al nombre previo")
+                    return@setOnClickListener
+                }
+
+                if (oldName != null) {
+                    categoriesUtils.modifyCategory(oldName, categoryName)
+                    dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
+                        "Se ha modificado el nombre de la categoría $oldName a " +
+                                categoryName
+                    ) {
+                        finish()
+                    }
+                }
             }
         }
     }
 
     private fun checkIfCategoryExists(name: String): Boolean {
         return categoriesUtils.getActiveCategories().contains(name)
+    }
+
+    private fun inactiveCategoryNameFound(categoryName: String) {
+        val onYesFunction = {
+            categoriesUtils.activateCategory(categoryName)
+            dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
+                "Categoría $categoryName restaurada") {
+                finish()
+            }
+        }
+        val onNoFunction = {
+            dialogUtils.showDialog(binding.root.context,
+                "Elija otro nombre")
+        }
+        dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+            "Ya existe una categoría de nombre $categoryName que se encuentra " +
+                    "inactiva, desea restaurarla?", onYesFunction, onNoFunction)
     }
 
     private fun checkIfCategoryIsInactive(name: String): Boolean {

@@ -10,12 +10,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.PopUpUtils
 
 class ModulosFragment : Fragment() {
 
     private var _binding: FragmentModulosBinding? = null
     private var areasUtils = AllowedAreasUtils()
     private val dialogUtils = DialogUtils()
+    private val popUpUtils = PopUpUtils()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -71,9 +73,9 @@ class ModulosFragment : Fragment() {
             if(areaIsInactive) {
                 val onYesFunction = {
                     areasUtils.activateArea(area)
-                    dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
-                        "Lugar físico $area restaurado") {
-                    }
+                    popUpUtils.showPopUp(binding.root.context,
+                        "Lugar físico $area restaurado", "Cerrar")
+                    binding.modificarInput.text.clear()
                 }
                 val onNoFunction = {
                     dialogUtils.showDialog(binding.root.context,
@@ -88,18 +90,10 @@ class ModulosFragment : Fragment() {
             val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
             intent.putExtra("type", "modify")
             intent.putExtra("name", area)
-            if(arrayInstitutes.contains("ICI"))
-                intent.putExtra("ICI", true)
-            else intent.putExtra("ICI", false)
-            if(arrayInstitutes.contains("ICO"))
-                intent.putExtra("ICO", true)
-            else intent.putExtra("ICO", false)
-            if(arrayInstitutes.contains("IDEI"))
-                intent.putExtra("IDEI", true)
-            else intent.putExtra("IDEI", false)
-            if(arrayInstitutes.contains("IDH"))
-                intent.putExtra("IDH", true)
-            else intent.putExtra("IDH", false)
+            intent.putExtra("ICI", arrayInstitutes.contains("ICI"))
+            intent.putExtra("ICO", arrayInstitutes.contains("ICO"))
+            intent.putExtra("IDEI", arrayInstitutes.contains("IDEI"))
+            intent.putExtra("IDH", arrayInstitutes.contains("IDH"))
 
             startActivity(intent)
         }
@@ -120,11 +114,21 @@ class ModulosFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            areasUtils.deactivateArea(area)
+            val onYesFunction = {
+                areasUtils.deactivateArea(area)
 
-            dialogUtils.showDialog(binding.root.context, "$area ha sido eliminado exitosamente")
-            binding.modificarInput.text.clear()
-            areasUtils = AllowedAreasUtils()
+                popUpUtils.showPopUp(binding.root.context,
+                    "$area ha sido desactivado exitosamente", "Cerrar")
+                binding.modificarInput.text.clear()
+            }
+
+            val onNoFunction = {
+                dialogUtils.showDialog(binding.root.context,
+                    "Elija otro nombre")
+            }
+
+            dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                "Desea desactivar el lugar físico $area?", onYesFunction, onNoFunction)
         }
 
         return root

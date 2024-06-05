@@ -40,18 +40,11 @@ class ABMAreaActivity : AppCompatActivity() {
 
         if(type == "modify") {
             input.setText(intent.getStringExtra("name"))
-            if(intent.getBooleanExtra("ICI", false)) {
-                checkboxICI.isChecked = true
-            }
-            if(intent.getBooleanExtra("ICO", false)) {
-                checkboxICO.isChecked = true
-            }
-            if(intent.getBooleanExtra("IDH", false)) {
-                checkboxIDH.isChecked = true
-            }
-            if(intent.getBooleanExtra("IDEI", false)) {
-                checkboxIDEI.isChecked = true
-            }
+
+            checkboxICI.isChecked = intent.getBooleanExtra("ICI", false)
+            checkboxICO.isChecked = intent.getBooleanExtra("ICO", false)
+            checkboxIDH.isChecked = intent.getBooleanExtra("IDH", false)
+            checkboxIDEI.isChecked = intent.getBooleanExtra("IDEI", false)
 
             instructions.text = binding.root.context.getString(R.string.texto_ayuda_modificar)
             button.text = binding.root.context.getString(R.string.modificar_lugar_fisico)
@@ -121,22 +114,6 @@ class ABMAreaActivity : AppCompatActivity() {
     private fun addAreaAndReturnMessage(name: String, ici: Boolean, ico: Boolean,
                                         idh: Boolean, idei: Boolean): String {
         var text = "$name se agregó a los siguientes institutos:\n"
-//        if (ici) {
-//            areasUtil.addAreaToInstitute("ICI", name)
-//            text += "ICI\n"
-//        }
-//        if (ico) {
-//            areasUtil.addAreaToInstitute("ICO", name)
-//            text += "ICO\n"
-//        }
-//        if (idh) {
-//            areasUtil.addAreaToInstitute("IDH", name)
-//            text += "IDH\n"
-//        }
-//        if (idei) {
-//            areasUtil.addAreaToInstitute("IDEI", name)
-//            text += "IDEI"
-//        }
         if (ici) text += "ICI\n"
         if (ico) text += "ICO\n"
         if (idh) text += "IDH\n"
@@ -164,58 +141,4 @@ class ABMAreaActivity : AppCompatActivity() {
     private fun checkIfAreaIsInactive(area: String): Boolean {
         return areasUtils.getAllInactiveAreas().contains(area)
     }
-
-//    private fun modify2(oldName: String, newName: String, ici: Boolean, ico: Boolean,
-//                       idh: Boolean, idei: Boolean) {
-//        if(oldName != newName) {
-//            if(ici) {
-//                areasUtils.addAreaToInstitute("ICI", newName)
-//            }
-//
-//            if(ico) {
-//                areasUtils.addAreaToInstitute("ICO", newName)
-//            }
-//
-//            if(idh) {
-//                areasUtils.addAreaToInstitute("IDH", newName)
-//            }
-//
-//            if(idei) {
-//                areasUtils.addAreaToInstitute("IDEI", newName)
-//            }
-//
-//            remove(oldName)
-//        } else {
-//            if(!intent.getBooleanExtra("ICI", false) && ici) {
-//                areasUtils.addAreaToInstitute("ICI", newName)
-//            } else if(intent.getBooleanExtra("ICI", false) && !ici) {
-//                areasUtils.removeAreaFromInstitute("ICI", newName)
-//            }
-//
-//            if(!intent.getBooleanExtra("ICO", false) && ico) {
-//                areasUtils.addAreaToInstitute("ICO", newName)
-//            } else if(intent.getBooleanExtra("ICO", false) && !ico) {
-//                areasUtils.removeAreaFromInstitute("ICO", newName)
-//            }
-//
-//            if(!intent.getBooleanExtra("IDH", false) && idh) {
-//                areasUtils.addAreaToInstitute("IDH", newName)
-//            } else if(intent.getBooleanExtra("IDH", false) && !idh) {
-//                areasUtils.removeAreaFromInstitute("IDH", newName)
-//            }
-//
-//            if(!intent.getBooleanExtra("IDEI", false) && idei) {
-//                areasUtils.addAreaToInstitute("IDEI", newName)
-//            } else if(intent.getBooleanExtra("IDEI", false) && !idei) {
-//                areasUtils.removeAreaFromInstitute("IDEI", newName)
-//            }
-//        }
-//    }
-//
-//    private fun remove(name: String) {
-//        areasUtils.removeAreaFromInstitute("ICI", name)
-//        areasUtils.removeAreaFromInstitute("ICO", name)
-//        areasUtils.removeAreaFromInstitute("IDH", name)
-//        areasUtils.removeAreaFromInstitute("IDEI", name)
-//    }
 }

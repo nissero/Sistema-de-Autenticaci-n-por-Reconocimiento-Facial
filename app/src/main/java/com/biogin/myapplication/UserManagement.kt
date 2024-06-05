@@ -15,11 +15,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
-import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
-import com.biogin.myapplication.utils.PopUpUtil
+import com.biogin.myapplication.utils.PopUpUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -33,7 +32,7 @@ class UserManagement : AppCompatActivity() {
     private lateinit var binding: ActivityUserManagementBinding
     private var oldDni : String = ""
     private var validations  = FormValidations()
-    private val popUpUtil = PopUpUtil()
+    private val popUpUtil = PopUpUtils()
     private val emailService = EmailService("smtp-mail.outlook.com", 587)
     private val firebaseMethods = FirebaseMethods()
     private lateinit var oldDniLogs: String
@@ -82,8 +81,6 @@ class UserManagement : AppCompatActivity() {
             params.startToStart = binding.linearLayout.id
         }
 
-
-//        val categories: Array<out String> = resources.getStringArray(R.array.user_categories)
         val categories: ArrayList<String>? = intent.getStringArrayListExtra("categories")
         val categoryIndex = categories?.indexOfFirst { it == intent.getStringExtra("category") }
 
@@ -192,7 +189,6 @@ class UserManagement : AppCompatActivity() {
             }
         }
 
-//        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
         val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -258,17 +254,14 @@ class UserManagement : AppCompatActivity() {
             }
             false
         }
-
-
     }
 
     private fun checkUpdateButtonActivation() {
-        lateinit var buttonToEnable : Button
 
-        if(intent.getStringExtra("button_option_chosen") == "UpdateUser") {
-            buttonToEnable = findViewById(R.id.update_user_button)
+        val buttonToEnable : Button = if(intent.getStringExtra("button_option_chosen") == "UpdateUser") {
+            findViewById(R.id.update_user_button)
         } else {
-            buttonToEnable = findViewById(R.id.duplicate_user_button)
+            findViewById(R.id.duplicate_user_button)
         }
 
         val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
@@ -279,15 +272,15 @@ class UserManagement : AppCompatActivity() {
         if (formHasNoErrors()) {
             if (!categoriesWithNoInstitute.contains(categorySelected)) {
                 if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
-                    buttonToEnable?.isEnabled = true
+                    buttonToEnable.isEnabled = true
                 } else {
-                    buttonToEnable?.isEnabled = false
+                    buttonToEnable.isEnabled = false
                 }
             } else {
-                buttonToEnable?.isEnabled = true
+                buttonToEnable.isEnabled = true
             }
         } else {
-            buttonToEnable?.isEnabled = false
+            buttonToEnable.isEnabled = false
         }
     }
 

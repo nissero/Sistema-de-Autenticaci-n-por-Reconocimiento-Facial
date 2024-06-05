@@ -18,21 +18,59 @@ class CategoriesUtils {
         val success = firebaseCategoryMethods.addCategory(newCategory)
 
         if(success)
-            categoriesList.set(name, newCategory)
+            categoriesList[name] = newCategory
     }
 
     fun deactivateCategory(name: String) {
         val success = firebaseCategoryMethods.deactivateCategory(name)
         if(success) {
-            categoriesList.get(name)?.active = false
+            categoriesList[name]?.active = false
         }
     }
 
     fun activateCategory(name: String) {
         val success = firebaseCategoryMethods.activateCategory(name)
         if(success) {
-            categoriesList.get(name)?.active = true
+            categoriesList[name]?.active = true
         }
+    }
+
+    fun modifyCategory(oldName: String, newName: String) {
+        firebaseCategoryMethods.modifyCategory(oldName, newName) {
+            success ->
+            run {
+                if (success) {
+                    firebaseCategoryMethods.updateUserOnCategoryChange(oldName, newName)
+
+                    val isTemporaryOldName = categoriesList[oldName]?.isTemporary
+                    val allowsInstitutesOldName = categoriesList[oldName]?.allowsInstitutes
+                    val isActiveOldName = categoriesList[oldName]?.active
+                    lateinit var newCategory: Category
+
+                    if (isTemporaryOldName != null && allowsInstitutesOldName != null &&
+                        isActiveOldName != null
+                    ) {
+                        newCategory = Category(
+                            newName, isTemporaryOldName, allowsInstitutesOldName,
+                            isActiveOldName
+                        )
+                    }
+
+                    categoriesList.remove(oldName)
+                    categoriesList[newName] = newCategory
+                }
+            }
+        }
+    }
+
+    fun getCategoryFromName(name: String): Category? {
+        val category = categoriesList[name]
+
+        if(category != null) {
+            if (category.active) return category
+        }
+
+        return null
     }
 
     fun getActiveCategories(): ArrayList<String> {

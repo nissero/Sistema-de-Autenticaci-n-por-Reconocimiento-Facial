@@ -16,7 +16,7 @@ import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
-import com.biogin.myapplication.utils.PopUpUtil
+import com.biogin.myapplication.utils.PopUpUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,7 +29,7 @@ class ABMFragment : Fragment() {
 
     private lateinit var loginRepo: LoginRepository
     private lateinit var dataSource : LoginDataSource
-    private val popUpUtil = PopUpUtil()
+    private val popUpUtils = PopUpUtils()
     private var categoriesUtils = CategoriesUtils()
 
     override fun onCreateView(
@@ -106,19 +106,19 @@ class ABMFragment : Fragment() {
     }
 
     private fun openPopupUserNotFound() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "El usuario no existe para el DNI ingresado",
             "Reintentar")
     }
 
     private fun openPopupUserAlreadyDeactivated() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "El usuario ya se encuentra inactivo",
             "Continuar")
     }
 
     private fun openPopupUserSuccessfullyDeleted() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "Usuario desactivado de forma exitosa",
             "Continuar")
     }

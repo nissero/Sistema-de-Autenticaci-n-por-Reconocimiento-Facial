@@ -1,6 +1,6 @@
 package com.biogin.myapplication.utils
 
-class AllowedAreasUtils() {
+class AllowedAreasUtils {
     private var firebaseAreaMethods = FirebaseAreaMethods()
     private var modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
     private var inactiveModulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
@@ -11,7 +11,7 @@ class AllowedAreasUtils() {
     fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
         val allowedAreas = mutableSetOf<String>()
         for (institute in institutes) {
-            allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
+            allowedAreas.addAll(modulesAssociatedWithInstitutes[institute]!!)
         }
 
         return allowedAreas
@@ -22,10 +22,10 @@ class AllowedAreasUtils() {
         val success = firebaseAreaMethods.addArea(newArea, ici, ico, idei, idh)
 
         if(success) {
-            if (ici) modulesAssociatedWithInstitutes.get("ICI")?.add(newArea)
-            if (ico) modulesAssociatedWithInstitutes.get("ICO")?.add(newArea)
-            if (idei) modulesAssociatedWithInstitutes.get("IDEI")?.add(newArea)
-            if (idh) modulesAssociatedWithInstitutes.get("IDH")?.add(newArea)
+            if (ici) modulesAssociatedWithInstitutes["ICI"]?.add(newArea)
+            if (ico) modulesAssociatedWithInstitutes["ICO"]?.add(newArea)
+            if (idei) modulesAssociatedWithInstitutes["IDEI"]?.add(newArea)
+            if (idh) modulesAssociatedWithInstitutes["IDH"]?.add(newArea)
         }
     }
 
@@ -160,29 +160,37 @@ class AllowedAreasUtils() {
 
     private fun updateMaps() {
         firebaseAreaMethods.readActiveAreas("ICI") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readActiveAreas("ICO") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readActiveAreas("IDH") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readActiveAreas("IDEI") {
-                institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
 
         firebaseAreaMethods.readInactiveAreas("ICI") {
-                institute -> inactiveModulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readInactiveAreas("ICO") {
-                institute -> inactiveModulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readInactiveAreas("IDH") {
-                institute -> inactiveModulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
         firebaseAreaMethods.readInactiveAreas("IDEI") {
-                institute -> inactiveModulesAssociatedWithInstitutes.set(institute.name, institute.areas)
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
         }
     }
 

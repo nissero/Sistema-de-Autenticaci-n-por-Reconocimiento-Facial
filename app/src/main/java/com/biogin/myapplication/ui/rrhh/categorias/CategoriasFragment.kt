@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.biogin.myapplication.databinding.FragmentCategoriasBinding
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.PopUpUtils
 
 class CategoriasFragment : Fragment() {
 
@@ -20,6 +21,7 @@ class CategoriasFragment : Fragment() {
 
     private var categoriesUtils = CategoriesUtils()
     private val dialogUtils = DialogUtils()
+    private val popUpUtils = PopUpUtils()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,6 +46,110 @@ class CategoriasFragment : Fragment() {
             intent.putExtra("type", "add")
 
             startActivity(intent)
+        }
+
+        val input = binding.modificarCategoriaInput
+
+        binding.buttonModificarCategoria.setOnClickListener {
+            val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+
+            if(categoryName.isEmpty()) {
+                dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
+                return@setOnClickListener
+            }
+
+            if(categoryName == "Seguridad" || categoryName == "Administrador" ||
+                categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh" ||
+                categoryName == "Jerárquico" || categoryName == "Rr.hh" ||
+                categoryName == "Recursos humanos") {
+                dialogUtils.showDialog(binding.root.context,
+                    "Las siguientes categorías no pueden ser modificadas:\nAdministrador\n" +
+                            "Seguridad\nJerarquico\nRRHH")
+                return@setOnClickListener
+            }
+
+            val category = categoriesUtils.getCategoryFromName(categoryName)
+
+            val categoryIsInactive = categoriesUtils.getInactiveCategories().contains(categoryName)
+
+            if(category == null && !categoryIsInactive) {
+                dialogUtils.showDialog(binding.root.context, "No existe una categoría\n" +
+                        "de nombre $categoryName")
+                return@setOnClickListener
+            }
+
+            if(categoryIsInactive) {
+                val onYesFunction = {
+                    categoriesUtils.activateCategory(categoryName)
+                    popUpUtils.showPopUp(binding.root.context,
+                        "Categoría $categoryName restaurada", "Cerrar")
+                    binding.modificarCategoriaInput.text.clear()
+                }
+                val onNoFunction = {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Elija otro nombre")
+                }
+                dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                    "Ya existe una categoría de nombre $categoryName que se encuentra " +
+                            "inactiva, desea restaurarla?", onYesFunction, onNoFunction)
+                return@setOnClickListener
+            }
+
+            if (category != null) {
+                val intent = Intent(root.context, ABMCategoryActivity::class.java)
+
+                intent.putExtra("type", "modify")
+                intent.putExtra("name", categoryName)
+                intent.putExtra("temporary", category.isTemporary)
+                intent.putExtra("institute", category.allowsInstitutes)
+
+                startActivity(intent)
+            }
+        }
+
+        binding.buttonDesactivarCategoria.setOnClickListener {
+            val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+
+            if(categoryName.isEmpty()) {
+                dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
+                return@setOnClickListener
+            }
+
+            if(categoryName == "Seguridad" || categoryName == "Administrador" ||
+                categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh" ||
+                categoryName == "Jerárquico" || categoryName == "Rr.hh" ||
+                categoryName == "Recursos humanos") {
+                dialogUtils.showDialog(binding.root.context,
+                    "Las siguientes categorías no pueden ser desactivadas:\nAdministrador\n" +
+                            "Seguridad\nJerarquico\nRRHH")
+                return@setOnClickListener
+            }
+
+            val categories = categoriesUtils.getActiveCategories()
+
+            if(!categories.contains(categoryName)) {
+                dialogUtils.showDialog(binding.root.context, "No existe una categoría\n" +
+                        "de nombre $categoryName")
+                return@setOnClickListener
+            }
+
+
+
+            val onYesFunction = {
+                categoriesUtils.deactivateCategory(categoryName)
+
+                popUpUtils.showPopUp(binding.root.context, "La categoría $categoryName ha sido " +
+                        "desactivada exitosamente", "Cerrar")
+                input.text.clear()
+            }
+
+            val onNoFunction = {
+                dialogUtils.showDialog(binding.root.context,
+                    "Elija otro nombre")
+            }
+
+            dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                "Desea desactivar la categoría $categoryName?", onYesFunction, onNoFunction)
         }
 
         return root

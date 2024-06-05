@@ -143,9 +143,13 @@
     <string name="title_categorias">Categorías</string>
     <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
     <string name="consultar_categorias">Consultar categorías</string>
+    <string name="modificar_categoria">Modificar\ncategoría</string>
+    <string name="desactivar_categoria">Desactivar\ncategoría</string>
     <string name="info_agregar_categoria">Para agregar una nueva categoría,\npresione el botón de abajo</string>
     <string name="texto_ayuda_categorias">Para crear una nueva categoría,\ningrese el nombre y complete los\ncampos correspondiente</string>
-    <string name="texto_ayuda__modificacion_categorias">Para modificar una categoría existente,\ncambie los campos correspondientes\ny presione al botón</string>
+    <string name="info_modificar_categoria">Para modificar o desactivar una categoría,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+    <string name="texto_ayuda_modificacion_categorias">La modificación de categorías existentes\npermite cambiar únicamente el nombre de\nla misma</string>
     <string name="ayuda_categoria_temporal">Tilde la siguiente opción si las\npersonas que tengan asignada esta\ncategoría tendrán permitido el acceso\ndurante un plazo determinado</string>
     <string name="ayuda_categoria__institutos">Tilde la siguiente opcioón si las\npersonas que tengan asignada esta\ncategoría tendrán institutos a los\nque pertenecen</string>
+    <string name="agregar_categoria">Agregar categoría</string>
 </resources>
