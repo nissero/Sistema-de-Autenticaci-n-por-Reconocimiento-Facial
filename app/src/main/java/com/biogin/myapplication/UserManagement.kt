@@ -122,8 +122,6 @@ class UserManagement : AppCompatActivity() {
         }
 
         binding.updateUserButton.setOnClickListener {
-            val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
 
             lateinit var fechaDesde: String
             lateinit var fechaHasta: String
@@ -196,8 +194,6 @@ class UserManagement : AppCompatActivity() {
 //        }
 
         binding.duplicateUserButton.setOnClickListener {
-            val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
-            val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
 
             lateinit var fechaDesde: String
             lateinit var fechaHasta: String
@@ -239,6 +235,7 @@ class UserManagement : AppCompatActivity() {
                     binding.updateUserDni.text.toString(),
                     binding.updateUserEmail.text.toString(),
                     binding.updateUserCategoriesSpinner.selectedItem.toString(),
+                    binding.updateUserStateSpinner.selectedItem.toString(),
                     selectedInstitutes,
                     fechaDesde,
                     fechaHasta
@@ -289,10 +286,10 @@ class UserManagement : AppCompatActivity() {
         datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         fechaDesdeEditText.setOnClickListener{
-            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {checkUpdateButtonActivation()}
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
         }
         fechaHastaEditText.setOnClickListener {
-            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {checkUpdateButtonActivation()}
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
         }
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -303,12 +300,14 @@ class UserManagement : AppCompatActivity() {
             ) {
                 val categorySelected  = categoriesSpinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                    disableAlertCheckAtLeastOneInstitute()
-                } else {
-                    enableCheckboxes()
-                    enableAlertCheckAtLeastOneInstitute()
+                if (categoriesWithNoInstitute != null) {
+                    if (categoriesWithNoInstitute.contains(categorySelected)) {
+                        disableCheckboxes()
+                        disableAlertCheckAtLeastOneInstitute()
+                    } else {
+                        enableCheckboxes()
+                        enableAlertCheckAtLeastOneInstitute()
+                    }
                 }
                 
                 if (temporaryCategories != null) {

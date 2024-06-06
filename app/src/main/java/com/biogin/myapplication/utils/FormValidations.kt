@@ -5,9 +5,11 @@ import android.util.Patterns
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.core.text.isDigitsOnly
-import com.biogin.myapplication.R
 
 class FormValidations {
+
+    private val categoriesUtils = CategoriesUtils()
+
     fun validateName(textView: EditText) {
         val text = textView.text.toString().trim()
         if (text.isEmpty()) {
@@ -51,20 +53,19 @@ class FormValidations {
         }
     }
 
-    fun isCategoryValidWithInstitutesCheckboxes(
+    private fun isCategoryValidWithInstitutesCheckboxes(
         context: Context,
         category: String,
         institutes: ArrayList<CheckBox>
     ): Boolean {
-        val categoriesWithNoInstitute =
-            context.resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = categoriesUtils.getNoInstitutesCategories()
         if (categoriesWithNoInstitute.contains(category)) {
             return true
         }
         return isAnyInstituteSelected(institutes)
     }
 
-    fun isAnyInstituteSelected(institutesCheckboxes: ArrayList<CheckBox>): Boolean {
+    private fun isAnyInstituteSelected(institutesCheckboxes: ArrayList<CheckBox>): Boolean {
         var isAnyInstituteSelected = false
         for (checkbox in institutesCheckboxes) {
             isAnyInstituteSelected = isAnyInstituteSelected || checkbox.isChecked == true
@@ -78,7 +79,7 @@ class FormValidations {
         return alphanumericRegex.matches(text)
     }
 
-    public fun isFormValid(
+    fun isFormValid(
         context: Context,
         name: EditText,
         surname: EditText,
@@ -99,7 +100,7 @@ class FormValidations {
         return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors && institutesCheckboxesHasNoErrors
     }
 
-    public fun checkAllTextValidations(
+    private fun checkAllTextValidations(
         name: EditText,
         surname: EditText,
         dni: EditText,

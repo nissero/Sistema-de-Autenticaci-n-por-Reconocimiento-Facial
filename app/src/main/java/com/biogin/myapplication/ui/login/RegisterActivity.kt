@@ -78,7 +78,6 @@ class RegisterActivity : AppCompatActivity() {
         val dni = binding.registerDni
         val email = binding.registerEmail
         val checkboxes = getCheckboxesArray()
-        val spinner = binding.registerCategoriesSpinner
         val continueButton = binding.registerContinueButton
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -92,12 +91,14 @@ class RegisterActivity : AppCompatActivity() {
 
                 val categorySelected  = spinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                    disableAlertCheckAtLeastOneInstitute()
-                } else {
-                    enableCheckboxes()
-                    enableAlertCheckAtLeastOneInstitute()
+                if (categoriesWithNoInstitute != null) {
+                    if (categoriesWithNoInstitute.contains(categorySelected)) {
+                        disableCheckboxes()
+                        disableAlertCheckAtLeastOneInstitute()
+                    } else {
+                        enableCheckboxes()
+                        enableAlertCheckAtLeastOneInstitute()
+                    }
                 }
 
                 if (temporaryCategories != null) {
@@ -165,10 +166,10 @@ class RegisterActivity : AppCompatActivity() {
                 loadingDialog.startLoadingDialog()
                 val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
                 dataSource.uploadUserToFirebase(
-                    name?.text.toString(),
-                    surname?.text.toString(),
-                    dni?.text.toString(),
-                    email?.text.toString(),
+                    name.text.toString(),
+                    surname.text.toString(),
+                    dni.text.toString(),
+                    email.text.toString(),
                     spinner?.selectedItem.toString(),
                     institutesSelected,
                     fechaDesde,
@@ -176,10 +177,10 @@ class RegisterActivity : AppCompatActivity() {
                 ).addOnSuccessListener {
                     loadingDialog.dismissDialog()
                     val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                    intent.putExtra("name", name?.text.toString())
-                    intent.putExtra("surname", surname?.text.toString())
-                    intent.putExtra("dni", dni?.text.toString())
-                    intent.putExtra("email", email?.text.toString())
+                    intent.putExtra("name", name.text.toString())
+                    intent.putExtra("surname", surname.text.toString())
+                    intent.putExtra("dni", dni.text.toString())
+                    intent.putExtra("email", email.text.toString())
                     startActivity(intent)
                 }.addOnFailureListener { ex ->
                     loadingDialog.dismissDialog()
@@ -208,8 +209,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
         loginViewModel.loginFormState.observe(this, Observer {
             val loginState = it ?: return@Observer
