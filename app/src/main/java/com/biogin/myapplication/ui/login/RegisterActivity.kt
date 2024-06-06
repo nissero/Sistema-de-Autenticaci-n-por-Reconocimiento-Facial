@@ -300,16 +300,18 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkContinueButtonActivation() {
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
 
         val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val categorySelected  = spinner.selectedItem.toString()
 
         if (formHasNoErrors()) {
-            if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                binding.registerContinueButton?.isEnabled = validations.isAnyInstituteSelected(getCheckboxesArray())
-            } else {
-                binding.registerContinueButton?.isEnabled = true
+            if (categoriesWithNoInstitute != null) {
+                if (!categoriesWithNoInstitute.contains(categorySelected)) {
+                    binding.registerContinueButton?.isEnabled = validations.isAnyInstituteSelected(getCheckboxesArray())
+                } else {
+                    binding.registerContinueButton?.isEnabled = true
+                }
             }
         } else {
             binding.registerContinueButton?.isEnabled = false

@@ -1,5 +1,6 @@
 package com.biogin.myapplication
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,8 +9,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.biogin.myapplication.data.LoginDataSource
@@ -23,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.mail.internet.InternetAddress
 
 class UserManagement : AppCompatActivity() {
@@ -36,7 +40,11 @@ class UserManagement : AppCompatActivity() {
     private val emailService = EmailService("smtp-mail.outlook.com", 587)
     private val firebaseMethods = FirebaseMethods()
     private lateinit var oldDniLogs: String
+    private lateinit var fechaDesdeEditText: EditText
+    private lateinit var fechaHastaEditText: EditText
+    private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -117,6 +125,21 @@ class UserManagement : AppCompatActivity() {
         binding.updateUserButton.setOnClickListener {
             val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
             val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+
+            lateinit var fechaDesde: String
+            lateinit var fechaHasta: String
+
+            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
+                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+            } else {
+                fechaDesde = ""
+                fechaHasta = ""
+            }
+
+            Log.d("REGISTERACTIVITY", fechaDesde)
+            Log.d("REGISTERACTIVITY", fechaHasta)
+
             val task = dataSource.modifyUserFirebase(
                 binding.updateUserName.text.toString(),
                 binding.updateUserSurname.text.toString(),
@@ -124,7 +147,9 @@ class UserManagement : AppCompatActivity() {
                 binding.updateUserEmail.text.toString(),
                 binding.updateUserCategoriesSpinner.selectedItem.toString(),
                 binding.updateUserStateSpinner.selectedItem.toString(),
-                selectedInstitutes
+                selectedInstitutes,
+                fechaDesde,
+                fechaHasta
             )
 
             task.addOnSuccessListener {
@@ -142,14 +167,30 @@ class UserManagement : AppCompatActivity() {
                 }
             }
         }
-
-        binding.buttonTest.setOnClickListener {
-            sendEmailOnDniChange(oldDni, binding.updateUserDni.text.toString())
-        }
+//
+//        binding.buttonTest.setOnClickListener {
+//            sendEmailOnDniChange(oldDni, binding.updateUserDni.text.toString())
+//        }
 
         binding.duplicateUserButton.setOnClickListener {
             val checkboxes = arrayListOf(binding.checkboxICI, binding.checkboxICO, binding.checkboxIDEI, binding.checkboxIDH)
             val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+
+            lateinit var fechaDesde: String
+            lateinit var fechaHasta: String
+
+            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
+                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+            } else {
+                fechaDesde = ""
+                fechaHasta = ""
+            }
+
+            Log.d("REGISTERACTIVITY", fechaDesde)
+            Log.d("REGISTERACTIVITY", fechaHasta)
+
+
             val task = dataSource.duplicateUserInFirebase(
                 binding.updateUserName.text.toString(),
                 binding.updateUserSurname.text.toString(),
@@ -157,7 +198,10 @@ class UserManagement : AppCompatActivity() {
                 binding.updateUserDni.text.toString(),
                 binding.updateUserEmail.text.toString(),
                 binding.updateUserCategoriesSpinner.selectedItem.toString(),
-                selectedInstitutes
+                binding.updateUserStateSpinner.selectedItem.toString(),
+                selectedInstitutes,
+                fechaDesde,
+                fechaHasta
             )
 
             task.addOnSuccessListener {
@@ -190,6 +234,18 @@ class UserManagement : AppCompatActivity() {
         }
 
         val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
+
+        fechaDesdeEditText = binding.registerFechaDesdeUpdate
+        fechaHastaEditText = binding.registerFechaHastaUpdate
+
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
+
+        fechaDesdeEditText.setOnClickListener{
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {checkUpdateButtonActivation()}
+        }
+        fechaHastaEditText.setOnClickListener {
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {checkUpdateButtonActivation()}
+        }
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -206,6 +262,16 @@ class UserManagement : AppCompatActivity() {
                         enableCheckboxes()
                     }
                 }
+
+                if (temporaryCategories != null) {
+                    if (temporaryCategories.contains(categorySelected)){
+                        fechaDesdeEditText.visibility = View.VISIBLE
+                    } else {
+                        fechaDesdeEditText.visibility = View.INVISIBLE
+                        fechaHastaEditText.visibility = View.INVISIBLE
+                    }
+                }
+
                 checkUpdateButtonActivation()
             }
 
@@ -264,20 +330,18 @@ class UserManagement : AppCompatActivity() {
             findViewById(R.id.duplicate_user_button)
         }
 
-        val categoriesWithNoInstitute = resources.getStringArray(R.array.user_categories_with_no_institute)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
 
         val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val categorySelected  = spinner.selectedItem.toString()
 
         if (formHasNoErrors()) {
-            if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                if (validations.isAnyInstituteSelected(getCheckboxesArray())) {
-                    buttonToEnable.isEnabled = true
+            if (categoriesWithNoInstitute != null) {
+                if (!categoriesWithNoInstitute.contains(categorySelected)) {
+                    buttonToEnable.isEnabled = validations.isAnyInstituteSelected(getCheckboxesArray())
                 } else {
-                    buttonToEnable.isEnabled = false
+                    buttonToEnable.isEnabled = true
                 }
-            } else {
-                buttonToEnable.isEnabled = true
             }
         } else {
             buttonToEnable.isEnabled = false
@@ -328,6 +392,17 @@ class UserManagement : AppCompatActivity() {
         binding.checkboxICO.visibility = View.INVISIBLE
         binding.checkboxIDH.visibility = View.INVISIBLE
         binding.checkboxICI.visibility = View.INVISIBLE
+    }
+
+    private fun String.toCalendarDate(): Calendar {
+        val splitDate = split("/")
+        val year = splitDate[2].toInt()
+        val month = splitDate[1].toInt() - 1 // Month in Calendar is 0-based
+        val day = splitDate[0].toInt()
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, day)
+        return calendar
     }
 
     @OptIn(DelicateCoroutinesApi::class)

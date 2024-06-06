@@ -12,12 +12,11 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".ui.login.RegisterActivity">
 
-
     <EditText
         android:id="@+id/update_user_name"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="@string/nombre"
         android:inputType="text"
@@ -31,7 +30,7 @@
         android:id="@+id/update_user_surname"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Apellido"
         android:inputType="text"
@@ -45,7 +44,7 @@
         android:id="@+id/update_user_email"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="textEmailAddress"
@@ -59,13 +58,14 @@
         android:id="@+id/update_user_dni"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="28dp"
         android:ems="10"
         android:hint="DNI"
         android:inputType="number"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/update_user_name"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/update_user_name"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -73,8 +73,7 @@
         android:id="@+id/update_user_categories_spinner"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
-        android:entries="@array/user_categories"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="@+id/update_user_name"
         app:layout_constraintStart_toStartOf="@+id/update_user_name"
         app:layout_constraintTop_toBottomOf="@+id/update_user_email" />
@@ -83,7 +82,7 @@
         android:id="@+id/update_user_state_spinner"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:entries="@array/user_active_options"
         app:layout_constraintEnd_toEndOf="@+id/update_user_name"
         app:layout_constraintStart_toStartOf="@+id/update_user_name"
@@ -115,11 +114,40 @@
         app:layout_constraintEnd_toEndOf="@+id/linearLayout"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
+    <EditText
+        android:id="@+id/register_fecha_desde_update"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Trabajara desde"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_user_state_spinner" />
+
+    <EditText
+        android:id="@+id/register_fecha_hasta_update"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Trabajara hasta"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_fecha_desde_update"
+        app:layout_constraintVertical_bias="0.0" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
-        android:layout_width="386dp"
-        android:layout_height="59dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="380dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="130dp"
         app:layout_constraintEnd_toEndOf="@+id/update_user_name"
         app:layout_constraintStart_toStartOf="@+id/update_user_name"
         app:layout_constraintTop_toBottomOf="@+id/update_user_state_spinner">
@@ -184,13 +212,13 @@
         android:id="@+id/button_test"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginBottom="188dp"
+        android:layout_marginBottom="108dp"
         android:text="Button"
         android:textSize="12sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.453"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
