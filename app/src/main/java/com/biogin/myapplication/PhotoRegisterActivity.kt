@@ -40,7 +40,6 @@ class PhotoRegisterActivity : AppCompatActivity() {
             camera.flipCamera()
         }
     }
-
     private fun initCamera() {
         camera = CameraHelper(
             null,

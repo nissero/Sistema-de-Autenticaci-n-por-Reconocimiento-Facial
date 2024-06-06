@@ -17,6 +17,7 @@ import com.biogin.myapplication.databinding.FragmentAbmBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.ui.rrhh.TempUserSuspensionActivity
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -70,6 +71,24 @@ class ABMFragment : Fragment() {
                         val userData = (result as Result.Success<LoggedInUser>).data
                         Log.e("data", userData.toString())
                         startActivityUserManagement(userData, true)
+                    } else {
+                        openPopupUserNotFound()
+                    }
+                }
+            }
+        }
+
+        binding.deactivateUserForXTime.setOnClickListener {
+            var result: Result<LoggedInUser>
+            runBlocking {
+                lifecycleScope.launch {
+                    val dni = binding.dniUserToFind.text.toString()
+                    result = loginRepo.getUser(dni)
+
+                    if (result is Result.Success) {
+                        val intent = Intent(binding.root.context, TempUserSuspensionActivity::class.java)
+                        intent.putExtra("dniUser", binding.dniUserToFind.text.toString())
+                        startActivity(intent)
                     } else {
                         openPopupUserNotFound()
                     }

@@ -9,8 +9,11 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,11 +26,23 @@
         <activity
             android:name=".ui.rrhh.categorias.ABMCategoryActivity"
             android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".ui.rrhh.categorias.Categorias"-->
+<!--            android:exported="false" />-->
         <activity
-            android:name=".ui.rrhh.categorias.Categorias"
-            android:exported="false" />
+            android:name=".ui.admin.AdminActivity"
+            android:exported="true" />
+        <meta-data
+            android:name="com.parse.SERVER_URL"
+            android:value="@string/back4app_server_url" />
+        <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="@string/back4app_app_id" />
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="@string/back4app_client_key" />
         <activity
-            android:name=".ui.rrhh.abm.ABMCategoriaActivity"
+            android:name=".ui.rrhh.TempUserSuspensionActivity"
             android:exported="false" />
         <activity
             android:name=".ui.rrhh.modulos.ABMAreaActivity"

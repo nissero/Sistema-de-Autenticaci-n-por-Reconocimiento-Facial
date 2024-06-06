@@ -27,6 +27,8 @@ class FirebaseMethods {
                     val areasPermitidas = userData?.get("areasPermitidas") as? ArrayList<String> ?: arrayListOf()
 
                     val usuario = Usuario(nombre, apellido, dni, email, area, categoria, estado, areasPermitidas)
+
+                    Log.d("LOGIN", "FIREBASE RESPONDIO")
                     callback(usuario)
                 } else {
                     // Usuario no encontrado, devolver objeto Usuario vacío
@@ -56,8 +58,8 @@ class FirebaseMethods {
                 }
                 callback(logsString)
             }.addOnFailureListener { e ->
-            Log.e("Firestore", "Error al obtener los datos del usuario con  $dni", e)
-        }
+                Log.e("Firestore", "Error al obtener los datos del usuario con  $dni", e)
+            }
     }
 
 //    fun readInstitutes(instituteName: String, callback: (Institute) -> Unit) {

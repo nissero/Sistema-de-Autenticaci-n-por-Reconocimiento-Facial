@@ -3,6 +3,7 @@ package com.biogin.myapplication.ui.login
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,19 +27,30 @@ import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
+import java.util.Calendar
+
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var institutesUtils: InstitutesUtils
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var fechaDesdeEditText: EditText
+    private lateinit var fechaHastaEditText: EditText
+    private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
     private var validations  = FormValidations()
     private var loadingDialog = LoadingDialog(this)
+    private var fechaDesde = ""
+    private var fechaHasta = ""
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
         val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
@@ -46,6 +59,19 @@ class RegisterActivity : AppCompatActivity() {
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
         val adapter = userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapter
+
+        fechaDesdeEditText = findViewById(R.id.register_fecha_desde)
+        fechaHastaEditText = findViewById(R.id.register_fecha_hasta)
+
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
+
+
+        fechaDesdeEditText.setOnClickListener{
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {checkContinueButtonActivation()}
+        }
+        fechaHastaEditText.setOnClickListener {
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {checkContinueButtonActivation()}
+        }
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -65,6 +91,16 @@ class RegisterActivity : AppCompatActivity() {
                         enableCheckboxes()
                     }
                 }
+
+                if (temporaryCategories != null) {
+                    if (temporaryCategories.contains(categorySelected)){
+                        fechaDesdeEditText.visibility = View.VISIBLE
+                    } else {
+                        fechaDesdeEditText.visibility = View.INVISIBLE
+                        fechaHastaEditText.visibility = View.INVISIBLE
+                    }
+                }
+
                 checkContinueButtonActivation()
             }
 
@@ -131,7 +167,18 @@ class RegisterActivity : AppCompatActivity() {
             checkContinueButtonActivation()
         }
 
+
+
         continueButton?.setOnClickListener {
+
+            fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+            fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+
+
+            Log.d("REGISTERACTIVITY", fechaDesde)
+            Log.d("REGISTERACTIVITY", fechaHasta)
+
+
             loadingDialog.startLoadingDialog()
             val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
             dataSource.uploadUserToFirebase(
@@ -140,7 +187,9 @@ class RegisterActivity : AppCompatActivity() {
                 dni?.text.toString(),
                 email?.text.toString(),
                 spinner?.selectedItem.toString(),
-                institutesSelected
+                institutesSelected,
+                fechaDesde,
+                fechaHasta
             ).addOnSuccessListener {
                 loadingDialog.dismissDialog()
                 val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
@@ -206,6 +255,20 @@ class RegisterActivity : AppCompatActivity() {
 
         onResume()
     }
+
+
+
+    private fun String.toCalendarDate(): Calendar {
+        val splitDate = split("/")
+        val year = splitDate[2].toInt()
+        val month = splitDate[1].toInt() - 1 // Month in Calendar is 0-based
+        val day = splitDate[0].toInt()
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, day)
+        return calendar
+    }
+
 
     private fun enableCheckboxes() {
         binding.checkboxIDEI?.isEnabled = true

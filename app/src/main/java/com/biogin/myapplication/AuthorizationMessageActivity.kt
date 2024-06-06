@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -28,15 +29,29 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         // Get the authorization result, DNI, and apellido from the intent
         val authorizationResult = intent.getStringExtra("authorizationResult")
         val typeOfLogIn = intent.getStringExtra("typeOfLogIn")
-        val dni = intent.getStringExtra("dni")
+        val connection = intent.getStringExtra("connection")
         val apellido = intent.getStringExtra("apellido")
+        val dni = intent.getStringExtra("dni")
+
+
+        val nombre = intent.getStringExtra("nombre")
+        val categoria = intent.getStringExtra("categoria")
+        val areasPermitidas = intent.getStringExtra("areasPermitidas")
+
+
 
         val message: SpannableString
         val colorResource: Int
 
         if (authorizationResult == "authorized") {
-            message = SpannableString("ACCESO AUTORIZADO\n" +
-                    "DNI: $dni \n APELLIDO: $apellido")
+            message = if (connection == "online"){
+                SpannableString("ACCESO AUTORIZADO\n" +
+                        "DNI: $dni \n APELLIDO: $apellido \n NOMBRE: $nombre \n CATEGORIA: $categoria \n AREAS PERMITIDAS: $areasPermitidas")
+            } else {
+                SpannableString("ACCESO AUTORIZADO\n" +
+                        "DNI: $dni \n APELLIDO: $apellido")
+            }
+
             message.setSpan(ForegroundColorSpan(Color.GREEN), 0, 17, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)  // Green for "ACCESO AUTORIZADO"
             colorResource = R.color.black  // Black for details
         } else {
@@ -51,17 +66,21 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         buttonContinuar.setOnClickListener {
             if (typeOfLogIn == "visitor"){
                 finish()
-            } else {
-                if (authorizationResult == "authorized"){
+            } else if (authorizationResult == "authorized"){
+                if (typeOfLogIn == "security"){
                     val dniMaster = intent.getStringExtra("dni")
                     val intent = Intent(this, SeguridadActivity::class.java)
                     intent.putExtra("dniMaster", dniMaster)
                     startActivity(intent)
                     finish()
                 }
-                else{
+                else if (typeOfLogIn == "rrhh"){
+                    val intent = Intent(this, RRHHActivity::class.java)
+                    startActivity(intent)
                     finish()
                 }
+            } else {
+                finish()
             }
         }
     }
