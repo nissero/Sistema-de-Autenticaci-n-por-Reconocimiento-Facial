@@ -5,13 +5,20 @@
         android:id="@+id/navigation_abm"
         android:icon="@drawable/abm"
         android:title="@string/title_abm" />
+
     <item
         android:id="@+id/navigation_logs2"
         android:icon="@drawable/logs"
         android:title="@string/title_logs" />
+
+    <item
+        android:id="@+id/navigation_categorias"
+        android:icon="@drawable/category"
+        android:title="@string/title_categorias" />
+
     <item
         android:id="@+id/navigation_modulos"
         android:icon="@drawable/module"
-        android:title="@string/title_modulos" />
+        android:title="@string/title_lugares" />
 
 </menu>

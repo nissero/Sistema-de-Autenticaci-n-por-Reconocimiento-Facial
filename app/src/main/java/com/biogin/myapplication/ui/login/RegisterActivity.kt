@@ -52,11 +52,11 @@ class RegisterActivity : AppCompatActivity() {
 
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        val categoriesWithNoInstitute =
-            resources.getStringArray(R.array.user_categories_with_no_institute)
-        val userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
+        val temporaryCategories = intent.getStringArrayListExtra("temporary categories")
+        val userCategories = intent.getStringArrayListExtra("categories")
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        val adapter = userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapter
 
 
@@ -78,7 +78,6 @@ class RegisterActivity : AppCompatActivity() {
         val dni = binding.registerDni
         val email = binding.registerEmail
         val checkboxes = getCheckboxesArray()
-        val spinner = binding.registerCategoriesSpinner
         val continueButton = binding.registerContinueButton
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -92,19 +91,23 @@ class RegisterActivity : AppCompatActivity() {
 
                 val categorySelected  = spinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute.contains(categorySelected)) {
-                    disableCheckboxes()
-                    disableAlertCheckAtLeastOneInstitute()
-                } else {
-                    enableCheckboxes()
-                    enableAlertCheckAtLeastOneInstitute()
+                if (categoriesWithNoInstitute != null) {
+                    if (categoriesWithNoInstitute.contains(categorySelected)) {
+                        disableCheckboxes()
+                        disableAlertCheckAtLeastOneInstitute()
+                    } else {
+                        enableCheckboxes()
+                        enableAlertCheckAtLeastOneInstitute()
+                    }
                 }
 
-                if (categorySelected == "Externo" || categorySelected == "Temporal"){
-                    fechaDesdeEditText.visibility = View.VISIBLE
-                } else {
-                    fechaDesdeEditText.visibility = View.INVISIBLE
-                    fechaHastaEditText.visibility = View.INVISIBLE
+                if (temporaryCategories != null) {
+                    if (temporaryCategories.contains(categorySelected)){
+                        fechaDesdeEditText.visibility = View.VISIBLE
+                    } else {
+                        fechaDesdeEditText.visibility = View.INVISIBLE
+                        fechaHastaEditText.visibility = View.INVISIBLE
+                    }
                 }
 
             }
@@ -163,10 +166,10 @@ class RegisterActivity : AppCompatActivity() {
                 loadingDialog.startLoadingDialog()
                 val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
                 dataSource.uploadUserToFirebase(
-                    name?.text.toString(),
-                    surname?.text.toString(),
-                    dni?.text.toString(),
-                    email?.text.toString(),
+                    name.text.toString(),
+                    surname.text.toString(),
+                    dni.text.toString(),
+                    email.text.toString(),
                     spinner?.selectedItem.toString(),
                     institutesSelected,
                     fechaDesde,
@@ -174,10 +177,10 @@ class RegisterActivity : AppCompatActivity() {
                 ).addOnSuccessListener {
                     loadingDialog.dismissDialog()
                     val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                    intent.putExtra("name", name?.text.toString())
-                    intent.putExtra("surname", surname?.text.toString())
-                    intent.putExtra("dni", dni?.text.toString())
-                    intent.putExtra("email", email?.text.toString())
+                    intent.putExtra("name", name.text.toString())
+                    intent.putExtra("surname", surname.text.toString())
+                    intent.putExtra("dni", dni.text.toString())
+                    intent.putExtra("email", email.text.toString())
                     startActivity(intent)
                 }.addOnFailureListener { ex ->
                     loadingDialog.dismissDialog()
@@ -206,8 +209,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
         loginViewModel.loginFormState.observe(this, Observer {
             val loginState = it ?: return@Observer
@@ -278,7 +280,6 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxIDH?.visibility = View.INVISIBLE
         binding.checkboxICI?.visibility = View.INVISIBLE
     }
-
     private fun enableAlertCheckAtLeastOneInstitute() {
         binding.errTextCheckboxesNotSelectedRegister?.visibility = View.VISIBLE
     }
