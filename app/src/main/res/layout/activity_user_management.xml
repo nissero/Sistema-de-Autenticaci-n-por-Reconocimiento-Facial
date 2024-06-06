@@ -58,7 +58,7 @@
         android:id="@+id/update_user_dni"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="30dp"
         android:ems="10"
         android:hint="DNI"
         android:inputType="number"
@@ -93,9 +93,8 @@
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
         android:backgroundTint="#0D99FF"
-        android:enabled="false"
         android:text="Actualizar usuario"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
@@ -106,9 +105,8 @@
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
         android:backgroundTint="#0D99FF"
-        android:enabled="false"
         android:text="Modificar DNI usuario"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/linearLayout"
@@ -220,5 +218,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/err_text_checkboxes_not_selected_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:text="@string/text_select_at_least_an_institute"
+        android:textColor="#EA2424"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

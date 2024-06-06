@@ -42,8 +42,7 @@ class RegisterActivity : AppCompatActivity() {
     private var loadingDialog = LoadingDialog(this)
     private var fechaDesde = ""
     private var fechaHasta = ""
-
-
+    private var areAllFieldsValid = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +59,7 @@ class RegisterActivity : AppCompatActivity() {
         val adapter = userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapter
 
+
         fechaDesdeEditText = findViewById(R.id.register_fecha_desde)
         fechaHastaEditText = findViewById(R.id.register_fecha_hasta)
 
@@ -67,11 +67,19 @@ class RegisterActivity : AppCompatActivity() {
 
 
         fechaDesdeEditText.setOnClickListener{
-            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {checkContinueButtonActivation()}
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
         }
         fechaHastaEditText.setOnClickListener {
-            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {checkContinueButtonActivation()}
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
         }
+
+        val name = binding.registerName
+        val surname = binding.registerSurname
+        val dni = binding.registerDni
+        val email = binding.registerEmail
+        val checkboxes = getCheckboxesArray()
+        val spinner = binding.registerCategoriesSpinner
+        val continueButton = binding.registerContinueButton
 
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -81,15 +89,15 @@ class RegisterActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-                
+
                 val categorySelected  = spinner.selectedItem.toString()
 
-                if (categoriesWithNoInstitute != null) {
-                    if (categoriesWithNoInstitute.contains(categorySelected)) {
-                        disableCheckboxes()
-                    } else {
-                        enableCheckboxes()
-                    }
+                if (categoriesWithNoInstitute.contains(categorySelected)) {
+                    disableCheckboxes()
+                    disableAlertCheckAtLeastOneInstitute()
+                } else {
+                    enableCheckboxes()
+                    enableAlertCheckAtLeastOneInstitute()
                 }
 
                 if (temporaryCategories != null) {
@@ -101,7 +109,6 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
 
-                checkContinueButtonActivation()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -109,123 +116,98 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        val name = binding.registerName
-        val surname = binding.registerSurname
-        val dni = binding.registerDni
-        val email = binding.registerEmail
-        val checkboxes = getCheckboxesArray()
-
-        val spinner = binding.registerCategoriesSpinner
-        val continueButton = binding.registerContinueButton
-
-        name?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateName(name)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
+        name?.setOnFocusChangeListener { _, _ ->
+            validations.validateName(name)
         }
 
-        surname?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateSurname(surname)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
+        surname?.setOnFocusChangeListener { _, _ ->
+            validations.validateSurname(surname)
+        }
+
+        dni?.setOnFocusChangeListener { _, _ ->
+            validations.validateDNI(dni)
         }
 
         dni?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
                 validations.validateDNI(dni)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
+                return@setOnEditorActionListener true
             }
             false
         }
 
-        email?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                validations.validateEmail(email)
-                checkContinueButtonActivation()
-                return@setOnEditorActionListener false
-            }
-            false
+        email?.setOnFocusChangeListener { _, _ ->
+            validations.validateEmail(email)
         }
 
-        binding.checkboxIDH?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxICI?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxICO?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
-        binding.checkboxIDEI?.setOnCheckedChangeListener { _, _ ->
-            checkContinueButtonActivation()
-        }
 
 
 
         continueButton?.setOnClickListener {
-
             fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
             fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
 
-
-            loadingDialog.startLoadingDialog()
-            val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
-            dataSource.uploadUserToFirebase(
-                name?.text.toString(),
-                surname?.text.toString(),
-                dni?.text.toString(),
-                email?.text.toString(),
-                spinner?.selectedItem.toString(),
-                institutesSelected,
-                fechaDesde,
-                fechaHasta
-            ).addOnSuccessListener {
-                loadingDialog.dismissDialog()
-                val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                intent.putExtra("name", name?.text.toString())
-                intent.putExtra("surname", surname?.text.toString())
-                intent.putExtra("dni", dni?.text.toString())
-                intent.putExtra("email", email?.text.toString())
-                startActivity(intent)
-            }.addOnFailureListener { ex ->
-                loadingDialog.dismissDialog()
-                try {
-                    throw ex
-                } catch (e: FirebaseFirestoreException) {
-                    Log.e("Firebase", e.message.toString())
-                    val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-                        when (which) {
-                            DialogInterface.BUTTON_NEUTRAL -> {
+            val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
+            areAllFieldsValid = validations.isFormValid(
+                binding.root.context,
+                name!!,
+                surname!!,
+                dni!!,
+                email!!,
+                categorySelected,
+                getCheckboxesArray()
+            )
+            if (areAllFieldsValid) {
+                loadingDialog.startLoadingDialog()
+                val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
+                dataSource.uploadUserToFirebase(
+                    name?.text.toString(),
+                    surname?.text.toString(),
+                    dni?.text.toString(),
+                    email?.text.toString(),
+                    spinner?.selectedItem.toString(),
+                    institutesSelected,
+                    fechaDesde,
+                    fechaHasta
+                ).addOnSuccessListener {
+                    loadingDialog.dismissDialog()
+                    val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+                    intent.putExtra("name", name?.text.toString())
+                    intent.putExtra("surname", surname?.text.toString())
+                    intent.putExtra("dni", dni?.text.toString())
+                    intent.putExtra("email", email?.text.toString())
+                    startActivity(intent)
+                }.addOnFailureListener { ex ->
+                    loadingDialog.dismissDialog()
+                    try {
+                        throw ex
+                    } catch (e: FirebaseFirestoreException) {
+                        Log.e("Firebase", e.message.toString())
+                        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                            when (which) {
+                                DialogInterface.BUTTON_NEUTRAL -> {
+                                }
                             }
                         }
-                    }
 
-                    val builder = AlertDialog.Builder(binding.root.context)
+                        val builder = AlertDialog.Builder(binding.root.context)
 
-                    if(e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                        builder.setMessage(e.message).
-                        setNeutralButton("Reintentar", dialogClickListener).
-                        show()
-                    } else {
-                        builder.setMessage("Error al dar de alta el usuario, intente nuevamente")
-                            .setNeutralButton("Reintentar", dialogClickListener)
-                            .show()
+                        if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
+                            builder.setMessage(e.message)
+                                .setNeutralButton("Reintentar", dialogClickListener).show()
+                        } else {
+                            builder.setMessage("Error al dar de alta el usuario, intente nuevamente")
+                                .setNeutralButton("Reintentar", dialogClickListener)
+                                .show()
+                        }
                     }
                 }
             }
         }
-
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
@@ -298,42 +280,20 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxIDH?.visibility = View.INVISIBLE
         binding.checkboxICI?.visibility = View.INVISIBLE
     }
-
-    private fun checkContinueButtonActivation() {
-        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
-
-        val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val categorySelected  = spinner.selectedItem.toString()
-
-        if (formHasNoErrors()) {
-            if (categoriesWithNoInstitute != null) {
-                if (!categoriesWithNoInstitute.contains(categorySelected)) {
-                    binding.registerContinueButton?.isEnabled = validations.isAnyInstituteSelected(getCheckboxesArray())
-                } else {
-                    binding.registerContinueButton?.isEnabled = true
-                }
-            }
-        } else {
-            binding.registerContinueButton?.isEnabled = false
-        }
-
+    private fun enableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedRegister?.visibility = View.VISIBLE
     }
 
-    private fun getCheckboxesArray() : ArrayList<CheckBox> {
+    private fun disableAlertCheckAtLeastOneInstitute() {
+        binding.errTextCheckboxesNotSelectedRegister?.visibility = View.INVISIBLE
+    }
+
+    private fun getCheckboxesArray(): ArrayList<CheckBox> {
         val checkboxICO = findViewById<CheckBox>(R.id.checkbox_ICO)
         val checkboxICI = findViewById<CheckBox>(R.id.checkbox_ICI)
         val checkboxIDH = findViewById<CheckBox>(R.id.checkbox_IDH)
         val checkboxIDEI = findViewById<CheckBox>(R.id.checkbox_IDEI)
         return arrayListOf(checkboxICO, checkboxICI, checkboxIDH, checkboxIDEI)
-    }
-
-    private fun formHasNoErrors() : Boolean{
-        val nameHasNoErrors = binding.registerName?.error == null
-        val surnameHasNoErrors = binding.registerSurname?.error == null
-        val dniHasNoErrors = binding.registerDni?.error == null
-        val emailHasNoErrors = binding.registerEmail?.error == null
-
-        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors
     }
 
     private fun clearFields() {
