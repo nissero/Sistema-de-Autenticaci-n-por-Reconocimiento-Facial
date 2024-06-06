@@ -144,4 +144,5 @@
     <string name="back4app_app_id">ZIalbZmTNhF7KsEZhq6iGJS1F970qM7A4csbNIEn</string>
     <string name="back4app_client_key">P22gWwIeukQA3yiFIBohWEDDjFkqS1zEUTZPjgBG</string>
     <string name="home_text_enter_face_recognition_admin">Ingresar con reconocimiento facial (ADMIN)</string>
+    <string name="text_select_at_least_an_institute">* Seleccione al menos un instituto</string>
 </resources>
