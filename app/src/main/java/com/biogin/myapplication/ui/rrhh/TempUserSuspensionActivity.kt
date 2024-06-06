@@ -3,7 +3,6 @@ package com.biogin.myapplication.ui.rrhh
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -14,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.utils.DatePickerDialog
-import com.biogin.myapplication.utils.PopUpUtil
+import com.biogin.myapplication.utils.PopUpUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import java.util.Calendar
 
@@ -29,7 +28,7 @@ class TempUserSuspensionActivity : AppCompatActivity() {
 
     private lateinit var dniUser: String
 
-    private val popUpUtil = PopUpUtil()
+    private val popUpUtil = PopUpUtils()
 
 
     @RequiresApi(Build.VERSION_CODES.O)

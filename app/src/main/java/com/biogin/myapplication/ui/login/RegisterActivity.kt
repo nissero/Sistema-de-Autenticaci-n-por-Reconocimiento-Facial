@@ -52,11 +52,11 @@ class RegisterActivity : AppCompatActivity() {
 
         dataSource = LoginDataSource()
         institutesUtils = InstitutesUtils()
-        val categoriesWithNoInstitute =
-            resources.getStringArray(R.array.user_categories_with_no_institute)
-        val userCategories = resources.getStringArray(R.array.user_categories)
+        val categoriesWithNoInstitute = intent.getStringArrayListExtra("categories with no institutes")
+        val temporaryCategories = intent.getStringArrayListExtra("temporary categories")
+        val userCategories = intent.getStringArrayListExtra("categories")
         val categoriesSpinner = findViewById<Spinner>(R.id.register_categories_spinner)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, userCategories)
+        val adapter = userCategories?.let { ArrayAdapter(this, R.layout.simple_spinner_item, it.toList()) }
         categoriesSpinner.adapter = adapter
 
 
@@ -100,11 +100,13 @@ class RegisterActivity : AppCompatActivity() {
                     enableAlertCheckAtLeastOneInstitute()
                 }
 
-                if (categorySelected == "Externo" || categorySelected == "Temporal"){
-                    fechaDesdeEditText.visibility = View.VISIBLE
-                } else {
-                    fechaDesdeEditText.visibility = View.INVISIBLE
-                    fechaHastaEditText.visibility = View.INVISIBLE
+                if (temporaryCategories != null) {
+                    if (temporaryCategories.contains(categorySelected)){
+                        fechaDesdeEditText.visibility = View.VISIBLE
+                    } else {
+                        fechaDesdeEditText.visibility = View.INVISIBLE
+                        fechaHastaEditText.visibility = View.INVISIBLE
+                    }
                 }
 
             }
@@ -278,7 +280,6 @@ class RegisterActivity : AppCompatActivity() {
         binding.checkboxIDH?.visibility = View.INVISIBLE
         binding.checkboxICI?.visibility = View.INVISIBLE
     }
-
     private fun enableAlertCheckAtLeastOneInstitute() {
         binding.errTextCheckboxesNotSelectedRegister?.visibility = View.VISIBLE
     }

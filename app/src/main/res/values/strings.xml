@@ -29,21 +29,21 @@
     <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
     <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
     <string name="authorization_message_continue_button">OK</string>
-    <string-array name="user_categories">
-        <item>Docente</item>
-        <item>No docente</item>
-        <item>Estudiante</item>
-        <item>Externo</item>
-        <item>Jerarquico</item>
-        <item>RRHH</item>
-        <item>Temporal</item>
-    </string-array>
-    <string-array name="user_categories_with_no_institute">
-        <item>Externo</item>
-        <item>Temporal</item>
-        <item>RRHH</item>
-        <item>Jerarquico</item>
-    </string-array>
+<!--    <string-array name="user_categories">-->
+<!--        <item>Docente</item>-->
+<!--        <item>No docente</item>-->
+<!--        <item>Estudiante</item>-->
+<!--        <item>Externo</item>-->
+<!--        <item>Jerarquico</item>-->
+<!--        <item>RRHH</item>-->
+<!--        <item>Temporal</item>-->
+<!--    </string-array>-->
+<!--    <string-array name="user_categories_with_no_institute">-->
+<!--        <item>Externo</item>-->
+<!--        <item>Temporal</item>-->
+<!--        <item>RRHH</item>-->
+<!--        <item>Jerarquico</item>-->
+<!--    </string-array>-->
     <string-array name="user_active_options">
         <item>Activo</item>
         <item>Inactivo</item>
@@ -67,6 +67,7 @@
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
+    <string name="title_lugares">Lugares</string>
     <string name="integrantes_biogin">
         <b>Nuestro Equipo:\n</b>
         • Antúnez, Fernando Iván\n
@@ -128,18 +129,30 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="texto_ayuda_agregar">Para agregar un nuevo lugar\nfísico, ingrese un nombre y seleccione\na que institutos pertenece</string>
-    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\n puede cambiar el nombre y modificar\na que institutos pertenece</string>
+    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\npuede cambiar el nombre y modificar\na que institutos pertenece</string>
     <string name="nombre">Nombre</string>
     <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
-    <string name="eliminar_lugar_fisico">Eliminar\nlugar físico</string>
-    <string name="mensaje_modificar_lugar">Para modificar o eliminar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+    <string name="desactivar_lugar_fisico">Desactivar\nlugar físico</string>
+    <string name="mensaje_modificar_lugar">Para modificar o desactivar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+
     <string name="dni_rrhh">DNI\nrrhh</string>
     <string name="dni_user_affected">DNI user afectado</string>
     <string name="log_type">Tipo de log</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
+    <string name="title_categorias">Categorías</string>
+    <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
+    <string name="consultar_categorias">Consultar categorías</string>
+    <string name="modificar_categoria">Modificar\ncategoría</string>
+    <string name="desactivar_categoria">Desactivar\ncategoría</string>
+    <string name="info_agregar_categoria">Para agregar una nueva categoría,\npresione el botón de abajo</string>
+    <string name="texto_ayuda_categorias">Para crear una nueva categoría,\ningrese el nombre y complete los\ncampos correspondiente</string>
+    <string name="info_modificar_categoria">Para modificar o desactivar una categoría,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+    <string name="texto_ayuda_modificacion_categorias">La modificación de categorías existentes\npermite cambiar únicamente el nombre de\nla misma</string>
+    <string name="ayuda_categoria_temporal">Tilde la siguiente opción si las\npersonas que tengan asignada esta\ncategoría tendrán permitido el acceso\ndurante un plazo determinado</string>
+    <string name="ayuda_categoria__institutos">Tilde la siguiente opcioón si las\npersonas que tengan asignada esta\ncategoría tendrán institutos a los\nque pertenecen</string>
+    <string name="agregar_categoria">Agregar categoría</string>
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
     <string name="back4app_app_id">ZIalbZmTNhF7KsEZhq6iGJS1F970qM7A4csbNIEn</string>
     <string name="back4app_client_key">P22gWwIeukQA3yiFIBohWEDDjFkqS1zEUTZPjgBG</string>
