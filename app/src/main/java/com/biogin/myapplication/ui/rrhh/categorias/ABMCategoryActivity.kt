@@ -9,12 +9,14 @@ import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmCategoryBinding
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class ABMCategoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmCategoryBinding
     private val categoriesUtils = CategoriesUtils()
     private val dialogUtils = DialogUtils()
+    private val stringUtils = StringUtils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbmCategoryBinding.inflate(layoutInflater)
@@ -46,7 +48,7 @@ class ABMCategoryActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val categoryName = stringUtils.normalizeAndSentenceCase(input.text.toString())
             if(categoryName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")

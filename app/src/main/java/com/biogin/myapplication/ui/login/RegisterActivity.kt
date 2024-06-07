@@ -26,6 +26,7 @@ import com.biogin.myapplication.databinding.ActivityRegisterBinding
 import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
+import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import java.util.Calendar
 
@@ -43,6 +44,7 @@ class RegisterActivity : AppCompatActivity() {
     private var fechaDesde = ""
     private var fechaHasta = ""
     private var areAllFieldsValid = false
+    private val stringUtils = StringUtils()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +66,6 @@ class RegisterActivity : AppCompatActivity() {
         fechaHastaEditText = findViewById(R.id.register_fecha_hasta)
 
         datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
-
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
@@ -141,9 +142,6 @@ class RegisterActivity : AppCompatActivity() {
             validations.validateEmail(email)
         }
 
-
-
-
         continueButton?.setOnClickListener {
             fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
             fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
@@ -165,9 +163,11 @@ class RegisterActivity : AppCompatActivity() {
             if (areAllFieldsValid) {
                 loadingDialog.startLoadingDialog()
                 val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
+                val normalizedName = stringUtils.normalizeAndSentenceCase(name.text.toString())
+                val normalizedSurname = stringUtils.normalizeAndSentenceCase(surname.text.toString())
                 dataSource.uploadUserToFirebase(
-                    name.text.toString(),
-                    surname.text.toString(),
+                    normalizedName,
+                    normalizedSurname,
                     dni.text.toString(),
                     email.text.toString(),
                     spinner?.selectedItem.toString(),
@@ -177,8 +177,8 @@ class RegisterActivity : AppCompatActivity() {
                 ).addOnSuccessListener {
                     loadingDialog.dismissDialog()
                     val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                    intent.putExtra("name", name.text.toString())
-                    intent.putExtra("surname", surname.text.toString())
+                    intent.putExtra("name", normalizedName)
+                    intent.putExtra("surname", normalizedSurname)
                     intent.putExtra("dni", dni.text.toString())
                     intent.putExtra("email", email.text.toString())
                     startActivity(intent)

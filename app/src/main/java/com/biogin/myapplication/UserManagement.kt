@@ -20,6 +20,7 @@ import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -42,6 +43,7 @@ class UserManagement : AppCompatActivity() {
     private lateinit var fechaHastaEditText: EditText
     private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
     private var areAllFieldsValid = false
+    private val stringUtils = StringUtils()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,9 +158,13 @@ class UserManagement : AppCompatActivity() {
                     binding.checkboxIDH
                 )
                 val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val normalizedName =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
+                val normalizedSurname =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
                 val task = dataSource.modifyUserFirebase(
-                    binding.updateUserName.text.toString(),
-                    binding.updateUserSurname.text.toString(),
+                    normalizedName,
+                    normalizedSurname,
                     binding.updateUserDni.text.toString(),
                     binding.updateUserEmail.text.toString(),
                     binding.updateUserCategoriesSpinner.selectedItem.toString(),
@@ -228,9 +234,13 @@ class UserManagement : AppCompatActivity() {
                     binding.checkboxIDH
                 )
                 val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val normalizedName =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
+                val normalizedSurname =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
                 val task = dataSource.duplicateUserInFirebase(
-                    binding.updateUserName.text.toString(),
-                    binding.updateUserSurname.text.toString(),
+                    normalizedName,
+                    normalizedSurname,
                     oldDni,
                     binding.updateUserDni.text.toString(),
                     binding.updateUserEmail.text.toString(),
