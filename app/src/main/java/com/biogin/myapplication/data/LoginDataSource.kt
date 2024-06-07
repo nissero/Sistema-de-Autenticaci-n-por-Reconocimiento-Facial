@@ -109,7 +109,7 @@ class LoginDataSource {
                 transaction.set(docRefDni, newUser)
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_CREATION,
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_CREATION,
                 MasterUserDataSession.getDniUser(), dni, category)
         }
     }
@@ -200,7 +200,7 @@ class LoginDataSource {
                 }
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
         }
     }
 
@@ -221,14 +221,6 @@ class LoginDataSource {
         lateinit var tx: Task<Transaction>
         if(!categoriesUtils.getTemporaryCategories().contains(category)) {
             tx = db.runTransaction { transaction ->
-//                transaction.update(docRefUserUpdated,
-//                    "nombre", name,
-//                    "apellido", surname,
-//                    "email", email,
-//                    "categoria", category,
-//                    "estado", state,
-//                    "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-//                    "institutos", institutesSelected)
 
                 val newUser = hashMapOf(
                     "nombre" to name,
@@ -243,7 +235,7 @@ class LoginDataSource {
 
                 transaction.set(docRefUserUpdated, newUser)
 
-                logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+                logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
             }
         } else {
             tx = db.runTransaction { transaction ->
@@ -274,7 +266,7 @@ class LoginDataSource {
                         "trabajaHasta", fechaHasta)
                 }
 
-                logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+                logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
             }
         }
         return tx
@@ -309,7 +301,7 @@ class LoginDataSource {
                 }
             }
             transaction.update(docRefDni, "estado", "Inactivo")
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 
@@ -379,7 +371,7 @@ class LoginDataSource {
                 transaction.update(docRefDni, dataActualizada)
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 

@@ -93,7 +93,9 @@ class CategoriasFragment : Fragment() {
                 }
                 dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
                     "Ya existe una categoría de nombre $categoryName que se encuentra " +
-                            "inactiva, desea restaurarla?", onYesFunction, onNoFunction)
+                            "inactiva, desea restaurarla?\nTenga en cuenta que las personas " +
+                            "que poseían dicha categoría no seran reactivadas.",
+                    onYesFunction, onNoFunction)
                 return@setOnClickListener
             }
 
@@ -148,7 +150,9 @@ class CategoriasFragment : Fragment() {
             }
 
             dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
-                "Desea desactivar la categoría $categoryName?", onYesFunction, onNoFunction)
+                "Esta seguro que desea desactivar la categoría $categoryName?\n" +
+                        "Esta acción inactivará cualquier persona que posea dicha categoría",
+                onYesFunction, onNoFunction)
         }
 
         return root
