@@ -21,15 +21,17 @@
         android:textColorHint="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.484" />
 
     <Button
         android:id="@+id/update_user_option_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
         android:text="Modificar usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
@@ -40,7 +42,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
         android:text="Modificar DNI usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
         app:layout_constraintHorizontal_bias="1.0"
@@ -52,7 +54,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
         android:text="Inactivar usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
         app:layout_constraintHorizontal_bias="0.0"
@@ -78,10 +80,9 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="116dp"
         android:layout_marginEnd="50dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
         android:text="Registrar usuario"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -106,5 +107,6 @@
         app:layout_constraintBottom_toTopOf="@+id/register_user_option_button"
         app:layout_constraintEnd_toEndOf="@+id/update_user_dni_option_button"
         app:layout_constraintStart_toStartOf="@+id/update_user_dni_option_button" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

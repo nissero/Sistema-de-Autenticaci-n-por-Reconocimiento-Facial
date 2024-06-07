@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
+import com.biogin.myapplication.utils.CategoriesUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
@@ -30,6 +31,8 @@ import com.biogin.myapplication.logs.Log as LogsApp
 class LoginDataSource {
     private var allowedAreasUtils: AllowedAreasUtils = AllowedAreasUtils()
     private var logsRepository: LogsRepository = LogsRepository()
+    private val categoriesUtils = CategoriesUtils()
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun uploadUserToFirebase(
         name: String,
@@ -62,7 +65,7 @@ class LoginDataSource {
                 }
             }
 
-            if (category == "Externo" || category == "Temporal"){
+            if (categoriesUtils.getTemporaryCategories().contains(category)) {
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
 
@@ -129,6 +132,7 @@ class LoginDataSource {
             .await()
             .size() != 0
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun duplicateUserInFirebase(
         name: String,
         surname: String,
@@ -136,7 +140,10 @@ class LoginDataSource {
         newDni: String,
         email: String,
         category: String,
+        state: String,
         institutesSelected: ArrayList<String>,
+        fechaDesde: String,
+        fechaHasta: String
     ): Task<Transaction> {
 
         val db = FirebaseFirestore.getInstance()
@@ -151,24 +158,62 @@ class LoginDataSource {
             }
 
             val docRefOldDni = db.collection("usuarios").document(oldDni)
-            var transactionInstance = transaction.update(docRefOldDni, "estado", "Inactivo")
+            val transactionInstance = transaction.update(docRefOldDni, "estado", "Inactivo")
 
-            val newUser = hashMapOf(
-                "nombre" to name,
-                "apellido" to surname,
-                "dni" to newDni,
-                "email" to email,
-                "categoria" to category,
-                "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                "institutos" to institutesSelected,
-                "estado" to "Activo"
-            )
+            if(!categoriesUtils.getTemporaryCategories().contains(category)) {
+                val newUser = hashMapOf(
+                    "nombre" to name,
+                    "apellido" to surname,
+                    "dni" to newDni,
+                    "email" to email,
+                    "categoria" to category,
+                    "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                    "institutos" to institutesSelected,
+                    "estado" to state
+                )
 
-            transactionInstance.set(docRefNewDni, newUser)
+                transactionInstance.set(docRefNewDni, newUser)
+            } else {
+                val today = LocalDate.now()
+                val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                if (trabajaDesdeDate.isAfter(today)){
+                    val newUser = hashMapOf(
+                        "nombre" to name,
+                        "apellido" to surname,
+                        "dni" to newDni,
+                        "email" to email,
+                        "categoria" to category,
+                        "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos" to institutesSelected,
+                        "estado" to "Inactivo",
+                        "trabajaDesde" to fechaDesde,
+                        "trabajaHasta" to fechaHasta
+                    )
+
+                    transaction.set(docRefNewDni, newUser)
+                }
+                if (trabajaDesdeDate.isEqual(today)){
+                    val newUser = hashMapOf(
+                        "nombre" to name,
+                        "apellido" to surname,
+                        "dni" to newDni,
+                        "email" to email,
+                        "categoria" to category,
+                        "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos" to institutesSelected,
+                        "estado" to "Activo",
+                        "trabajaDesde" to fechaDesde,
+                        "trabajaHasta" to fechaHasta
+                    )
+                    transaction.set(docRefNewDni, newUser)
+                }
+            }
+
             logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_DNI_UPDATE,MasterUserDataSession.getDniUser(), "$oldDni a $newDni", category)
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun modifyUserFirebase(
         name: String,
         surname: String,
@@ -176,22 +221,72 @@ class LoginDataSource {
         email: String,
         category: String,
         state: String,
-        institutesSelected: ArrayList<String>
+        institutesSelected: ArrayList<String>,
+        fechaDesde: String,
+        fechaHasta: String
     ): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
         val docRefUserUpdated = db.collection("usuarios").document(dni)
-        return db.runTransaction { transaction ->
-            transaction.update(docRefUserUpdated,
-                "nombre", name,
-                "apellido", surname,
-                "email", email,
-                "categoria", category,
-                "estado", state,
-                "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                "institutos", institutesSelected)
+        lateinit var tx: Task<Transaction>
+        if(!categoriesUtils.getTemporaryCategories().contains(category)) {
+            tx = db.runTransaction { transaction ->
+//                transaction.update(docRefUserUpdated,
+//                    "nombre", name,
+//                    "apellido", surname,
+//                    "email", email,
+//                    "categoria", category,
+//                    "estado", state,
+//                    "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+//                    "institutos", institutesSelected)
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+                val newUser = hashMapOf(
+                    "nombre" to name,
+                    "apellido" to surname,
+                    "dni" to dni,
+                    "email" to email,
+                    "categoria" to category,
+                    "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                    "institutos" to institutesSelected,
+                    "estado" to "Activo"
+                )
+
+                transaction.set(docRefUserUpdated, newUser)
+
+                logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+            }
+        } else {
+            tx = db.runTransaction { transaction ->
+                val today = LocalDate.now()
+                val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                if (trabajaDesdeDate.isAfter(today)){
+                    transaction.update(docRefUserUpdated,
+                        "nombre", name,
+                        "apellido", surname,
+                        "email", email,
+                        "categoria", category,
+                        "estado", "Inactivo",
+                        "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos", institutesSelected,
+                        "trabajaDesde", fechaDesde,
+                        "trabajaHasta", fechaHasta)
+                }
+                if (trabajaDesdeDate.isEqual(today)) {
+                    transaction.update(docRefUserUpdated,
+                        "nombre", name,
+                        "apellido", surname,
+                        "email", email,
+                        "categoria", category,
+                        "estado", state,
+                        "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos", institutesSelected,
+                        "trabajaDesde", fechaDesde,
+                        "trabajaHasta", fechaHasta)
+                }
+
+                logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+            }
         }
+        return tx
     }
 
     fun deactivateUserFirebase(dni: String): Task<Transaction> {
@@ -247,7 +342,7 @@ class LoginDataSource {
                 data?.get("categoria").toString(),
                 data?.get("estado").toString(),
                 data?.get("institutos") as ArrayList<String>,
-                data?.get("areasPermitidas") as ArrayList<String>,
+                data["areasPermitidas"] as ArrayList<String>,
             )
 
             return Result.Success(user)

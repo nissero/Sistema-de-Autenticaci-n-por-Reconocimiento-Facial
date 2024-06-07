@@ -33,7 +33,7 @@
     <EditText
         android:id="@+id/nombre_input"
         android:layout_width="360dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_marginTop="70dp"
         android:hint="Módulo 1"
         android:inputType="text"
