@@ -24,14 +24,17 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".ui.rrhh.categorias.ABMCategoryActivity"
+            android:name=".ui.TempUserAccess"
             android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".ui.rrhh.categorias.Categorias"-->
-<!--            android:exported="false" />-->
+        <activity
+            android:name=".ui.rrhh.categorias.ABMCategoryActivity"
+            android:exported="false" /> <!-- <activity -->
+        <!-- android:name=".ui.rrhh.categorias.Categorias" -->
+        <!-- android:exported="false" /> -->
         <activity
             android:name=".ui.admin.AdminActivity"
             android:exported="true" />
+
         <meta-data
             android:name="com.parse.SERVER_URL"
             android:value="@string/back4app_server_url" />
@@ -41,6 +44,7 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
+
         <activity
             android:name=".ui.rrhh.TempUserSuspensionActivity"
             android:exported="false" />
