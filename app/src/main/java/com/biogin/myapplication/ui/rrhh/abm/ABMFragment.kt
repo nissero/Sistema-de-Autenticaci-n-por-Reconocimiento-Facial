@@ -14,7 +14,7 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
-import com.biogin.myapplication.ui.TempUserAccess
+import com.biogin.myapplication.ui.rrhh.TempUserAccess
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtils

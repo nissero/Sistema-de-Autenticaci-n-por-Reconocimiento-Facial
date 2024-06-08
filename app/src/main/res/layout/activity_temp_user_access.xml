@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.TempUserAccess">
+    tools:context=".ui.rrhh.TempUserAccess">
 
     <TextView
         android:id="@+id/user_instruction_message"
@@ -51,16 +51,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user_instruction_message" />
 
-    <Spinner
-        android:id="@+id/register_categories_spinner"
-        android:layout_width="332dp"
-        android:layout_height="59dp"
-        android:layout_marginTop="196dp"
-        android:tooltipText="Categoría"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/options_recycler_view"
+        android:layout_width="234dp"
+        android:layout_height="260dp"
+        android:layout_marginTop="180dp"
+        android:hint="Lugares Físicos"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_instruction_message" />
+        app:layout_constraintTop_toBottomOf="@+id/user_instruction_message"
+        tools:listitem="@layout/item_option" />
 
     <Button
         android:id="@+id/continue_button"
@@ -73,10 +73,9 @@
         android:text="Continuar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user_instruction_message"
-        app:layout_constraintVertical_bias="0.614" />
+        app:layout_constraintVertical_bias="0.981" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
