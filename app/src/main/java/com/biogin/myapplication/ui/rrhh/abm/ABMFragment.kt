@@ -19,6 +19,7 @@ import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtils
 import com.biogin.myapplication.ui.rrhh.TempUserSuspensionActivity
+import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

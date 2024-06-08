@@ -53,8 +53,7 @@ class FirebaseAreaMethods {
     }
 
     fun addArea(newArea: String, ici: Boolean, ico: Boolean,
-                idei: Boolean, idh: Boolean): Boolean {
-        var success = false
+                idei: Boolean, idh: Boolean, callback: (Boolean) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("lugares").document(newArea)
 
@@ -69,16 +68,14 @@ class FirebaseAreaMethods {
         docRef.set(area)
             .addOnSuccessListener {
                 Log.d("Firebase", "Se ha creado el lugar físico $newArea correctamente")
-                success = true
-            }.addOnFailureListener {
-                    e -> Log.w("Firebase", "Error al crear categoría", e)
+                callback(true)
+            }.addOnFailureListener { e ->
+                Log.w("Firebase", "Error al crear categoría", e)
+                callback(false)
             }
-
-        return success
     }
 
-    fun deactivateArea(area: String): Boolean {
-        var success = false
+    fun deactivateArea(area: String, callback: (Boolean) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("lugares").document(area)
 
@@ -91,23 +88,23 @@ class FirebaseAreaMethods {
                         docRef.update("activo", false)
                         Log.d("Firebase", "Se inactivó el lugar físico $area")
 
-                        success = true
+                        callback(true)
                     } else {
                         Log.d("Firebase", "El lugar físico $area ya se encuentra inactivado")
+                        callback(false)
                     }
                 } else {
                     Log.d("Firebase", "No existe el documento")
+                    callback(false)
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d("Firebase", "Se falló al obtener el documento del lugar físico $area", exception)
+                callback(false)
             }
-
-        return success
     }
 
-    fun activateArea(area: String): Boolean {
-        var success = false
+    fun activateArea(area: String, callback: (Boolean) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("lugares").document(area)
 
@@ -120,24 +117,23 @@ class FirebaseAreaMethods {
                         docRef.update("activo", true)
                         Log.d("Firebase", "Se activó el lugar físico $area")
 
-                        success = true
+                        callback(true)
                     } else {
                         Log.d("Firebase", "El lugar físico $area ya se encuentra activado")
+                        callback(false)
                     }
                 } else {
                     Log.d("Firebase", "No existe el documento")
+                    callback(false)
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d("Firebase", "Se falló al obtener el documento del lugar físico $area", exception)
             }
-
-        return success
     }
 
     fun modifyArea(area: String, ici: Boolean, ico: Boolean,
-                   idei: Boolean, idh: Boolean): Boolean {
-        var success = false
+                   idei: Boolean, idh: Boolean, callback: (Boolean) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("lugares").document(area)
 
@@ -150,15 +146,15 @@ class FirebaseAreaMethods {
                     docRef.update("IDH", idh)
                     Log.d("Firebase", "Se modificó el lugar físico $area")
 
-                    success = true
+                    callback(true)
                 } else {
                     Log.d("Firebase", "No existe el documento")
+                    callback(false)
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d("Firebase", "Se falló al obtener el documento del lugar físico $area", exception)
+                callback(false)
             }
-
-        return success
     }
 }

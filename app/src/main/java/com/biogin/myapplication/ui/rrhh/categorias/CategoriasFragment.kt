@@ -10,6 +10,7 @@ import com.biogin.myapplication.databinding.FragmentCategoriasBinding
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.DialogUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class CategoriasFragment : Fragment() {
 
@@ -22,6 +23,7 @@ class CategoriasFragment : Fragment() {
     private var categoriesUtils = CategoriesUtils()
     private val dialogUtils = DialogUtils()
     private val popUpUtils = PopUpUtils()
+    private val stringUtils = StringUtils()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +53,8 @@ class CategoriasFragment : Fragment() {
         val input = binding.modificarCategoriaInput
 
         binding.buttonModificarCategoria.setOnClickListener {
-            val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val categoryName =
+                stringUtils.normalizeAndSentenceCase(input.text.toString())
 
             if(categoryName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
@@ -59,9 +62,8 @@ class CategoriasFragment : Fragment() {
             }
 
             if(categoryName == "Seguridad" || categoryName == "Administrador" ||
-                categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh" ||
-                categoryName == "Jerárquico" || categoryName == "Rr.hh" ||
-                categoryName == "Recursos humanos") {
+                categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh"
+                || categoryName == "Rr.hh" || categoryName == "Recursos humanos") {
                 dialogUtils.showDialog(binding.root.context,
                     "Las siguientes categorías no pueden ser modificadas:\nAdministrador\n" +
                             "Seguridad\nJerarquico\nRRHH")
@@ -91,7 +93,9 @@ class CategoriasFragment : Fragment() {
                 }
                 dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
                     "Ya existe una categoría de nombre $categoryName que se encuentra " +
-                            "inactiva, desea restaurarla?", onYesFunction, onNoFunction)
+                            "inactiva, desea restaurarla?\nTenga en cuenta que las personas " +
+                            "que poseían dicha categoría no seran reactivadas.",
+                    onYesFunction, onNoFunction)
                 return@setOnClickListener
             }
 
@@ -108,7 +112,7 @@ class CategoriasFragment : Fragment() {
         }
 
         binding.buttonDesactivarCategoria.setOnClickListener {
-            val categoryName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val categoryName = stringUtils.normalizeAndSentenceCase(input.text.toString())
 
             if(categoryName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
@@ -117,8 +121,7 @@ class CategoriasFragment : Fragment() {
 
             if(categoryName == "Seguridad" || categoryName == "Administrador" ||
                 categoryName == "Admin" ||categoryName == "Jerarquico" || categoryName == "Rrhh" ||
-                categoryName == "Jerárquico" || categoryName == "Rr.hh" ||
-                categoryName == "Recursos humanos") {
+                categoryName == "Rr.hh" || categoryName == "Recursos humanos") {
                 dialogUtils.showDialog(binding.root.context,
                     "Las siguientes categorías no pueden ser desactivadas:\nAdministrador\n" +
                             "Seguridad\nJerarquico\nRRHH")
@@ -132,8 +135,6 @@ class CategoriasFragment : Fragment() {
                         "de nombre $categoryName")
                 return@setOnClickListener
             }
-
-
 
             val onYesFunction = {
                 categoriesUtils.deactivateCategory(categoryName)
@@ -149,7 +150,9 @@ class CategoriasFragment : Fragment() {
             }
 
             dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
-                "Desea desactivar la categoría $categoryName?", onYesFunction, onNoFunction)
+                "Esta seguro que desea desactivar la categoría $categoryName?\n" +
+                        "Esta acción inactivará cualquier persona que posea dicha categoría",
+                onYesFunction, onNoFunction)
         }
 
         return root

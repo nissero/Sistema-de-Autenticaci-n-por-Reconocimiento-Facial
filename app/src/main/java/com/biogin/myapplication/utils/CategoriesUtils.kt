@@ -15,23 +15,33 @@ class CategoriesUtils {
     fun addCategory(name: String, isTemporary: Boolean, allowsInstitutes: Boolean,
                     active: Boolean) {
         val newCategory = Category(name, isTemporary, allowsInstitutes, active)
-        val success = firebaseCategoryMethods.addCategory(newCategory)
-
-        if(success)
-            categoriesList[name] = newCategory
-    }
-
-    fun deactivateCategory(name: String) {
-        val success = firebaseCategoryMethods.deactivateCategory(name)
-        if(success) {
-            categoriesList[name]?.active = false
+        firebaseCategoryMethods.addCategory(newCategory) {
+            success ->
+            run {
+                if(success)
+                    categoriesList[name] = newCategory
+            }
         }
     }
 
+    fun deactivateCategory(name: String) {
+        firebaseCategoryMethods.deactivateCategory(name) {
+            success ->
+            run {
+                if(success)
+                    categoriesList[name]?.active = false
+            }
+        }
+
+    }
+
     fun activateCategory(name: String) {
-        val success = firebaseCategoryMethods.activateCategory(name)
-        if(success) {
-            categoriesList[name]?.active = true
+        firebaseCategoryMethods.activateCategory(name) {
+            success ->
+            run {
+                if(success)
+                    categoriesList[name]?.active = true
+            }
         }
     }
 

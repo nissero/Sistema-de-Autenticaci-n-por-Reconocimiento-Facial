@@ -18,8 +18,8 @@ class LogsAdapter(val context : Context, val logList : List<Log>): RecyclerView.
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (logList != null && logList.size > 0){
-            var log = logList.get(position)
+        if (logList.isNotEmpty()){
+            val log = logList[position]
             holder.timestamp.text = addLineJumpToStringInSpaces(log.timestamp)
             holder.logEventName.text = addLineJumpToStringInSpaces(log.logEventName.value)
             if(log.dniMasterUser.isEmpty()) {
@@ -42,7 +42,7 @@ class LogsAdapter(val context : Context, val logList : List<Log>): RecyclerView.
 
         }
     }
-    fun addLineJumpToStringInSpaces(s : String) : String {
+    private fun addLineJumpToStringInSpaces(s : String) : String {
         return s.replace("\\s+".toRegex(), "\n")
     }
     override fun getItemCount(): Int {

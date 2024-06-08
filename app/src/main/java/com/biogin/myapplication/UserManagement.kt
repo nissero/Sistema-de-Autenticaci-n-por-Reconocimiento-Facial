@@ -18,8 +18,10 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
+import com.biogin.myapplication.utils.HierarchicalUtils
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -42,6 +44,8 @@ class UserManagement : AppCompatActivity() {
     private lateinit var fechaHastaEditText: EditText
     private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
     private var areAllFieldsValid = false
+    private val stringUtils = StringUtils()
+    private val hierarchicalUtils = HierarchicalUtils()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,9 +160,13 @@ class UserManagement : AppCompatActivity() {
                     binding.checkboxIDH
                 )
                 val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val normalizedName =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
+                val normalizedSurname =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
                 val task = dataSource.modifyUserFirebase(
-                    binding.updateUserName.text.toString(),
-                    binding.updateUserSurname.text.toString(),
+                    normalizedName,
+                    normalizedSurname,
                     binding.updateUserDni.text.toString(),
                     binding.updateUserEmail.text.toString(),
                     binding.updateUserCategoriesSpinner.selectedItem.toString(),
@@ -228,9 +236,13 @@ class UserManagement : AppCompatActivity() {
                     binding.checkboxIDH
                 )
                 val selectedInstitutes = institutesUtils.getInstitutesSelected(checkboxes)
+                val normalizedName =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
+                val normalizedSurname =
+                    stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
                 val task = dataSource.duplicateUserInFirebase(
-                    binding.updateUserName.text.toString(),
-                    binding.updateUserSurname.text.toString(),
+                    normalizedName,
+                    normalizedSurname,
                     oldDni,
                     binding.updateUserDni.text.toString(),
                     binding.updateUserEmail.text.toString(),
@@ -407,7 +419,7 @@ class UserManagement : AppCompatActivity() {
         println("success")
         val auth = EmailService.UserPassAuthenticator("fernandoivanantunez@hotmail.com",
             "steveharris40184869")
-        val to = listOf(InternetAddress("antunez.fernandoivan.43377@gmail.com"))
+        val to = listOf(InternetAddress(hierarchicalUtils.getMail()))
         val from = InternetAddress("fernandoivanantunez@hotmail.com")
         val subject = "Aviso de cambio de DNI"
         val body = "Buenas, le enviamos este mail para informarle que al usuario registrado con el " +
@@ -422,7 +434,11 @@ class UserManagement : AppCompatActivity() {
                 try {
                     emailService.send(email)
                 } catch (e: Exception) {
-                    println(e.stackTrace)
+                    try {
+                        emailService.send(email)
+                    } catch (e: Exception) {
+                        println(e.stackTrace)
+                    }
                 }
             }
         }
