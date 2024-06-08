@@ -389,7 +389,7 @@ class LoginDataSource {
                 transaction.update(docRefDni, dataActualizada)
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_TEMPORAL_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_TEMPORAL_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 
@@ -489,7 +489,7 @@ class LoginDataSource {
                 transaction.update(docRefDni, dataActualizada)
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.GRANT_TEMPORAL_ACCESS, MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.GRANT_TEMPORAL_ACCESS,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
 
