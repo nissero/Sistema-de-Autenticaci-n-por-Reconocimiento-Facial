@@ -21,6 +21,7 @@ import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.admin.AdminActivity
+import com.biogin.myapplication.ui.jerarquico.JerarquicoActivity
 import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -52,6 +53,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
                 "seguridad" -> initCamera(:: ifSecurity)
                 "rrhh" -> initCamera(:: ifRRHH)
                 "admin" -> initCamera(:: ifAdmin)
+                "jerarquico" -> initCamera(:: ifJerarquico)
                 else -> initCamera(:: ifAny)
             }
 
@@ -65,6 +67,9 @@ class FaceRecognitionActivity : AppCompatActivity() {
                 }
                 "admin" -> viewBinding.skipButton.setOnClickListener {
                     goToAdminActivity()
+                }
+                "jerarquico" -> viewBinding.skipButton.setOnClickListener {
+                    goToJerarquicoActivity()
                 }
                 else -> {
                     viewBinding.skipButton.visibility = View.INVISIBLE
@@ -85,7 +90,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun goToRRHHActivity() {
         camera.shutdown()
         val intent = Intent(this, RRHHActivity::class.java)
-        MasterUserDataSession.setUserDataForSession("43908111", "RRHH")
+        MasterUserDataSession.setUserDataForSession("44456445", "RRHH")
         startActivity(intent)
         finish()
     }
@@ -101,9 +106,19 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun goToAdminActivity() {
         camera.shutdown()
         val intent = Intent(this, AdminActivity::class.java)
+        MasterUserDataSession.setUserDataForSession("44456445", "RRHH")
         startActivity(intent)
         finish()
     }
+
+    private fun goToJerarquicoActivity() {
+        camera.shutdown()
+        val intent = Intent(this, JerarquicoActivity::class.java)
+        MasterUserDataSession.setUserDataForSession("40184869", "Jerarquico")
+        startActivity(intent)
+        finish()
+    }
+
     private fun finDeTurno() {
         camera.shutdown()
         val intent = Intent(this@FaceRecognitionActivity,
@@ -261,12 +276,28 @@ class FaceRecognitionActivity : AppCompatActivity() {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToAdminActivity()
+                goToJerarquicoActivity()
             }, dialogShowTime)
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
             this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Admin")
+        }
+    }
+
+    private fun ifJerarquico(user: Usuario) {
+        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "jerarquico") {
+            MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
+            logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
+            this.showAuthorizationMessage(user)
+            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+            Handler(Looper.getMainLooper()).postDelayed({
+                goToAdminActivity()
+            }, dialogShowTime)
+        } else {
+            logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
+            this.showAccessDeniedMessage()
+            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Jerárquico")
         }
     }
 
