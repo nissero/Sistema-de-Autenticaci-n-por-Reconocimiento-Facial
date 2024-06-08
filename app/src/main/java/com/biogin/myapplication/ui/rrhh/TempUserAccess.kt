@@ -1,6 +1,7 @@
 package com.biogin.myapplication.ui.rrhh
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -8,12 +9,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
+import com.biogin.myapplication.data.Result
+import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.utils.DatePickerDialog
 import com.biogin.myapplication.utils.PopUpUtils
+import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 class TempUserAccess : AppCompatActivity() {
@@ -50,18 +59,38 @@ class TempUserAccess : AppCompatActivity() {
 
         continueButton = findViewById(R.id.continue_button)
 
+        dataSource = LoginDataSource()
+
         val recyclerView: RecyclerView = findViewById(R.id.options_recycler_view)
 
-        options = mutableListOf()
 
-        for (i in 0..15){
-            options.add(i, Option("Option $i"))
+
+        var result: Result<MutableList<String>>
+        runBlocking {
+            lifecycleScope.launch {
+                result = dataSource.getLugares(dniUser)
+                if (result is Result.Success) {
+                    options = mutableListOf()
+
+                    val lugares = (result as Result.Success<MutableList<String>>).data
+                    Log.d("getLugares", "LUGARES NO ACCEDIBLES X USUARIO: $lugares")
+                    for ((index, lugar) in lugares.withIndex()){
+                        options.add(index, Option(lugar))
+                    }
+
+                    adapter = OptionsAdapter(options) {enableButton()}
+
+                    recyclerView.layoutManager = LinearLayoutManager(this@TempUserAccess)
+                    recyclerView.adapter = adapter
+                } else {
+                    Log.e("getLugares", "error")
+                }
+            }
         }
 
         // Create and set the adapter
-        adapter = OptionsAdapter(options)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+
+
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) { enableButton() }
@@ -72,9 +101,32 @@ class TempUserAccess : AppCompatActivity() {
         }
 
         continueButton.setOnClickListener {
-            val selectedOptions = getSelectedOptions()
-            // Do something with the selected options
-            Toast.makeText(this, "Selected options: $selectedOptions", Toast.LENGTH_SHORT).show()
+            val optionsSelected = getSelectedOptions()
+            dataSource.addTemportalUserAccessToLugares(
+                dniUser,
+                datePickerDialog.formatDate(fechaDesdeEditText.text.toString()),
+                datePickerDialog.formatDate(fechaHastaEditText.text.toString()),
+                optionsSelected
+            ).addOnSuccessListener {
+                popUpUtil.showPopUp(this, "El usuario tendrá acceso a $optionsSelected desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text}", "Salir")
+                finish()
+            }.addOnFailureListener { ex ->
+                try {
+                    throw ex
+                } catch (e: FirebaseFirestoreException) {
+                    if (e.code == FirebaseFirestoreException.Code.NOT_FOUND) {
+                        popUpUtil.showPopUp(this,
+                            "USUARIO NO ENCONTRADO",
+                            "Reintentar")
+                        finish()
+                    } else if (e.code == FirebaseFirestoreException.Code.INVALID_ARGUMENT) {
+                        popUpUtil.showPopUp(this,
+                            "USUARIO NO ENCONTRADO",
+                            "Reintentar")
+                        finish()
+                    }
+                }
+            }
         }
     }
 
@@ -83,7 +135,7 @@ class TempUserAccess : AppCompatActivity() {
     }
 
     private fun enableButton(){
-        continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty()
+        continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty() && adapter.isAnyOptionSelected()
     }
 
     private fun String.toCalendarDate(): Calendar {

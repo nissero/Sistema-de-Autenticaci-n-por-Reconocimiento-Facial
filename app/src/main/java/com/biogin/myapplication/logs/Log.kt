@@ -21,7 +21,9 @@ class Log (val logEventType : LogEventType, val logEventName : LogEventName,
         USER_SUCCESSFUL_AUTHENTICATION("USER SUCCESSFUL AUTHENTICATION"),
         START_OF_SHIFT("START OF SHIFT"),
         END_OF_SHIFT("END OF SHIFT"),
-        EMPTY_LOG("")
+        EMPTY_LOG(""),
+        GRANT_TEMPORAL_ACCESS("GRANT TEMPORTAL ACCESS"),
+        USER_TEMPORAL_INACTIVATION("USER TEMPORAL INACTIVATION")
     }
 
     companion object {

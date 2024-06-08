@@ -7,7 +7,8 @@ import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 
-class OptionsAdapter (private val options: MutableList<Option>) : RecyclerView.Adapter<OptionsAdapter.OptionViewHolder>() {
+class OptionsAdapter (private val options: MutableList<Option>,
+                      private val enableButton: () -> Unit) : RecyclerView.Adapter<OptionsAdapter.OptionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_option, parent, false)
@@ -20,10 +21,14 @@ class OptionsAdapter (private val options: MutableList<Option>) : RecyclerView.A
         holder.checkBox.isChecked = option.isSelected
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             option.isSelected = isChecked
+            enableButton()
         }
     }
 
     override fun getItemCount(): Int = options.size
+    fun isAnyOptionSelected(): Boolean {
+        return options.any { it.isSelected }
+    }
 
     class OptionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.option_checkbox)

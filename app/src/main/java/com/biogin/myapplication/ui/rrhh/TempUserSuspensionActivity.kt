@@ -63,17 +63,22 @@ class TempUserSuspensionActivity : AppCompatActivity() {
         }
 
         continueButton.setOnClickListener {
-            dataSource.disableForSomeTime(dniUser, datePickerDialog.formatDate(fechaDesdeEditText.text.toString()), datePickerDialog.formatDate(fechaHastaEditText.text.toString())).
-            addOnSuccessListener {
-                if (dataSource.ifSuspensionDateEqualsToday(fechaDesdeEditText.text.toString(), dniUser)){
-                    Log.d("suspensionUsuario", "BIEN")
-                    popUpUtil.showPopUp(this,
-                        "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text} con efecto inmediato", "Salir")
-                } else{
-                    popUpUtil.showPopUp(this,
-                        "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text}", "Salir")
-                }
-                finish()
+            dataSource.disableForSomeTime(
+                dniUser,
+                datePickerDialog.formatDate(fechaDesdeEditText.text.toString()),
+                datePickerDialog.formatDate(fechaHastaEditText.text.toString()))
+                .addOnSuccessListener {
+                    if (dataSource.ifSuspensionDateEqualsToday(fechaDesdeEditText.text.toString(), dniUser)){
+                        Log.d("suspensionUsuario", "BIEN")
+                        popUpUtil.showPopUp(this,
+                        "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text} con efecto inmediato",
+                            "Salir")
+                    } else{
+                        popUpUtil.showPopUp(this,
+                            "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text}",
+                            "Salir")
+                    }
+                    finish()
             }.addOnFailureListener { ex ->
                 try {
                     throw ex

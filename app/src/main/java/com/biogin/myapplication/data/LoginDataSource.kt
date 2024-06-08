@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
@@ -15,6 +16,11 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
+import com.google.firebase.firestore.dataObjects
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -391,9 +397,10 @@ class LoginDataSource {
                 transaction.update(docRefDni, dataActualizada)
             }
 
-            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_TEMPORAL_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun ifSuspensionDateEqualsToday(fechaDesde: String, dni: String): Boolean {
@@ -406,7 +413,6 @@ class LoginDataSource {
         }
         return false
     }
-
 
     @SuppressLint("SimpleDateFormat")
     private fun convertStringToTimestamp(dateString: String): Timestamp {
@@ -424,5 +430,77 @@ class LoginDataSource {
 
         return Timestamp(calendar.timeInMillis / 1000, 0)
     }
+
+    suspend fun getLugares(dniUser: String): Result<MutableList<String>> {
+        val ret = mutableListOf<String>()
+        val db = FirebaseFirestore.getInstance()
+        val collectionRef = db.collection("lugares")
+
+        var resultUserData: Result<LoggedInUser> = getUserFromFirebase(dniUser)
+        var userLugares = arrayListOf<String>()
+        if (resultUserData is Result.Success){
+            userLugares = resultUserData.data.areasAllowed
+        }
+
+        Log.d("getLugares", "LUGARES USUARIO: $userLugares")
+
+        // Realizar una consulta a la colección "lugares"
+        val task = collectionRef.get()
+        val result = task.await() // Esperar a que la consulta se complete
+
+        for (document in result) {
+            val id = document.id
+            if (userLugares.isNotEmpty()){
+                if (!userLugares.contains(id)){
+                    ret.add(id)
+                }
+            } else {
+                ret.add(id)
+            }
+        }
+
+        return Result.Success(ret)
+    }
+
+    fun addTemportalUserAccessToLugares(dni: String, fechaDesde: String, fechaHasta: String, placesSelected: List<String>): Task<Transaction> {
+        val db = FirebaseFirestore.getInstance()
+        return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
+            val dniDoc = transaction.get(docRefDni)
+
+            if (!dniDoc.exists()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val fechaDesdeTimeStamp = convertStringToTimestamp(fechaDesde)
+            val fechaHastaTimeStamp = convertStringToTimestamp(fechaHasta)
+
+            val data = dniDoc.data
+            val nuevosAtributos = mapOf(
+                "accesoDesde" to fechaDesdeTimeStamp,
+                "accesoHasta" to fechaHastaTimeStamp,
+                "areasTemporales" to placesSelected
+            )
+            val dataActualizada = data?.plus(nuevosAtributos)
+
+            if (dataActualizada != null) {
+                transaction.update(docRefDni, dataActualizada)
+            }
+
+            logsRepository.LogEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.GRANT_TEMPORAL_ACCESS, MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+        }
+    }
+
+
 
 }
