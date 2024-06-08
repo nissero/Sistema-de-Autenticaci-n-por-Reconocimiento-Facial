@@ -60,5 +60,11 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("authenticationType", "admin")
             startActivity(intent)
         }
+
+        viewBinding.buttonFaceRecognitionJerarquico.setOnClickListener {
+            val intent = Intent(this, FaceRecognitionActivity::class.java)
+            intent.putExtra("authenticationType", "jerarquico")
+            startActivity(intent)
+        }
     }
 }

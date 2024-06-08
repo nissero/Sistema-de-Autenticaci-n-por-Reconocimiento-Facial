@@ -1,123 +1,132 @@
 package com.biogin.myapplication.utils
 
-import android.util.Log
-import com.biogin.myapplication.FirebaseMethods
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-
-class AllowedAreasUtils() {
-    private var firebaseMethods = FirebaseMethods()
+class AllowedAreasUtils {
+    private var firebaseAreaMethods = FirebaseAreaMethods()
     private var modulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
+    private var inactiveModulesAssociatedWithInstitutes = HashMap<String, ArrayList<String>>()
 
     init {
-        updateMap()
+        updateMaps()
     }
     fun getAllowedAreas(institutes : ArrayList<String>) : MutableSet<String> {
         val allowedAreas = mutableSetOf<String>()
         for (institute in institutes) {
-            allowedAreas.addAll(modulesAssociatedWithInstitutes.get(institute)!!)
+            allowedAreas.addAll(modulesAssociatedWithInstitutes[institute]!!)
         }
 
         return allowedAreas
     }
 
-    fun addAreaToInstitute(instituteName: String, newArea: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(!areasArray.contains(newArea)) {
-                        areasArray.add(newArea)
-                        docRefInstitute.update("areas", areasArray)
-                        Log.d("Firebase", "Se agregó el area $newArea al instituto $instituteName")
-
-                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newArea)
-                    } else {
-                        Log.d("Firebase", "Ya existe el area $newArea en el instituto $instituteName")
-                    }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
+    fun addArea(newArea: String, ici: Boolean, ico: Boolean,
+                idei: Boolean, idh: Boolean) {
+        firebaseAreaMethods.addArea(newArea, ici, ico, idei, idh) {
+            success ->
+            run {
+                if(success) {
+                    if (ici) modulesAssociatedWithInstitutes["ICI"]?.add(newArea)
+                    if (ico) modulesAssociatedWithInstitutes["ICO"]?.add(newArea)
+                    if (idei) modulesAssociatedWithInstitutes["IDEI"]?.add(newArea)
+                    if (idh) modulesAssociatedWithInstitutes["IDH"]?.add(newArea)
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
-            }
+        }
     }
 
-    fun removeAreaFromInstitute(instituteName: String, areaToRemove: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(areasArray.contains(areaToRemove)) {
-                        docRefInstitute.update("areas", FieldValue.arrayRemove(areaToRemove))
-                        Log.d("Firebase", "Se eliminó el area $areaToRemove del instituto $instituteName")
-
-                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(areaToRemove)
-                    } else {
-                        Log.d("Firebase", "No existe el area $areaToRemove en el " +
-                                "instituto $instituteName")
+    fun deactivateArea(areaToRemove: String) {
+        firebaseAreaMethods.deactivateArea(areaToRemove) {
+            success ->
+            run {
+                if(success) {
+                    if(modulesAssociatedWithInstitutes["ICI"]?.contains(areaToRemove) == true) {
+                        modulesAssociatedWithInstitutes["ICI"]?.remove(areaToRemove)
+                        inactiveModulesAssociatedWithInstitutes["ICI"]?.add(areaToRemove)
                     }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
+                    if(modulesAssociatedWithInstitutes["ICO"]?.contains(areaToRemove) == true) {
+                        modulesAssociatedWithInstitutes["ICO"]?.remove(areaToRemove)
+                        inactiveModulesAssociatedWithInstitutes["ICO"]?.add(areaToRemove)
+                    }
+                    if(modulesAssociatedWithInstitutes["IDH"]?.contains(areaToRemove) == true) {
+                        modulesAssociatedWithInstitutes["IDH"]?.remove(areaToRemove)
+                        inactiveModulesAssociatedWithInstitutes["IDH"]?.add(areaToRemove)
+                    }
+                    if(modulesAssociatedWithInstitutes["IDEI"]?.contains(areaToRemove) == true) {
+                        modulesAssociatedWithInstitutes["IDEI"]?.remove(areaToRemove)
+                        inactiveModulesAssociatedWithInstitutes["IDEI"]?.add(areaToRemove)
+                    }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
-            }
+        }
     }
 
-    fun updateName(instituteName: String, oldName: String, newName: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRefInstitute = db.collection("institutos").document(instituteName)
-        docRefInstitute.get()
-            .addOnSuccessListener { instituteDocument ->
-                if (instituteDocument != null) {
-                    val instituteData = instituteDocument.data
-                    val areasArray = instituteData?.get("areas") as ArrayList<String>
-                    if(areasArray.contains(oldName)) {
-                        docRefInstitute.update("areas", FieldValue.arrayRemove(oldName))
-                        docRefInstitute.update("areas", FieldValue.arrayUnion(newName))
-                        Log.d("Firebase", "Se actualizó el nombre de $oldName a $newName " +
-                                "en el instituto $instituteName")
-
-                        modulesAssociatedWithInstitutes.get(instituteName)?.remove(oldName)
-                        modulesAssociatedWithInstitutes.get(instituteName)?.add(newName)
-                    } else {
-                        Log.d("Firebase", "No existe el area $newName en el " +
-                                "instituto $instituteName")
+    fun activateArea(area: String) {
+        firebaseAreaMethods.activateArea(area) {
+            success ->
+            run {
+                if(success) {
+                    if(inactiveModulesAssociatedWithInstitutes["ICI"]?.contains(area) == true) {
+                        inactiveModulesAssociatedWithInstitutes["ICI"]?.remove(area)
+                        modulesAssociatedWithInstitutes["ICI"]?.add(area)
                     }
-                } else {
-                    Log.d("Firebase", "No existe el documento")
+                    if(inactiveModulesAssociatedWithInstitutes["ICO"]?.contains(area) == true) {
+                        inactiveModulesAssociatedWithInstitutes["ICO"]?.remove(area)
+                        modulesAssociatedWithInstitutes["ICO"]?.add(area)
+                    }
+                    if(inactiveModulesAssociatedWithInstitutes["IDH"]?.contains(area) == true) {
+                        inactiveModulesAssociatedWithInstitutes["IDH"]?.remove(area)
+                        modulesAssociatedWithInstitutes["IDH"]?.add(area)
+                    }
+                    if(inactiveModulesAssociatedWithInstitutes["IDEI"]?.contains(area) == true) {
+                        inactiveModulesAssociatedWithInstitutes["IDEI"]?.remove(area)
+                        modulesAssociatedWithInstitutes["IDEI"]?.add(area)
+                    }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("Firebase", "Se fallo al obtener el documento del instituto $instituteName", exception)
+        }
+    }
+
+    fun modifyArea(area: String, ici: Boolean, ico: Boolean,
+                   idei: Boolean, idh: Boolean) {
+        firebaseAreaMethods.modifyArea(area, ici, ico, idei, idh) {
+            success ->
+            run {
+                if(success) {
+                    if(modulesAssociatedWithInstitutes["ICI"]?.contains(area) == true &&
+                        !ici) {
+                        modulesAssociatedWithInstitutes["ICI"]?.remove(area)
+                    } else if(modulesAssociatedWithInstitutes["ICI"]?.contains(area) == false &&
+                        ici) {
+                        modulesAssociatedWithInstitutes["ICI"]?.add(area)
+                    }
+
+                    if(modulesAssociatedWithInstitutes["ICO"]?.contains(area) == true &&
+                        !ico) {
+                        modulesAssociatedWithInstitutes["ICO"]?.remove(area)
+                    } else if(modulesAssociatedWithInstitutes["ICO"]?.contains(area) == false &&
+                        ico) {
+                        modulesAssociatedWithInstitutes["ICO"]?.add(area)
+                    }
+
+                    if(modulesAssociatedWithInstitutes["IDEI"]?.contains(area) == true &&
+                        !idei) {
+                        modulesAssociatedWithInstitutes["IDEI"]?.remove(area)
+                    } else if(modulesAssociatedWithInstitutes["IDEI"]?.contains(area) == false &&
+                        idei) {
+                        modulesAssociatedWithInstitutes["IDEI"]?.add(area)
+                    }
+
+                    if(modulesAssociatedWithInstitutes["IDH"]?.contains(area) == true &&
+                        !idh) {
+                        modulesAssociatedWithInstitutes["IDH"]?.remove(area)
+                    } else if(modulesAssociatedWithInstitutes["IDH"]?.contains(area) == false &&
+                        idh) {
+                        modulesAssociatedWithInstitutes["IDH"]?.add(area)
+                    }
+                }
             }
-    }
-
-    private fun updateMap() {
-        firebaseMethods.readInstitutes("ICI") {
-            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
-        }
-        firebaseMethods.readInstitutes("ICO") {
-            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
-        }
-        firebaseMethods.readInstitutes("IDH") {
-            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
-        }
-        firebaseMethods.readInstitutes("IDEI") {
-            institute -> modulesAssociatedWithInstitutes.set(institute.name, institute.areas)
         }
     }
 
-    fun getInstitutesFromArea(area: String): ArrayList<String> {
+    fun getInstitutesFromActiveArea(area: String): ArrayList<String> {
         val institutes = ArrayList<String>()
 
         for(institute in modulesAssociatedWithInstitutes.keys) {
@@ -129,7 +138,7 @@ class AllowedAreasUtils() {
         return institutes
     }
 
-    fun getAllAreas(): ArrayList<String> {
+    fun getAllActiveAreas(): ArrayList<String> {
         val allAreas = ArrayList<String>()
 
         for(institute in modulesAssociatedWithInstitutes) {
@@ -145,4 +154,55 @@ class AllowedAreasUtils() {
         return allAreas
     }
 
+    fun getAllInactiveAreas(): ArrayList<String> {
+        val allAreas = ArrayList<String>()
+
+        for(institute in inactiveModulesAssociatedWithInstitutes) {
+            for(area in institute.value) {
+                if(!allAreas.contains(area)) {
+                    allAreas.add(area)
+                }
+            }
+        }
+
+        allAreas.sort()
+
+        return allAreas
+    }
+
+    private fun updateMaps() {
+        firebaseAreaMethods.readActiveAreas("ICI") {
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readActiveAreas("ICO") {
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readActiveAreas("IDH") {
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readActiveAreas("IDEI") {
+                institute ->
+            modulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+
+        firebaseAreaMethods.readInactiveAreas("ICI") {
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readInactiveAreas("ICO") {
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readInactiveAreas("IDH") {
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+        firebaseAreaMethods.readInactiveAreas("IDEI") {
+                institute ->
+            inactiveModulesAssociatedWithInstitutes[institute.name] = institute.areas
+        }
+    }
 }

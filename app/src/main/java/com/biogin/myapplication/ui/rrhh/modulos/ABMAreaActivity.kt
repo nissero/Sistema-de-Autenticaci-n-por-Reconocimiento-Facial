@@ -9,14 +9,16 @@ import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
-import com.biogin.myapplication.utils.DialogUtil
+import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class ABMAreaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAbmAreaBinding
-    private val dialogUtil = DialogUtil()
-    private val areasUtil = AllowedAreasUtils()
+    private val dialogUtils = DialogUtils()
+    private val areasUtils = AllowedAreasUtils()
     private val loadingUtil = LoadingDialog(this)
+    private val stringUtils = StringUtils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbmAreaBinding.inflate(layoutInflater)
@@ -40,18 +42,11 @@ class ABMAreaActivity : AppCompatActivity() {
 
         if(type == "modify") {
             input.setText(intent.getStringExtra("name"))
-            if(intent.getBooleanExtra("ICI", false)) {
-                checkboxICI.isChecked = true
-            }
-            if(intent.getBooleanExtra("ICO", false)) {
-                checkboxICO.isChecked = true
-            }
-            if(intent.getBooleanExtra("IDH", false)) {
-                checkboxIDH.isChecked = true
-            }
-            if(intent.getBooleanExtra("IDEI", false)) {
-                checkboxIDEI.isChecked = true
-            }
+
+            checkboxICI.isChecked = intent.getBooleanExtra("ICI", false)
+            checkboxICO.isChecked = intent.getBooleanExtra("ICO", false)
+            checkboxIDH.isChecked = intent.getBooleanExtra("IDH", false)
+            checkboxIDEI.isChecked = intent.getBooleanExtra("IDEI", false)
 
             instructions.text = binding.root.context.getString(R.string.texto_ayuda_modificar)
             button.text = binding.root.context.getString(R.string.modificar_lugar_fisico)
@@ -59,32 +54,50 @@ class ABMAreaActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val areaName = input.text.toString().uppercase()
+            val areaName = stringUtils.normalizeAndSentenceCase(input.text.toString())
             if(areaName.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context,
+                dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")
                 return@setOnClickListener
             }
 
             if(!checkboxICI.isChecked && !checkboxIDEI.isChecked &&
                 !checkboxICO.isChecked && !checkboxIDH.isChecked) {
-                dialogUtil.showDialog(binding.root.context,
+                dialogUtils.showDialog(binding.root.context,
                     "Debe seleccionar al menos un instituto")
                 return@setOnClickListener
             }
 
             if(intent.getStringExtra("type") == "add") {
                 if(checkIfAreaExists(areaName)) {
-                    dialogUtil.showDialog(binding.root.context,
+                    dialogUtils.showDialog(binding.root.context,
                         "Ya existe un lugar físico de nombre $areaName, para modificarlo\n" +
                                 "debe ir a la sección previa y seguir las instrucciones")
+                    return@setOnClickListener
+                }
+
+                if(checkIfAreaIsInactive(areaName)) {
+                    val onYesFunction = {
+                        areasUtils.activateArea(areaName)
+                        dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
+                            "Lugar físico $areaName restaurado") {
+                            finish()
+                        }
+                    }
+                    val onNoFunction = {
+                        dialogUtils.showDialog(binding.root.context,
+                            "Elija otro nombre")
+                    }
+                    dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                        "Ya existe un lugar físico de nombre $areaName que se encuentra " +
+                                "inactivo, desea restaurarlo?", onYesFunction, onNoFunction)
                     return@setOnClickListener
                 }
 
                 val message =
                     addAreaAndReturnMessage(areaName, checkboxICI.isChecked, checkboxICO.isChecked,
                         checkboxIDH.isChecked, checkboxIDEI.isChecked)
-                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                dialogUtils.showDialogWithFunctionOnClose(binding.root.context, message) {
                     finish()
                 }
             } else if(intent.getStringExtra("type") == "modify") {
@@ -92,7 +105,7 @@ class ABMAreaActivity : AppCompatActivity() {
                     checkboxICI.isChecked, checkboxICO.isChecked,
                     checkboxIDH.isChecked, checkboxIDEI.isChecked)
                 val message = "$areaName ha sido modificado exitosamente"
-                dialogUtil.showDialogWithFunctionOnClose(binding.root.context, message) {
+                dialogUtils.showDialogWithFunctionOnClose(binding.root.context, message) {
                     finish()
                 }
             }
@@ -103,82 +116,31 @@ class ABMAreaActivity : AppCompatActivity() {
     private fun addAreaAndReturnMessage(name: String, ici: Boolean, ico: Boolean,
                                         idh: Boolean, idei: Boolean): String {
         var text = "$name se agregó a los siguientes institutos:\n"
-        if (ici) {
-            areasUtil.addAreaToInstitute("ICI", name)
-            text += "ICI\n"
-        }
-        if (ico) {
-            areasUtil.addAreaToInstitute("ICO", name)
-            text += "ICO\n"
-        }
-        if (idh) {
-            areasUtil.addAreaToInstitute("IDH", name)
-            text += "IDH\n"
-        }
-        if (idei) {
-            areasUtil.addAreaToInstitute("IDEI", name)
-            text += "IDEI"
-        }
+        if (ici) text += "ICI\n"
+        if (ico) text += "ICO\n"
+        if (idh) text += "IDH\n"
+        if (idei) text += "IDEI"
+
+        areasUtils.addArea(name, ici, ico, idei, idh)
 
         return text
-    }
-
-    private fun remove(name: String) {
-        areasUtil.removeAreaFromInstitute("ICI", name)
-        areasUtil.removeAreaFromInstitute("ICO", name)
-        areasUtil.removeAreaFromInstitute("IDH", name)
-        areasUtil.removeAreaFromInstitute("IDEI", name)
     }
 
     private fun modify(oldName: String, newName: String, ici: Boolean, ico: Boolean,
                        idh: Boolean, idei: Boolean) {
         if(oldName != newName) {
-            if(ici) {
-                areasUtil.addAreaToInstitute("ICI", newName)
-            }
-
-            if(ico) {
-                areasUtil.addAreaToInstitute("ICO", newName)
-            }
-
-            if(idh) {
-                areasUtil.addAreaToInstitute("IDH", newName)
-            }
-
-            if(idei) {
-                areasUtil.addAreaToInstitute("IDEI", newName)
-            }
-
-            remove(oldName)
+            areasUtils.addArea(newName, ici, ico, idei, idh)
+            areasUtils.deactivateArea(oldName)
         } else {
-            if(!intent.getBooleanExtra("ICI", false) && ici) {
-                areasUtil.addAreaToInstitute("ICI", newName)
-            } else if(intent.getBooleanExtra("ICI", false) && !ici) {
-                areasUtil.removeAreaFromInstitute("ICI", newName)
-            }
-
-            if(!intent.getBooleanExtra("ICO", false) && ico) {
-                areasUtil.addAreaToInstitute("ICO", newName)
-            } else if(intent.getBooleanExtra("ICO", false) && !ico) {
-                areasUtil.removeAreaFromInstitute("ICO", newName)
-            }
-
-            if(!intent.getBooleanExtra("IDH", false) && idh) {
-                areasUtil.addAreaToInstitute("IDH", newName)
-            } else if(intent.getBooleanExtra("IDH", false) && !idh) {
-                areasUtil.removeAreaFromInstitute("IDH", newName)
-            }
-
-            if(!intent.getBooleanExtra("IDEI", false) && idei) {
-                areasUtil.addAreaToInstitute("IDEI", newName)
-            } else if(intent.getBooleanExtra("IDEI", false) && !idei) {
-                areasUtil.removeAreaFromInstitute("IDEI", newName)
-            }
+            areasUtils.modifyArea(newName, ici, ico, idei, idh)
         }
     }
 
     private fun checkIfAreaExists(area: String): Boolean {
-        return areasUtil.getAllAreas().contains(area)
+        return areasUtils.getAllActiveAreas().contains(area)
     }
 
+    private fun checkIfAreaIsInactive(area: String): Boolean {
+        return areasUtils.getAllInactiveAreas().contains(area)
+    }
 }

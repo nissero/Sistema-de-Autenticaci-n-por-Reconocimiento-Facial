@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_abm" />
 
     <fragment
+        android:id="@+id/navigation_categorias"
+        android:name="com.biogin.myapplication.ui.rrhh.categorias.CategoriasFragment"
+        android:label="@string/title_categorias"
+        tools:layout="@layout/fragment_categorias" />
+
+    <fragment
         android:id="@+id/navigation_logs2"
         android:name="com.biogin.myapplication.ui.rrhh.logs.LogsRRHHFragment"
         android:label="@string/title_logs"

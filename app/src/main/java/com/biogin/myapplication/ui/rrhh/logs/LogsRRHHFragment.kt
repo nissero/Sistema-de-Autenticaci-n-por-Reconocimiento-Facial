@@ -51,7 +51,7 @@ class LogsRRHHFragment : Fragment() {
 
         var listaLogs : List<com.biogin.myapplication.logs.Log>
         runBlocking {
-            listaLogs = logsRepository.GetAllLogs()
+            listaLogs = logsRepository.getAllLogs()
         }
         val adapter = LogsAdapter(binding.root.context, listaLogs)
         recyclerView.adapter = adapter

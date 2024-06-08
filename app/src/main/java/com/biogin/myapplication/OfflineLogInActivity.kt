@@ -85,6 +85,7 @@ class OfflineLogInActivity : AppCompatActivity() {
             intent.putExtra("typeOfLogIn", "security")
             intent.putExtra("authorizationResult", "authorized")
             intent.putExtra("apellido", apellido)
+            intent.putExtra("connection", "offline")
             startActivity(intent)
 
             finish()
@@ -95,6 +96,7 @@ class OfflineLogInActivity : AppCompatActivity() {
             val intent = Intent(this, AuthorizationMessageActivity::class.java)
             intent.putExtra("typeOfLogIn", "security")
             intent.putExtra("authorizationResult", "denied")
+            intent.putExtra("connection", "offline")
             startActivity(intent)
             finish()
         }

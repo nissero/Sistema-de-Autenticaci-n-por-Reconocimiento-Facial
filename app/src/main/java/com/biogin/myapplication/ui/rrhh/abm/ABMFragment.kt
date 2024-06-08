@@ -15,7 +15,10 @@ import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
 import com.biogin.myapplication.ui.login.RegisterActivity
-import com.biogin.myapplication.utils.PopUpUtil
+import com.biogin.myapplication.utils.CategoriesUtils
+import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.ui.rrhh.TempUserSuspensionActivity
+import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -28,7 +31,9 @@ class ABMFragment : Fragment() {
 
     private lateinit var loginRepo: LoginRepository
     private lateinit var dataSource : LoginDataSource
-    private val popUpUtil = PopUpUtil()
+    private val popUpUtils = PopUpUtils()
+    private var categoriesUtils = CategoriesUtils()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,7 +53,7 @@ class ABMFragment : Fragment() {
 
                     if (result is Result.Success) {
                         val userData = (result as Result.Success<LoggedInUser>).data
-                        startActitivyUserManagement(userData, false)
+                        startActivityUserManagement(userData, false)
                     } else {
                         openPopupUserNotFound()
                     }
@@ -66,7 +71,25 @@ class ABMFragment : Fragment() {
                     if (result is Result.Success) {
                         val userData = (result as Result.Success<LoggedInUser>).data
                         Log.e("data", userData.toString())
-                        startActitivyUserManagement(userData, true)
+                        startActivityUserManagement(userData, true)
+                    } else {
+                        openPopupUserNotFound()
+                    }
+                }
+            }
+        }
+
+        binding.deactivateUserForXTime.setOnClickListener {
+            var result: Result<LoggedInUser>
+            runBlocking {
+                lifecycleScope.launch {
+                    val dni = binding.dniUserToFind.text.toString()
+                    result = loginRepo.getUser(dni)
+
+                    if (result is Result.Success) {
+                        val intent = Intent(binding.root.context, TempUserSuspensionActivity::class.java)
+                        intent.putExtra("dniUser", binding.dniUserToFind.text.toString())
+                        startActivity(intent)
                     } else {
                         openPopupUserNotFound()
                     }
@@ -75,7 +98,11 @@ class ABMFragment : Fragment() {
         }
 
         binding.registerUserOptionButton.setOnClickListener {
-            startActivity(Intent(binding.root.context, RegisterActivity::class.java))
+            val intent = Intent(binding.root.context, RegisterActivity::class.java)
+            intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
+            intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+            intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
+            startActivity(intent)
         }
 
         binding.deactivateUserOption.setOnClickListener {
@@ -99,35 +126,23 @@ class ABMFragment : Fragment() {
     }
 
     private fun openPopupUserNotFound() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "El usuario no existe para el DNI ingresado",
             "Reintentar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "El usuario no existe para el DNI ingresado")
-//        intent.putExtra("text_button", "Reintentar")
-//        startActivity(intent)
     }
 
     private fun openPopupUserAlreadyDeactivated() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "El usuario ya se encuentra inactivo",
             "Continuar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "El usuario ya se encuentra eliminado")
-//        intent.putExtra("text_button", "Continuar")
-//        startActivity(intent)
     }
 
     private fun openPopupUserSuccessfullyDeleted() {
-        popUpUtil.showPopUp(binding.root.context,
+        popUpUtils.showPopUp(binding.root.context,
             "Usuario desactivado de forma exitosa",
             "Continuar")
-//        val intent = Intent(binding.root.context, Popup::class.java)
-//        intent.putExtra("popup_text", "Usuario eliminado de forma exitosa")
-//        intent.putExtra("text_button", "Continuar")
-//        startActivity(intent)
     }
-    private fun startActitivyUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {
+    private fun startActivityUserManagement(userData : LoggedInUser, hasDNIUpdate : Boolean) {
         val intent = Intent(binding.root.context, UserManagement::class.java)
         intent.putExtra("dni", userData.dni)
         intent.putExtra("name", userData.name)
@@ -136,6 +151,10 @@ class ABMFragment : Fragment() {
         intent.putExtra("state", userData.state)
         intent.putExtra("category", userData.category)
         intent.putStringArrayListExtra("institutes", userData.institutes)
+
+        intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
+        intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+        intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
 
         if (hasDNIUpdate) {
             intent.putExtra("button_option_chosen", "UpdateDNI")
@@ -149,5 +168,10 @@ class ABMFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        categoriesUtils = CategoriesUtils()
     }
 }

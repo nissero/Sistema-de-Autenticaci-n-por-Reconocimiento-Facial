@@ -1,14 +1,15 @@
 package com.biogin.myapplication.utils
 
+import android.content.Context
 import android.util.Patterns
-import android.view.inputmethod.EditorInfo
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.core.text.isDigitsOnly
-import org.checkerframework.checker.regex.qual.Regex
-import java.util.regex.Pattern
 
 class FormValidations {
+
+    private val categoriesUtils = CategoriesUtils()
+
     fun validateName(textView: EditText) {
         val text = textView.text.toString().trim()
         if (text.isEmpty()) {
@@ -36,7 +37,7 @@ class FormValidations {
         val text = textView.text.toString().trim()
         if (text.isEmpty()) {
             textView.error = "El DNI es requerido"
-        }else if (!text.isDigitsOnly()) {
+        } else if (!text.isDigitsOnly()) {
             textView.error = "El DNI debe ser numerico"
         } else if (!dniRegex.matches(text)) {
             textView.error = "El DNI debe tener 7 u 8 digitos"
@@ -47,12 +48,24 @@ class FormValidations {
         val text = textView.text.toString().trim()
         if (text.isEmpty()) {
             textView.error = "El email es requerido"
-        }else if (!Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
             textView.error = "Ingrese un email valido"
         }
     }
 
-    fun isAnyInstituteSelected(institutesCheckboxes : ArrayList<CheckBox>) : Boolean{
+    private fun isCategoryValidWithInstitutesCheckboxes(
+        context: Context,
+        category: String,
+        institutes: ArrayList<CheckBox>
+    ): Boolean {
+        val categoriesWithNoInstitute = categoriesUtils.getNoInstitutesCategories()
+        if (categoriesWithNoInstitute.contains(category)) {
+            return true
+        }
+        return isAnyInstituteSelected(institutes)
+    }
+
+    private fun isAnyInstituteSelected(institutesCheckboxes: ArrayList<CheckBox>): Boolean {
         var isAnyInstituteSelected = false
         for (checkbox in institutesCheckboxes) {
             isAnyInstituteSelected = isAnyInstituteSelected || checkbox.isChecked == true
@@ -60,11 +73,42 @@ class FormValidations {
 
         return isAnyInstituteSelected
     }
-    private fun hasOnlyLetters(text : String) : Boolean {
+
+    private fun hasOnlyLetters(text: String): Boolean {
         val alphanumericRegex = "^[A-Za-z]*$".toRegex()
         return alphanumericRegex.matches(text)
     }
 
+    fun isFormValid(
+        context: Context,
+        name: EditText,
+        surname: EditText,
+        dni: EditText,
+        email: EditText,
+        categorySelected: String,
+        institutesCheckboxes: ArrayList<CheckBox>
+    ): Boolean {
+        checkAllTextValidations(name, surname, dni, email)
 
+        val nameHasNoErrors = name.error == null
+        val surnameHasNoErrors = surname.error == null
+        val dniHasNoErrors = dni.error == null
+        val emailHasNoErrors = email.error == null
+        val institutesCheckboxesHasNoErrors =
+            isCategoryValidWithInstitutesCheckboxes(context, categorySelected, institutesCheckboxes)
 
+        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors && institutesCheckboxesHasNoErrors
+    }
+
+    private fun checkAllTextValidations(
+        name: EditText,
+        surname: EditText,
+        dni: EditText,
+        email: EditText
+    ) {
+        validateName(name)
+        validateSurname(surname)
+        validateDNI(dni)
+        validateEmail(email)
+    }
 }

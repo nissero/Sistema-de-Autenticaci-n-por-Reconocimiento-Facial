@@ -5,20 +5,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.text.toUpperCase
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
-import com.biogin.myapplication.utils.DialogUtil
-import com.biogin.myapplication.utils.PopUpUtil
-import java.util.Locale
+import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class ModulosFragment : Fragment() {
 
     private var _binding: FragmentModulosBinding? = null
     private var areasUtils = AllowedAreasUtils()
-    private val dialogUtil = DialogUtil()
+    private val dialogUtils = DialogUtils()
+    private val popUpUtils = PopUpUtils()
+    private val stringUtils = StringUtils()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -55,61 +56,81 @@ class ModulosFragment : Fragment() {
         }
 
         binding.modificarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().uppercase()
+            val area = stringUtils.normalizeAndSentenceCase(binding.modificarInput.text.toString())
 
             if(area.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context, "El campo no puede estar vacío")
+                dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
 
-            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+            val arrayInstitutes = areasUtils.getInstitutesFromActiveArea(area)
+            val areaIsInactive = areasUtils.getAllInactiveAreas().contains(area)
 
-            if(arrayInstitutes.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
+            if(arrayInstitutes.isEmpty() && !areaIsInactive) {
+                dialogUtils.showDialog(binding.root.context, "No existe un lugar físico\n" +
                         "de nombre $area")
+                return@setOnClickListener
+            }
+
+            if(areaIsInactive) {
+                val onYesFunction = {
+                    areasUtils.activateArea(area)
+                    popUpUtils.showPopUp(binding.root.context,
+                        "Lugar físico $area restaurado", "Cerrar")
+                    binding.modificarInput.text.clear()
+                }
+                val onNoFunction = {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Elija otro nombre")
+                }
+                dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                    "Ya existe un lugar físico de nombre $area que se encuentra " +
+                            "inactivo, desea restaurarlo?", onYesFunction, onNoFunction)
                 return@setOnClickListener
             }
 
             val intent = Intent(binding.root.context, ABMAreaActivity::class.java)
             intent.putExtra("type", "modify")
             intent.putExtra("name", area)
-            if(arrayInstitutes.contains("ICI"))
-                intent.putExtra("ICI", true)
-            else intent.putExtra("ICI", false)
-            if(arrayInstitutes.contains("ICO"))
-                intent.putExtra("ICO", true)
-            else intent.putExtra("ICO", false)
-            if(arrayInstitutes.contains("IDEI"))
-                intent.putExtra("IDEI", true)
-            else intent.putExtra("IDEI", false)
-            if(arrayInstitutes.contains("IDH"))
-                intent.putExtra("IDH", true)
-            else intent.putExtra("IDH", false)
+            intent.putExtra("ICI", arrayInstitutes.contains("ICI"))
+            intent.putExtra("ICO", arrayInstitutes.contains("ICO"))
+            intent.putExtra("IDEI", arrayInstitutes.contains("IDEI"))
+            intent.putExtra("IDH", arrayInstitutes.contains("IDH"))
 
             startActivity(intent)
         }
 
         binding.eliminarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().uppercase()
+            val area = stringUtils.normalizeAndSentenceCase(binding.modificarInput.text.toString())
 
             if(area.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context, "El campo no puede estar vacío")
+                dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
                 return@setOnClickListener
             }
 
-            val arrayInstitutes = areasUtils.getInstitutesFromArea(area)
+            val areas = areasUtils.getAllActiveAreas()
 
-            if(arrayInstitutes.isEmpty()) {
-                dialogUtil.showDialog(binding.root.context, "No existe un lugar físico\n" +
+            if(!areas.contains(area)) {
+                dialogUtils.showDialog(binding.root.context, "No existe un lugar físico\n" +
                         "de nombre $area")
                 return@setOnClickListener
             }
 
-            for (institute in arrayInstitutes) {
-                areasUtils.removeAreaFromInstitute(institute, area)
+            val onYesFunction = {
+                areasUtils.deactivateArea(area)
+
+                popUpUtils.showPopUp(binding.root.context,
+                    "$area ha sido desactivado exitosamente", "Cerrar")
+                binding.modificarInput.text.clear()
             }
-            dialogUtil.showDialog(binding.root.context, "$area ha sido eliminado exitosamente")
-            binding.modificarInput.text.clear()
+
+            val onNoFunction = {
+                dialogUtils.showDialog(binding.root.context,
+                    "Elija otro nombre")
+            }
+
+            dialogUtils.showDialogWithTwoFunctionOnClose(binding.root.context,
+                "Desea desactivar el lugar físico $area?", onYesFunction, onNoFunction)
         }
 
         return root
@@ -126,7 +147,7 @@ class ModulosFragment : Fragment() {
                 dialogText += ",\n"
             }
             dialogText = dialogText.subSequence(0, dialogText.length - 2).toString()
-            dialogUtil.showDialog(binding.root.context, dialogText)
+            dialogUtils.showDialog(binding.root.context, dialogText)
         } catch(e: NullPointerException) {
             try {
                 Thread.sleep(5000)
@@ -136,9 +157,9 @@ class ModulosFragment : Fragment() {
                     dialogText += ",\n"
                 }
                 dialogText = dialogText.subSequence(0, dialogText.length - 2).toString()
-                dialogUtil.showDialog(binding.root.context, dialogText)
+                dialogUtils.showDialog(binding.root.context, dialogText)
             } catch(e: Exception) {
-                dialogUtil.showDialog(binding.root.context,
+                dialogUtils.showDialog(binding.root.context,
                     "No se pudo obtener la información en este momento\npruebe mas tarde")
             }
         }

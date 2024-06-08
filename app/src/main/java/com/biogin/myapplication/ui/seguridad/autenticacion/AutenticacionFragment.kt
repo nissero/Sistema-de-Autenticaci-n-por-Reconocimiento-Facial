@@ -1,6 +1,5 @@
 package com.biogin.myapplication.ui.seguridad.autenticacion
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +22,6 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.utils.ConnectionCheck
-import java.net.ConnectException
 
 class AutenticacionFragment : Fragment() {
 
@@ -80,22 +77,6 @@ class AutenticacionFragment : Fragment() {
             autenticacionOfflineButton.visibility = View.INVISIBLE
         }
 
-
-        //metodo para crear una actividad nueva y obtener un resultado
-        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
-                val data: Intent? = result.data
-                if(data?.getBooleanExtra("autenticado", false) == true) {
-                    turnoIniciado = false
-                    autenticacionButton.visibility = View.INVISIBLE
-                    autenticacionOfflineButton.visibility = View.INVISIBLE
-                    turnoButton.text = this.context?.getString(R.string.iniciar_turno)
-                    mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
-                }
-            }
-        }
-
         autenticacionButton.setOnClickListener {
             val intent = Intent(root.context, FaceRecognitionActivity::class.java)
             intent.putExtra("authenticationType", "visitante")
@@ -122,7 +103,7 @@ class AutenticacionFragment : Fragment() {
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.startOfShift(dniMaster)
@@ -143,14 +124,11 @@ class AutenticacionFragment : Fragment() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.endOfShift(dniMaster)
                                 }
-//                                val intent = Intent(root.context, FaceRecognitionActivity::class.java)
-//                                intent.putExtra("authenticationType", "fin de turno")
-//                                resultLauncher.launch(intent)
                                 turnoIniciado = false
                                 autenticacionButton.visibility = View.INVISIBLE
                                 autenticacionOfflineButton.visibility = View.INVISIBLE
@@ -168,6 +146,21 @@ class AutenticacionFragment : Fragment() {
                     .setNegativeButton("No", dialogClickListener).show()
             }
         }
+
+        //metodo para crear una actividad nueva y obtener un resultado
+//        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                // There are no request codes
+//                val data: Intent? = result.data
+//                if(data?.getBooleanExtra("autenticado", false) == true) {
+//                    turnoIniciado = false
+//                    autenticacionButton.visibility = View.INVISIBLE
+//                    autenticacionOfflineButton.visibility = View.INVISIBLE
+//                    turnoButton.text = this.context?.getString(R.string.iniciar_turno)
+//                    mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
+//                }
+//            }
+//        }
 
         return root
     }

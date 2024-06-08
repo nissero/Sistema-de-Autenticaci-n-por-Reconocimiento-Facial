@@ -8,31 +8,40 @@
     android:background="#E6E6E6"
     tools:context=".HomeActivity">
 
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Biogin X"
+        android:fontFamily="monospace"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/home_photo"
         android:layout_width="0dp"
         android:layout_height="196dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="250dp"
+        android:layout_marginBottom="380dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.67"
-        app:srcCompat="@drawable/home_user_photo" />
+        app:srcCompat="@drawable/main_logo" />
 
     <Button
         android:id="@+id/button_face_recognition_security"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
         android:text="@string/home_text_enter_face_recognition"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/button_face_recognition_rrhh"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/home_photo" />
@@ -41,12 +50,11 @@
         android:id="@+id/button_face_recognition_rrhh"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
         android:text="@string/home_text_enter_face_recognition_rrhh"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/button_login_offline"
         app:layout_constraintEnd_toEndOf="@+id/button_face_recognition_security"
         app:layout_constraintStart_toStartOf="@+id/button_face_recognition_security"
         app:layout_constraintTop_toBottomOf="@+id/button_face_recognition_security" />
@@ -55,26 +63,38 @@
         android:id="@+id/button_login_offline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
         android:text="@string/home_text_enter_dni_scanner"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/button_face_recognition_admin"
         app:layout_constraintEnd_toEndOf="@+id/button_face_recognition_security"
         app:layout_constraintStart_toStartOf="@+id/button_face_recognition_security"
         app:layout_constraintTop_toBottomOf="@+id/button_face_recognition_rrhh" />
 
     <Button
+        android:id="@+id/button_face_recognition_jerarquico"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/blue"
+        android:layout_marginTop="20dp"
+        android:text="@string/home_text_enter_face_recognition_jerarquico"
+        app:layout_constraintEnd_toEndOf="@+id/button_face_recognition_admin"
+        app:layout_constraintStart_toStartOf="@+id/button_face_recognition_admin"
+        app:layout_constraintTop_toBottomOf="@+id/button_login_offline" />
+
+    <Button
         android:id="@+id/button_face_recognition_admin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
         android:backgroundTint="@color/blue"
+        android:layout_marginTop="20dp"
         android:text="@string/home_text_enter_face_recognition_admin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/button_face_recognition_security"
-        app:layout_constraintStart_toStartOf="@+id/button_face_recognition_security"
-        app:layout_constraintTop_toBottomOf="@+id/button_login_offline" />
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="@+id/button_login_offline"
+        app:layout_constraintStart_toStartOf="@+id/button_login_offline"
+        app:layout_constraintTop_toBottomOf="@+id/button_face_recognition_jerarquico" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

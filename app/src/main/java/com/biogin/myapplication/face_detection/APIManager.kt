@@ -51,6 +51,7 @@ class APIManager(
                         Log.d(TAG, "$responseBody")
                         Log.d(TAG, "RESULTADO LIMPIO: $cleanDNI")
 
+                        Log.d("LOGIN", "API RESPONDIO")
                         onResult(cleanDNI) // Devolver el resultado de la detección de cara
                     }
 
