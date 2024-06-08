@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.parse.ParseFile
 import com.parse.ParseObject
@@ -56,6 +57,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                    private val dialogShowTime: Long?,
                    private var withAnalyzer: Boolean
 ) {
+
+    private val firestore = FirebaseFirestore.getInstance()
 
     private var imageCapture: ImageCapture? = null
     private lateinit var imageAnalyzer: ImageAnalysis
@@ -233,34 +236,24 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         val imageBytes = outputStream.toByteArray()
 
-        // Build the request body with the image bytes
-        val requestBody = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("image", "face.jpg", imageBytes.toRequestBody(MultipartBody.FORM))
-            .addFormDataPart("name", dni)
-            .build()
+        saveRequestToFirestore(imageBytes, dni)
+    }
 
-        // Build the request with the request body
-        val request = Request.Builder()
-            .url("https://Biogin.pythonanywhere.com/train")
-            .post(requestBody)
-            .build()
+    private fun saveRequestToFirestore(imageBytes: ByteArray, dni: String) {
+        val request = hashMapOf(
+            "image" to imageBytes,
+            "dni" to dni,
+            "timestamp" to System.currentTimeMillis()
+        )
 
-        // Execute the request asynchronously
-        val client = OkHttpClient()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to make request: ${e.message}")
-                callback(null)
+        firestore.collection("requests")
+            .add(request)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "Request added with ID: ${documentReference.id}")
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                // Log training result
-                Log.d(TAG, "Training result: $responseBody")
-                callback(responseBody)
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding request", e)
             }
-        })
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
