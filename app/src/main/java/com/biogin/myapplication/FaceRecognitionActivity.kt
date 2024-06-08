@@ -326,6 +326,15 @@ class FaceRecognitionActivity : AppCompatActivity() {
             intent.putExtra("categoria", user.getCategoria())
             intent.putExtra("areasPermitidas", user.getAreasPermitidas())
 
+            if(user.hasAreasTemporales()){
+                intent.putExtra("hasAreasTemporales", true)
+                intent.putExtra("areasTemporales", user.getAreasTemporales())
+                intent.putExtra("accesoDesde", user.getAccesoDesde())
+                intent.putExtra("accesoHasta", user.getAccesoHasta())
+            } else{
+                intent.putExtra("hasAreasTemporales", false)
+            }
+
             //LOGIN DATA
             intent.putExtra("typeOfLogIn", "visitor")
             intent.putExtra("authorizationResult", "authorized")

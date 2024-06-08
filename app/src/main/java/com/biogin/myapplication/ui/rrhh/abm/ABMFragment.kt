@@ -14,6 +14,7 @@ import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.data.Result
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.databinding.FragmentAbmBinding
+import com.biogin.myapplication.ui.rrhh.TempUserAccess
 import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtils
@@ -88,6 +89,24 @@ class ABMFragment : Fragment() {
 
                     if (result is Result.Success) {
                         val intent = Intent(binding.root.context, TempUserSuspensionActivity::class.java)
+                        intent.putExtra("dniUser", binding.dniUserToFind.text.toString())
+                        startActivity(intent)
+                    } else {
+                        openPopupUserNotFound()
+                    }
+                }
+            }
+        }
+
+        binding.grantAccessForXTime.setOnClickListener {
+            var result: Result<LoggedInUser>
+            runBlocking {
+                lifecycleScope.launch {
+                    val dni = binding.dniUserToFind.text.toString()
+                    result = loginRepo.getUser(dni)
+
+                    if (result is Result.Success) {
+                        val intent = Intent(binding.root.context, TempUserAccess::class.java)
                         intent.putExtra("dniUser", binding.dniUserToFind.text.toString())
                         startActivity(intent)
                     } else {

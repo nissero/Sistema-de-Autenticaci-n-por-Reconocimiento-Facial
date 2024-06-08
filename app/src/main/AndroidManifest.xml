@@ -26,6 +26,9 @@
         <activity
             android:name=".ui.jerarquico.JerarquicoActivity"
             android:exported="false" />
+      <activity
+            android:name=".ui.rrhh.TempUserAccess"
+            android:exported="false" />
         <activity
             android:name=".ui.rrhh.categorias.ABMCategoryActivity"
             android:exported="false" /> <!-- <activity -->

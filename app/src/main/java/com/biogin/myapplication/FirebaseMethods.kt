@@ -1,8 +1,10 @@
 package com.biogin.myapplication
 
+import android.icu.text.SimpleDateFormat
 import android.util.Log
 import com.biogin.myapplication.data.Category
 import com.biogin.myapplication.data.Institute
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -26,7 +28,32 @@ class FirebaseMethods {
                     val estado = userData?.get("estado") as? String ?: ""
                     val areasPermitidas = userData?.get("areasPermitidas") as? ArrayList<String> ?: arrayListOf()
 
-                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria, estado, areasPermitidas)
+                    var areasTemporales: ArrayList<String> = arrayListOf()
+
+                    val accesoDesde: Timestamp?
+                    val accesoHasta: Timestamp?
+
+                    var accesoDesdeString = ""
+                    var accesoHastaString = ""
+
+                    val hasAreasTemporales = userData?.containsKey("areasTemporales") ?: false
+                    val hasAccesoDesde = userData?.containsKey("accesoDesde") ?: false
+                    val hasAccesoHasta = userData?.containsKey("accesoHasta") ?: false
+
+                    if (hasAreasTemporales && hasAccesoDesde && hasAccesoHasta){
+                        areasTemporales = userData?.get("areasTemporales") as? ArrayList<String> ?: arrayListOf()
+                        accesoDesde = documentSnapshot.getTimestamp("accesoDesde")
+                        accesoHasta = documentSnapshot.getTimestamp("accesoHasta")
+
+                        val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy")
+                        accesoDesdeString = simpleDateFormat.format(accesoDesde?.toDate())
+                        accesoHastaString = simpleDateFormat.format(accesoHasta?.toDate())
+                    }
+
+                    Log.d("LOGIN", accesoDesdeString)
+                    Log.d("LOGIN", accesoHastaString)
+
+                    val usuario = Usuario(nombre, apellido, dni, email, area, categoria, estado, areasPermitidas, areasTemporales, accesoDesdeString, accesoHastaString)
 
                     Log.d("LOGIN", "FIREBASE RESPONDIO")
                     callback(usuario)
