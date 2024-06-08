@@ -9,7 +9,10 @@ class Usuario (
     private val area: String = "",
     private val categoria: String = "",
     private val estado: String = "",
-    private val areasPermitidas: ArrayList<String> = ArrayList()
+    private val areasPermitidas: ArrayList<String> = ArrayList(),
+    private val areasTemporales: ArrayList<String> = ArrayList(),
+    private val accesoDesde: String = "",
+    private val accesoHasta: String = ""
 ){
     fun getNombre(): String {
         return nombre
@@ -24,7 +27,7 @@ class Usuario (
     }
 
     fun getEstado(): Boolean {
-        return estado.toLowerCase() == "activo"
+        return estado.lowercase() == "activo"
     }
 
     fun getEmail(): String {
@@ -45,6 +48,26 @@ class Usuario (
         return areasPermitidas.ifEmpty {
             "Ninguna"
         }
+    }
+
+    fun getAreasTemporales(): String{
+        val areasTemporales = areasTemporales.joinToString()
+
+        return areasTemporales.ifEmpty {
+            "Ninguna"
+        }
+    }
+
+    fun hasAreasTemporales(): Boolean{
+        return areasTemporales.isNotEmpty()
+    }
+
+    fun getAccesoDesde(): String{
+        return accesoDesde
+    }
+
+    fun getAccesoHasta(): String{
+        return accesoHasta
     }
 
     //MODIFICAR CUANDO SE MODIFIQUE LA BASE DE DATOS
