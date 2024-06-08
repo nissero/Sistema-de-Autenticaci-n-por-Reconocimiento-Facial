@@ -11,6 +11,7 @@ import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class ModulosFragment : Fragment() {
 
@@ -18,6 +19,7 @@ class ModulosFragment : Fragment() {
     private var areasUtils = AllowedAreasUtils()
     private val dialogUtils = DialogUtils()
     private val popUpUtils = PopUpUtils()
+    private val stringUtils = StringUtils()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -54,7 +56,7 @@ class ModulosFragment : Fragment() {
         }
 
         binding.modificarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val area = stringUtils.normalizeAndSentenceCase(binding.modificarInput.text.toString())
 
             if(area.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")
@@ -99,7 +101,7 @@ class ModulosFragment : Fragment() {
         }
 
         binding.eliminarButton.setOnClickListener {
-            val area = binding.modificarInput.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val area = stringUtils.normalizeAndSentenceCase(binding.modificarInput.text.toString())
 
             if(area.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context, "El campo no puede estar vacío")

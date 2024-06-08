@@ -10,6 +10,7 @@ import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
+import com.biogin.myapplication.utils.StringUtils
 
 class ABMAreaActivity : AppCompatActivity() {
 
@@ -17,6 +18,7 @@ class ABMAreaActivity : AppCompatActivity() {
     private val dialogUtils = DialogUtils()
     private val areasUtils = AllowedAreasUtils()
     private val loadingUtil = LoadingDialog(this)
+    private val stringUtils = StringUtils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbmAreaBinding.inflate(layoutInflater)
@@ -52,7 +54,7 @@ class ABMAreaActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val areaName = input.text.toString().lowercase().replaceFirstChar(Char::titlecase)
+            val areaName = stringUtils.normalizeAndSentenceCase(input.text.toString())
             if(areaName.isEmpty()) {
                 dialogUtils.showDialog(binding.root.context,
                     "El campo de nombre no puede estar vacío")

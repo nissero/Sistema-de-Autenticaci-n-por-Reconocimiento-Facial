@@ -1,6 +1,5 @@
 package com.biogin.myapplication.ui.seguridad.autenticacion
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +22,6 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.utils.ConnectionCheck
-import java.net.ConnectException
 
 class AutenticacionFragment : Fragment() {
 
@@ -106,7 +103,7 @@ class AutenticacionFragment : Fragment() {
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.startOfShift(dniMaster)
@@ -127,7 +124,7 @@ class AutenticacionFragment : Fragment() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.LogEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.endOfShift(dniMaster)

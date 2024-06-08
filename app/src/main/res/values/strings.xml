@@ -29,21 +29,21 @@
     <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
     <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
     <string name="authorization_message_continue_button">OK</string>
-<!--    <string-array name="user_categories">-->
-<!--        <item>Docente</item>-->
-<!--        <item>No docente</item>-->
-<!--        <item>Estudiante</item>-->
-<!--        <item>Externo</item>-->
-<!--        <item>Jerarquico</item>-->
-<!--        <item>RRHH</item>-->
-<!--        <item>Temporal</item>-->
-<!--    </string-array>-->
-<!--    <string-array name="user_categories_with_no_institute">-->
-<!--        <item>Externo</item>-->
-<!--        <item>Temporal</item>-->
-<!--        <item>RRHH</item>-->
-<!--        <item>Jerarquico</item>-->
-<!--    </string-array>-->
+    <!--    <string-array name="user_categories">-->
+    <!--        <item>Docente</item>-->
+    <!--        <item>No docente</item>-->
+    <!--        <item>Estudiante</item>-->
+    <!--        <item>Externo</item>-->
+    <!--        <item>Jerarquico</item>-->
+    <!--        <item>RRHH</item>-->
+    <!--        <item>Temporal</item>-->
+    <!--    </string-array>-->
+    <!--    <string-array name="user_categories_with_no_institute">-->
+    <!--        <item>Externo</item>-->
+    <!--        <item>Temporal</item>-->
+    <!--        <item>RRHH</item>-->
+    <!--        <item>Jerarquico</item>-->
+    <!--    </string-array>-->
     <string-array name="user_active_options">
         <item>Activo</item>
         <item>Inactivo</item>
@@ -158,4 +158,7 @@
     <string name="back4app_client_key">P22gWwIeukQA3yiFIBohWEDDjFkqS1zEUTZPjgBG</string>
     <string name="home_text_enter_face_recognition_admin">Ingresar con reconocimiento facial (ADMIN)</string>
     <string name="text_select_at_least_an_institute">* Seleccione al menos un instituto</string>
+    <string name="home_text_enter_face_recognition_jerarquico">Ingresar con reconocimiento facial (JERÁRQUICO)</string>
+    <string name="ayuda_mail_jerarquico">Para configurar el mail al cual se enviarán\nlos reportes, complete el siguiente campo</string>
+    <string name="ayuda_dias_entrenamiento">Seleccione los días en los que se entrenaran\nlos modelos para la autenticación facil</string>
 </resources>

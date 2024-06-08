@@ -14,19 +14,19 @@ import java.util.Date
 import java.util.Locale
 
 class LogsRepository {
-    val LOGS_COLLECTION_NAME = "logs"
-    suspend fun GetAllLogs() : List<Log> {
+    private val LOGS_COLLECTION_NAME = "logs"
+    suspend fun getAllLogs() : List<Log> {
         val db = FirebaseFirestore.getInstance()
         val logs : ArrayList<Log> = ArrayList()
 
         val collectionRef = db.collection(LOGS_COLLECTION_NAME)
-        var logsObtained = collectionRef.
+        val logsObtained = collectionRef.
             get().
             await()
             .documents
 
         for (logDocument in logsObtained) {
-            var document = logDocument.data
+            val document = logDocument.data
             if (document != null) {
                 logs.add(
                     Log(
@@ -82,7 +82,7 @@ class LogsRepository {
         return s.replace("\\s+".toRegex(), "_")
     }
 
-    fun getSuccesfulAuthenticationsOfDay() : Task<QuerySnapshot> {
+    fun getSuccessfulAuthenticationsOfDay() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection(LOGS_COLLECTION_NAME).
@@ -93,7 +93,7 @@ class LogsRepository {
 
     }
 
-    fun getUnsuccesfulAuthenticationsOfDay() : Task<QuerySnapshot> {
+    fun getUnsuccessfulAuthenticationsOfDay() : Task<QuerySnapshot> {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection(LOGS_COLLECTION_NAME).
@@ -103,7 +103,7 @@ class LogsRepository {
             .get()
     }
 
-    fun LogEventWithTransaction(db : FirebaseFirestore, transaction : Transaction, logEventType : Log.LogEventType, logEventName: Log.LogEventName, dniRRHH : String, dniNewUser : String, categoryNewUser : String) :  Transaction {
+    fun logEventWithTransaction(db : FirebaseFirestore, transaction : Transaction, logEventType : Log.LogEventType, logEventName: Log.LogEventName, dniRRHH : String, dniNewUser : String, categoryNewUser : String) :  Transaction {
         val log = createHashmapLog(
             Log(
                 logEventType,
@@ -119,7 +119,7 @@ class LogsRepository {
         return transaction.set(newLogDocRef, log)
     }
 
-    fun LogEvent(logEventType : Log.LogEventType, logEventName: Log.LogEventName, dniMasterUser : String, dniNewUser : String, categoryNewUser : String) {
+    fun logEvent(logEventType : Log.LogEventType, logEventName: Log.LogEventName, dniMasterUser : String, dniNewUser : String, categoryNewUser : String) {
         val db = FirebaseFirestore.getInstance()
 
         val log = createHashmapLog(
