@@ -9,13 +9,23 @@
     tools:context=".ui.admin.AdminActivity">
 
     <TextView
-        android:id="@+id/admin_view_title"
+        android:id="@+id/title_app_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Configuración"
+        android:text="Application id"
+        app:layout_constraintBottom_toTopOf="@+id/edit_app_id"
+        app:layout_constraintEnd_toEndOf="@+id/edit_app_id"
+        app:layout_constraintStart_toStartOf="@+id/edit_app_id" />
+
+    <TextView
+        android:id="@+id/admin_view_title"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:text="Configuración ruteo"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,9 +34,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
-        android:text="Guardar"
-        android:textColor="#FFFFFF"
         android:backgroundTint="@color/blue"
+        android:text="Conectar"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -36,15 +46,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="100dp"
         android:orientation="horizontal"
         app:chipSpacing="25dp"
-        app:layout_constraintBottom_toTopOf="@+id/admin_save_config_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/admin_view_title"
-        app:layout_constraintVertical_bias="0.281"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
@@ -52,7 +61,11 @@
             style="@style/CloudChipOption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Firebase" />
+            android:text="Firebase"
+            app:checkedIconVisible="false"
+            app:chipIconVisible="false"
+            app:closeIconVisible="false"
+            android:checked="true"/>
 
         <com.google.android.material.chip.Chip
             android:id="@+id/back4apps_config_option"
@@ -62,14 +75,36 @@
             android:text="Back4Apps" />
     </com.google.android.material.chip.ChipGroup>
 
-    <TextView
-        android:id="@+id/title_cloud_routing"
+    <EditText
+        android:id="@+id/edit_app_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Ruteo cloud"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/chip_group_routing_opts"
-        app:layout_constraintEnd_toEndOf="@+id/chip_group_routing_opts"
-        app:layout_constraintStart_toStartOf="@+id/chip_group_routing_opts" />
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/title_secondary_routing_option"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chip_group_routing_opts" />
+
+    <TextView
+        android:id="@+id/title_secondary_routing_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Project id"
+        app:layout_constraintBottom_toTopOf="@+id/edit_secondary_routing_option"
+        app:layout_constraintEnd_toEndOf="@+id/edit_secondary_routing_option"
+        app:layout_constraintStart_toStartOf="@+id/edit_secondary_routing_option" />
+
+    <EditText
+        android:id="@+id/edit_secondary_routing_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/admin_save_config_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_app_id" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
