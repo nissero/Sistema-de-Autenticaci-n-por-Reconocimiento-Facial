@@ -143,14 +143,23 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         continueButton?.setOnClickListener {
-            fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-            fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+            val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
+
+            if (temporaryCategories != null) {
+                if(temporaryCategories.contains(categorySelected)) {
+                    if(fechaDesdeEditText.text.toString().isNotEmpty()) {
+                        fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                    }
+                    if(fechaHastaEditText.text.toString().isNotEmpty()) {
+                        fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+                    }
+                }
+            }
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
 
-            val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
-            val categorySelected = spinner.selectedItem.toString()
             areAllFieldsValid = validations.isFormValid(
                 binding.root.context,
                 name!!,

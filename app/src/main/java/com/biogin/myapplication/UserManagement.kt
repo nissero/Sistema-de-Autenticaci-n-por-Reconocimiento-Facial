@@ -126,22 +126,23 @@ class UserManagement : AppCompatActivity() {
         }
 
         binding.updateUserButton.setOnClickListener {
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
 
-            lateinit var fechaDesde: String
-            lateinit var fechaHasta: String
+            var fechaDesde = ""
+            var fechaHasta = ""
 
-            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
-                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-            } else {
-                fechaDesde = ""
-                fechaHasta = ""
+            if(!temporaryCategories?.contains(categorySelected)!!) {
+                if(fechaDesdeEditText.text.toString().isNotEmpty() &&
+                    fechaHastaEditText.text.toString().isNotEmpty()) {
+                    fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                    fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+                }
             }
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
-            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
-            val categorySelected = spinner.selectedItem.toString()
+
             areAllFieldsValid = validations.isFormValid(
                 binding.root.context,
                 name,
@@ -202,23 +203,23 @@ class UserManagement : AppCompatActivity() {
 //        }
 
         binding.duplicateUserButton.setOnClickListener {
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
 
-            lateinit var fechaDesde: String
-            lateinit var fechaHasta: String
+            var fechaDesde = ""
+            var fechaHasta = ""
 
-            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
-                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-            } else {
-                fechaDesde = ""
-                fechaHasta = ""
+            if(!temporaryCategories?.contains(categorySelected)!!) {
+                if(fechaDesdeEditText.text.toString().isNotEmpty() &&
+                    fechaHastaEditText.text.toString().isNotEmpty()) {
+                    fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                    fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+                }
             }
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
-            
-            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
-            val categorySelected = spinner.selectedItem.toString()
+
             areAllFieldsValid = validations.isFormValid(
                 binding.root.context,
                 name,
