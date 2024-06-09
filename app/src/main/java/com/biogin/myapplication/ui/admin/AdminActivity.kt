@@ -15,6 +15,7 @@ import com.biogin.myapplication.databinding.ActivityAdminBinding
 import com.biogin.myapplication.logs.Log
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.parse.Parse
 import com.parse.ParseObject
 import java.util.Calendar
 
@@ -88,7 +89,16 @@ class AdminActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else if (routingOptionSelected == "Back4App") {
-                logConnectionBack4App()
+                val connectionSuccessful = connectToBack4App()
+                if (connectionSuccessful) {
+                    logConnectionBack4App()
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "Conexión a Back4App fallida",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
                 Toast.makeText(
                     applicationContext,
@@ -111,20 +121,37 @@ class AdminActivity : AppCompatActivity() {
 
     private fun setBack4AppRoutingData() {
         val editTextAppId = findViewById<EditText>(R.id.edit_app_id)
-        val editTextSecondaryRoutingOption = findViewById<EditText>(R.id.edit_project_id)
+        val editTextProjectId = findViewById<EditText>(R.id.edit_project_id)
         editTextAppId.setText(back4appAppId)
-        editTextSecondaryRoutingOption.setText(back4appClientKey)
+        editTextProjectId.setText(back4appClientKey)
         routingOptionSelected = "Back4App"
     }
 
     private fun clearRoutingData() {
         val editTextAppId = findViewById<EditText>(R.id.edit_app_id)
-        val editTextSecondaryRoutingOption = findViewById<EditText>(R.id.edit_project_id)
+        val editTextProjectId = findViewById<EditText>(R.id.edit_project_id)
         editTextAppId.setText("")
-        editTextSecondaryRoutingOption.setText("")
+        editTextProjectId.setText("")
         routingOptionSelected = ""
     }
 
+    private fun connectToBack4App() : Boolean {
+        try {
+            val editTextAppId = findViewById<EditText>(R.id.edit_app_id)
+            val editTextProjectId = findViewById<EditText>(R.id.edit_project_id)
+            Parse.initialize(
+                Parse.Configuration.Builder(this)
+                    .applicationId(editTextAppId.text.toString())
+                    .clientKey(editTextProjectId.text.toString())
+                    .server(getString(R.string.back4app_server_url))
+                    .build()
+            )
+        } catch (e :  Exception) {
+            return false
+        }
+
+        return true
+    }
     private fun logConnectionBack4App() {
         val logsCollection = ParseObject("logs")
         logsCollection.put("logEventType", Log.LogEventType.INFO.name)
@@ -143,6 +170,11 @@ class AdminActivity : AppCompatActivity() {
                 ).show()
             } else {
                 android.util.Log.e("Back4Apps", "Fallo la conexión a back4app")
+                Toast.makeText(
+                    applicationContext,
+                    "Conexión a Back4App fallida",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
