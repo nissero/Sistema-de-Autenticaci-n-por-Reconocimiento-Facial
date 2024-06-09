@@ -1,7 +1,6 @@
 package com.biogin.myapplication
 
 import android.content.ContentValues
-import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
@@ -31,8 +30,6 @@ import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.parse.ParseFile
-import com.parse.ParseObject
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MultipartBody
@@ -73,7 +70,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
     private lateinit var cameraProvider: ProcessCameraProvider
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var cameraNumber: Int = 1
-    private var cloudOption = "Firebase"
+
 
     val firebaseMethods = FirebaseMethods()
 
@@ -156,13 +153,9 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                     Log.e(tag, "Photo capture failed: ${exc.message}", exc)
                     fin()
                 }
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    if(cloudOption == "Back4Apps") {
-                        uploadImageToBack4Apps(context,output.savedUri, intent.getStringExtra("dni") ?: "")
-                    } else if (cloudOption == "Firebase") {
-                        uploadPhotoToFirebase(output.savedUri, intent)
-                    }
 
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    uploadPhotoToFirebase(output.savedUri, intent)
                     output.savedUri?.let {
                         sendImageForTraining(it, intent.getStringExtra("dni") ?: "") { result ->
                             if (result != null) {
@@ -180,31 +173,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
             }
         )
     }
-    private fun uploadImageToBack4Apps(context : Context, imageUri: Uri?, dni: String) {
-        val stream = imageUri?.let { context.contentResolver.openInputStream(it) }
-        val parseFile = ParseFile("image.jpg", stream?.readBytes())
-        parseFile.saveInBackground({ e ->
-            if (e == null) {
-                val photo = ParseObject("Images")
-                photo.put("Photo", parseFile)
-                photo.put("DNI", dni)
-                photo.saveInBackground { saveError ->
-                    if (saveError == null) {
-                        // Image uploaded successfully
-                        Log.e("Back4Apps", "Imagen subida exitosamente")
-                    } else {
-                        Log.e("Back4Apps", "Fallo la subida de la imagen")
-                        // Error uploading image
-                    }
-                }
-            } else {
-                Log.e("Back4Apps", "Fallo el guardado de la imagen")
-                // Error saving the file
-            }
-        }, { progress ->
-            // Handle progress updates (if needed)
-        })
-    }
+
     fun uploadPhotoToFirebase(photo: Uri?, intent: Intent) {
         if (photo != null) {
             val imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
@@ -320,6 +289,40 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
+    fun isAnalyzing(): Boolean{
+        return isApiCallInProgress
+    }
+    fun analyzing(){
+        isApiCallInProgress = true
+    }
+
+    fun stopAnalyzing(){
+        isApiCallInProgress = false
+    }
+
+    fun wasAnalyzed(){
+        imageAnalyzer.clearAnalyzer()
+
+        if (dialogShowTime != null) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                seleccionarAnalizador(true)
+            }, dialogShowTime)
+        }
+    }
+
+    fun setLasApiCallTime(){
+        lastApiCallTimeMillis = System.currentTimeMillis()
+    }
+
+    fun verifyUser(dni: String){
+        firebaseMethods.readData(dni){ usuario ->
+            typeOfAuthorization?.let { it(usuario) }
+        }
+    }
+    fun shutdown(){
+        cameraExecutor.shutdown()
+    }
+
     fun isSomeoneAnalyzing(): Boolean{
         return isApiCallInProgress
     }
@@ -332,18 +335,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         isApiCallInProgress = false
     }
 
-    fun verifyUser(dni: String){
-        Log.d("LOGIN", "SE LLAMO A FIREBASE")
-        firebaseMethods.readData(dni){ usuario ->
-            typeOfAuthorization?.let { it(usuario) }
-        }
-    }
     fun clearAnalyzer(){
         imageAnalyzer.clearAnalyzer()
-    }
-    fun shutdown(){
-        imageAnalyzer.clearAnalyzer()
-        cameraExecutor.shutdown()
     }
 
     companion object {
