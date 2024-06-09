@@ -9,14 +9,18 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
@@ -230,7 +234,7 @@ class LoginDataSource {
                     "categoria" to category,
                     "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                     "institutos" to institutesSelected,
-                    "estado" to "Activo"
+                    "estado" to state
                 )
 
                 transaction.set(docRefUserUpdated, newUser)

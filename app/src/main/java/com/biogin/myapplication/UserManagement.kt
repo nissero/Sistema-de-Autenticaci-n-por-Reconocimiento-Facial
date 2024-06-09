@@ -46,6 +46,8 @@ class UserManagement : AppCompatActivity() {
     private var areAllFieldsValid = false
     private val stringUtils = StringUtils()
     private val hierarchicalUtils = HierarchicalUtils()
+    private var fechaDesde = ""
+    private var fechaHasta = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +62,8 @@ class UserManagement : AppCompatActivity() {
         val newDni = binding.updateUserDni
         val categoriesSpinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val userStateSpinner = findViewById<Spinner>(R.id.update_user_state_spinner)
+
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         val userCategories = intent.getStringArrayListExtra("categories")
         val adapterCategories =
@@ -129,10 +133,7 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            var fechaDesde = ""
-            var fechaHasta = ""
-
-            if(!temporaryCategories?.contains(categorySelected)!!) {
+            if(temporaryCategories?.contains(categorySelected)!!) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -206,10 +207,7 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            var fechaDesde = ""
-            var fechaHasta = ""
-
-            if(!temporaryCategories?.contains(categorySelected)!!) {
+            if(temporaryCategories?.contains(categorySelected)!!) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -295,8 +293,6 @@ class UserManagement : AppCompatActivity() {
 
         fechaDesdeEditText = binding.registerFechaDesdeUpdate
         fechaHastaEditText = binding.registerFechaHastaUpdate
-
-        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
