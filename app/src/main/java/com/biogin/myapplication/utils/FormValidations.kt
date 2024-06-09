@@ -1,6 +1,5 @@
 package com.biogin.myapplication.utils
 
-import android.content.Context
 import android.util.Patterns
 import android.widget.CheckBox
 import android.widget.EditText
@@ -54,7 +53,6 @@ class FormValidations {
     }
 
     private fun isCategoryValidWithInstitutesCheckboxes(
-        context: Context,
         category: String,
         institutes: ArrayList<CheckBox>
     ): Boolean {
@@ -80,7 +78,6 @@ class FormValidations {
     }
 
     fun isFormValid(
-        context: Context,
         name: EditText,
         surname: EditText,
         dni: EditText,
@@ -95,7 +92,7 @@ class FormValidations {
         val dniHasNoErrors = dni.error == null
         val emailHasNoErrors = email.error == null
         val institutesCheckboxesHasNoErrors =
-            isCategoryValidWithInstitutesCheckboxes(context, categorySelected, institutesCheckboxes)
+            isCategoryValidWithInstitutesCheckboxes(categorySelected, institutesCheckboxes)
 
         return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors && institutesCheckboxesHasNoErrors
     }

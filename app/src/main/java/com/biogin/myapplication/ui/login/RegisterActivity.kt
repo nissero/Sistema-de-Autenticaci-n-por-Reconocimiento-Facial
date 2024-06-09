@@ -17,8 +17,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
@@ -33,7 +31,6 @@ import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var institutesUtils: InstitutesUtils
-    private lateinit var loginViewModel: LoginViewModel
     private lateinit var dataSource: LoginDataSource
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var fechaDesdeEditText: EditText
@@ -161,7 +158,6 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("REGISTERACTIVITY", fechaHasta)
 
             areAllFieldsValid = validations.isFormValid(
-                binding.root.context,
                 name!!,
                 surname!!,
                 dni!!,
@@ -217,31 +213,6 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
-
-        loginViewModel.loginFormState.observe(this, Observer {
-            val loginState = it ?: return@Observer
-
-            // disable login button unless both username / password is valid
-            if (continueButton != null) {
-                continueButton.isEnabled = loginState.isDataValid
-            }
-
-            if (loginState.usernameError != null) {
-                if (name != null) {
-                    name.error = getString(loginState.usernameError)
-                }
-            }
-
-        })
-
-        name?.afterTextChanged {
-            loginViewModel.loginDataChanged(
-                name.text.toString(),
-                "",
-                ""
-            )
         }
 
         onResume()

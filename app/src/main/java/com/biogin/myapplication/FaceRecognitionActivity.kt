@@ -60,7 +60,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType) {
                 "seguridad" ->
                     viewBinding.skipButton.setOnClickListener {
-                        goToSeguridadActivity("43908111")
+                        goToSeguridadActivity()
                     }
                 "rrhh" -> viewBinding.skipButton.setOnClickListener {
                     goToRRHHActivity()
@@ -94,10 +94,9 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun goToSeguridadActivity(dniMaster: String) {
+    private fun goToSeguridadActivity() {
         camera.shutdown()
         val intent = Intent(this, SeguridadActivity::class.java)
-        intent.putExtra("dniMaster", dniMaster)
         startActivity(intent)
         finish()
     }

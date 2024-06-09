@@ -14,7 +14,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.biogin.myapplication.data.LoginDataSource
-import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
@@ -31,7 +30,6 @@ import javax.mail.internet.InternetAddress
 
 class UserManagement : AppCompatActivity() {
     private var dataSource = LoginDataSource()
-    private var loginRepo = LoginRepository(dataSource)
     private var institutesUtils = InstitutesUtils()
     private lateinit var binding: ActivityUserManagementBinding
     private var oldDni : String = ""
@@ -145,7 +143,6 @@ class UserManagement : AppCompatActivity() {
             Log.d("REGISTERACTIVITY", fechaHasta)
 
             areAllFieldsValid = validations.isFormValid(
-                binding.root.context,
                 name,
                 surname,
                 newDni,
@@ -198,10 +195,6 @@ class UserManagement : AppCompatActivity() {
                 }
             }
         }
-//
-//        binding.buttonTest.setOnClickListener {
-//            sendEmailOnDniChange(oldDni, binding.updateUserDni.text.toString())
-//        }
 
         binding.duplicateUserButton.setOnClickListener {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
@@ -219,7 +212,6 @@ class UserManagement : AppCompatActivity() {
             Log.d("REGISTERACTIVITY", fechaHasta)
 
             areAllFieldsValid = validations.isFormValid(
-                binding.root.context,
                 name,
                 surname,
                 newDni,
