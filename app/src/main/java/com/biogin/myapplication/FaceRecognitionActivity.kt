@@ -289,7 +289,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToAdminActivity()
+                goToJerarquicoActivity()
             }, dialogShowTime)
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
