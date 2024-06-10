@@ -7,6 +7,8 @@ class Log (val logEventType : LogEventType, val logEventName : LogEventName,
 
 
     enum class LogEventName(val value: String) {
+        FIREBASE_SUCCESFUL_CONNECTION("FIREBASE DATABASE SUCCESFUL CONNECTION"),
+        BACK4APP_SUCCESFUL_CONNECTION("BACK4APP DATABASE SUCCESFUL CONNECTION"),
         USER_UPDATE("USER UPDATE"),
         USER_DNI_UPDATE("USER DNI UPDATE"),
         USER_CREATION("USER CREATION"),

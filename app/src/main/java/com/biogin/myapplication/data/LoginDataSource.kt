@@ -248,7 +248,7 @@ class LoginDataSource {
                     "categoria" to category,
                     "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                     "institutos" to institutesSelected,
-                    "estado" to "Activo"
+                    "estado" to state
                 )
 
                 transaction.set(docRefUserUpdated, newUser)

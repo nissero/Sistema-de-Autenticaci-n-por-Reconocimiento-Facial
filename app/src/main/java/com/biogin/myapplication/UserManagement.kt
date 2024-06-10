@@ -46,6 +46,8 @@ class UserManagement : AppCompatActivity() {
     private var areAllFieldsValid = false
     private val stringUtils = StringUtils()
     private val hierarchicalUtils = HierarchicalUtils()
+    private var fechaDesde = ""
+    private var fechaHasta = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +62,8 @@ class UserManagement : AppCompatActivity() {
         val newDni = binding.updateUserDni
         val categoriesSpinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
         val userStateSpinner = findViewById<Spinner>(R.id.update_user_state_spinner)
+
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         val userCategories = intent.getStringArrayListExtra("categories")
         val adapterCategories =
@@ -126,22 +130,20 @@ class UserManagement : AppCompatActivity() {
         }
 
         binding.updateUserButton.setOnClickListener {
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
 
-            lateinit var fechaDesde: String
-            lateinit var fechaHasta: String
-
-            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
-                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-            } else {
-                fechaDesde = ""
-                fechaHasta = ""
+            if(temporaryCategories?.contains(categorySelected)!!) {
+                if(fechaDesdeEditText.text.toString().isNotEmpty() &&
+                    fechaHastaEditText.text.toString().isNotEmpty()) {
+                    fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                    fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+                }
             }
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
-            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
-            val categorySelected = spinner.selectedItem.toString()
+
             areAllFieldsValid = validations.isFormValid(
                 binding.root.context,
                 name,
@@ -202,23 +204,20 @@ class UserManagement : AppCompatActivity() {
 //        }
 
         binding.duplicateUserButton.setOnClickListener {
+            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
+            val categorySelected = spinner.selectedItem.toString()
 
-            lateinit var fechaDesde: String
-            lateinit var fechaHasta: String
-
-            if(fechaDesdeEditText.text.toString().isNotEmpty()) {
-                fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-                fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-            } else {
-                fechaDesde = ""
-                fechaHasta = ""
+            if(temporaryCategories?.contains(categorySelected)!!) {
+                if(fechaDesdeEditText.text.toString().isNotEmpty() &&
+                    fechaHastaEditText.text.toString().isNotEmpty()) {
+                    fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                    fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
+                }
             }
 
             Log.d("REGISTERACTIVITY", fechaDesde)
             Log.d("REGISTERACTIVITY", fechaHasta)
-            
-            val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
-            val categorySelected = spinner.selectedItem.toString()
+
             areAllFieldsValid = validations.isFormValid(
                 binding.root.context,
                 name,
@@ -294,8 +293,6 @@ class UserManagement : AppCompatActivity() {
 
         fechaDesdeEditText = binding.registerFechaDesdeUpdate
         fechaHastaEditText = binding.registerFechaHastaUpdate
-
-        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
