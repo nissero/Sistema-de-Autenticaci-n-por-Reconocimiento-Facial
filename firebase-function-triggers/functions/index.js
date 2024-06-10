@@ -26,6 +26,8 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
 
       console.log("Ejecutando usuario: ", userId)
 
+      const logsCollection = admin.firestore().collection("logs");
+
       if (userCategoria) {
         categoriasCollection.doc(userCategoria).get().then((categoriaDoc) => {
             if (categoriaDoc.exists) {
@@ -52,6 +54,17 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                                     userId,
                                     "USUARIO HA SIDO HABILITADO PARA TRABAJAR EXTERNAMENTE"
                                   );
+
+                                const newLog = {
+                                    category: userCategoria,
+                                    dniMasterUser: "",
+                                    dniUserAffected: userId,
+                                    logEventName: "INFO",
+                                    logEventType: "USER ACTIVATION",
+                                    timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                };
+
+                                logsCollection.add(newLog);
                             }
                         } else {
                             console.log(
@@ -66,6 +79,17 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                                     userId,
                                     "USUARIO HA SIDO DESHABILITADO PARA TRABAJAR EXTERNAMENTE"
                                   );
+
+                                const newLog = {
+                                    category: userCategoria,
+                                    dniMasterUser: "",
+                                    dniUserAffected: userId,
+                                    logEventName: "INFO",
+                                    logEventType: "USER INACTIVATION",
+                                    timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                };
+
+                                logsCollection.add(newLog);
                             }
                         }
                     }
@@ -107,6 +131,17 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                         userId,
                         "USUARIO HA SIDO DESHABILITADO YA QUE EL DIA DE LA FECHA ESTA DENTRO DEL PERIODO DE SUSPENSION"
                       );
+                    
+                    const newLog = {
+                        category: userCategoria,
+                        dniMasterUser: "",
+                        dniUserAffected: userId,
+                        logEventName: "INFO",
+                        logEventType: "USER INACTIVATION",
+                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    logsCollection.add(newLog);
                 }
             } else {
                 console.log(
@@ -121,6 +156,17 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                         userId,
                         "USUARIO HA SIDO HABILITADO YA QUE EL PERIODO DE SUSPENSION HA TERMINADO"
                       );
+
+                    const newLog = {
+                        category: userCategoria,
+                        dniMasterUser: "",
+                        dniUserAffected: userId,
+                        logEventName: "INFO",
+                        logEventType: "USER ACTIVATION",
+                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    logsCollection.add(newLog);
                 }
             }
         } catch (e){
