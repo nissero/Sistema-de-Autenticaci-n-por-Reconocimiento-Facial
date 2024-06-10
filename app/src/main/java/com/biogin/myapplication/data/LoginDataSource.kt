@@ -182,6 +182,9 @@ class LoginDataSource {
             } else {
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
                 if (trabajaDesdeDate.isAfter(today)){
                     val newUser = hashMapOf(
                         "nombre" to name,
@@ -192,8 +195,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Inactivo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
 
                     transaction.set(docRefNewDni, newUser)
@@ -208,8 +211,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Activo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
                     transaction.set(docRefNewDni, newUser)
                 }
@@ -256,6 +259,9 @@ class LoginDataSource {
             tx = db.runTransaction { transaction ->
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
                 if (trabajaDesdeDate.isAfter(today)){
                     transaction.update(docRefUserUpdated,
                         "nombre", name,
@@ -265,8 +271,8 @@ class LoginDataSource {
                         "estado", "Inactivo",
                         "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesde,
-                        "trabajaHasta", fechaHasta)
+                        "trabajaDesde", fechaDesdeTimestamp,
+                        "trabajaHasta", fechaHastaTimestamp)
                 }
                 if (trabajaDesdeDate.isEqual(today)) {
                     transaction.update(docRefUserUpdated,
@@ -277,8 +283,8 @@ class LoginDataSource {
                         "estado", state,
                         "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesde,
-                        "trabajaHasta", fechaHasta)
+                        "trabajaDesde", fechaDesdeTimestamp,
+                        "trabajaHasta", fechaHastaTimestamp)
                 }
 
                 logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
