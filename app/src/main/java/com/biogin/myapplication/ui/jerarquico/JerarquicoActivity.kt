@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
-import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.databinding.ActivityJerarquicoBinding
 import com.biogin.myapplication.utils.DialogUtils
 import com.biogin.myapplication.utils.HierarchicalUtils
@@ -30,12 +29,7 @@ class JerarquicoActivity : AppCompatActivity() {
         }
 
         val mailInput = binding.textInputMail
-//        val currentMail = hierarchicalUtils.getMail()
-//        if(currentMail.isNotEmpty())
-//            mailInput.setText(currentMail)
-
         val buttonMail = binding.buttonMail
-
         val checkBoxMonday = binding.checkBoxMonday
         val checkBoxTuesday = binding.checkBoxTuesday
         val checkBoxWednesday = binding.checkBoxWednesday
@@ -43,17 +37,6 @@ class JerarquicoActivity : AppCompatActivity() {
         val checkBoxFriday = binding.checkBoxFriday
         val checkBoxSaturday = binding.checkBoxSaturday
         val checkBoxSunday = binding.checkBoxSunday
-
-//        if(currentTrainingDays.isNotEmpty()) {
-//            checkBoxMonday.isChecked = currentTrainingDays[0]
-//            checkBoxTuesday.isChecked = currentTrainingDays[1]
-//            checkBoxWednesday.isChecked = currentTrainingDays[2]
-//            checkBoxThursday.isChecked = currentTrainingDays[3]
-//            checkBoxFriday.isChecked = currentTrainingDays[4]
-//            checkBoxSaturday.isChecked = currentTrainingDays[5]
-//            checkBoxSunday.isChecked = currentTrainingDays[6]
-//        }
-
         val buttonTrainingDays = binding.buttonTrainingDays
 
         buttonMail.setOnClickListener {

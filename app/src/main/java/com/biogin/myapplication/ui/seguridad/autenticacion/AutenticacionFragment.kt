@@ -147,20 +147,6 @@ class AutenticacionFragment : Fragment() {
             }
         }
 
-        //metodo para crear una actividad nueva y obtener un resultado
-//        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                // There are no request codes
-//                val data: Intent? = result.data
-//                if(data?.getBooleanExtra("autenticado", false) == true) {
-//                    turnoIniciado = false
-//                    autenticacionButton.visibility = View.INVISIBLE
-//                    autenticacionOfflineButton.visibility = View.INVISIBLE
-//                    turnoButton.text = this.context?.getString(R.string.iniciar_turno)
-//                    mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
-//                }
-//            }
-//        }
 
         return root
     }

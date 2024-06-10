@@ -7,7 +7,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
 import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
-import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
 import com.biogin.myapplication.utils.StringUtils
@@ -17,7 +16,6 @@ class ABMAreaActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAbmAreaBinding
     private val dialogUtils = DialogUtils()
     private val areasUtils = AllowedAreasUtils()
-    private val loadingUtil = LoadingDialog(this)
     private val stringUtils = StringUtils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
