@@ -134,7 +134,9 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            if(temporaryCategories?.contains(categorySelected)!!) {
+            val categoryIsTemporary = temporaryCategories?.contains(categorySelected)!!
+
+            if(categoryIsTemporary) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -152,11 +154,15 @@ class UserManagement : AppCompatActivity() {
                 email,
                 categorySelected,
                 getCheckboxesArray(),
+                categoryIsTemporary,
                 fechaDesdeEditText,
                 fechaHastaEditText
             )
 
+            println("llegue a previo all fields are valid")
+
             if(areAllFieldsValid) {
+                println("llegue a all fields are valid")
                 val checkboxes = arrayListOf(
                     binding.checkboxICI,
                     binding.checkboxICO,
@@ -205,7 +211,9 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            if(temporaryCategories?.contains(categorySelected)!!) {
+            val categoryIsTemporary = temporaryCategories?.contains(categorySelected)!!
+
+            if(categoryIsTemporary) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -223,6 +231,7 @@ class UserManagement : AppCompatActivity() {
                 email,
                 categorySelected,
                 getCheckboxesArray(),
+                categoryIsTemporary,
                 fechaDesdeEditText,
                 fechaHastaEditText
             )
