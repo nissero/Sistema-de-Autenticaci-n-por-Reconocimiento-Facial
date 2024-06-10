@@ -134,7 +134,9 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            if(temporaryCategories?.contains(categorySelected)!!) {
+            val categoryIsTemporary = temporaryCategories?.contains(categorySelected)!!
+
+            if(categoryIsTemporary) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -152,6 +154,7 @@ class UserManagement : AppCompatActivity() {
                 email,
                 categorySelected,
                 getCheckboxesArray(),
+                categoryIsTemporary,
                 fechaDesdeEditText,
                 fechaHastaEditText
             )
@@ -205,7 +208,9 @@ class UserManagement : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            if(temporaryCategories?.contains(categorySelected)!!) {
+            val categoryIsTemporary = temporaryCategories?.contains(categorySelected)!!
+
+            if(categoryIsTemporary) {
                 if(fechaDesdeEditText.text.toString().isNotEmpty() &&
                     fechaHastaEditText.text.toString().isNotEmpty()) {
                     fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
@@ -223,6 +228,7 @@ class UserManagement : AppCompatActivity() {
                 email,
                 categorySelected,
                 getCheckboxesArray(),
+                categoryIsTemporary,
                 fechaDesdeEditText,
                 fechaHastaEditText
             )
@@ -427,7 +433,6 @@ class UserManagement : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun sendEmailOnDniChange(oldDni: String, newDni: String) {
-        println("success")
         val auth = EmailService.UserPassAuthenticator("fernandoivanantunez@hotmail.com",
             "steveharris40184869")
         val to = listOf(InternetAddress(hierarchicalUtils.getMail()))

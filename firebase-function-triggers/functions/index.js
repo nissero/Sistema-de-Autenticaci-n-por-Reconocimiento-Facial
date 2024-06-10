@@ -59,8 +59,8 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                                     category: userCategoria,
                                     dniMasterUser: "",
                                     dniUserAffected: userId,
-                                    logEventName: "INFO",
-                                    logEventType: "USER ACTIVATION",
+                                    logEventName: "USER ACTIVATION",
+                                    logEventType: "INFO",
                                     timestamp: admin.firestore.FieldValue.serverTimestamp()
                                 };
 
@@ -84,8 +84,8 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                                     category: userCategoria,
                                     dniMasterUser: "",
                                     dniUserAffected: userId,
-                                    logEventName: "INFO",
-                                    logEventType: "USER INACTIVATION",
+                                    logEventName: "USER INACTIVATION",
+                                    logEventType: "INFO,
                                     timestamp: admin.firestore.FieldValue.serverTimestamp()
                                 };
 
@@ -136,8 +136,8 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                         category: userCategoria,
                         dniMasterUser: "",
                         dniUserAffected: userId,
-                        logEventName: "INFO",
-                        logEventType: "USER INACTIVATION",
+                        logEventName: "USER INACTIVATION",
+                        logEventType: "INFO",
                         timestamp: admin.firestore.FieldValue.serverTimestamp()
                     };
 
@@ -161,8 +161,8 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                         category: userCategoria,
                         dniMasterUser: "",
                         dniUserAffected: userId,
-                        logEventName: "INFO",
-                        logEventType: "USER ACTIVATION",
+                        logEventName: "USER ACTIVATION",
+                        logEventType: "INFO",
                         timestamp: admin.firestore.FieldValue.serverTimestamp()
                     };
 
