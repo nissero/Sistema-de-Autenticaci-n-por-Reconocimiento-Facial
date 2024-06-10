@@ -159,10 +159,7 @@ class UserManagement : AppCompatActivity() {
                 fechaHastaEditText
             )
 
-            println("llegue a previo all fields are valid")
-
             if(areAllFieldsValid) {
-                println("llegue a all fields are valid")
                 val checkboxes = arrayListOf(
                     binding.checkboxICI,
                     binding.checkboxICO,
@@ -429,7 +426,6 @@ class UserManagement : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun sendEmailOnDniChange(oldDni: String, newDni: String) {
-        println("success")
         val auth = EmailService.UserPassAuthenticator("fernandoivanantunez@hotmail.com",
             "steveharris40184869")
         val to = listOf(InternetAddress(hierarchicalUtils.getMail()))

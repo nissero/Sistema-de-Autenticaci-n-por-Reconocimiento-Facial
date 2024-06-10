@@ -2,7 +2,6 @@ package com.biogin.myapplication.utils
 
 import android.util.Log
 import com.biogin.myapplication.data.Category
-import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.google.firebase.firestore.FirebaseFirestore
