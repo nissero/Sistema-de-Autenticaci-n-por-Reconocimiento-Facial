@@ -210,7 +210,8 @@ class FirebaseCategoryMethods() {
         documentReference.get()
             .addOnSuccessListener { documents ->
                 for(document in documents) {
-                    if(document.data["categoria"] == categoryName) {
+                    if(document.data["categoria"] == categoryName &&
+                        document.data["estado"] == "Activo") {
                         documentReference.document(document.data["dni"].toString())
                             .update("estado", "Inactivo")
                             .addOnSuccessListener {
