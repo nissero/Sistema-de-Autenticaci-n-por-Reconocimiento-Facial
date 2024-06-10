@@ -32,7 +32,6 @@ class JerarquicoActivity : AppCompatActivity() {
 
         val mailInput = binding.textInputMail
         val buttonMail = binding.buttonMail
-
         val checkBoxMonday = binding.checkBoxMonday
         val checkBoxTuesday = binding.checkBoxTuesday
         val checkBoxWednesday = binding.checkBoxWednesday

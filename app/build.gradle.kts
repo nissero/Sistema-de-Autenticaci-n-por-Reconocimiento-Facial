@@ -109,4 +109,7 @@ dependencies {
     implementation("com.sun.mail:android-mail:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("com.github.parse-community.Parse-SDK-Android:parse:4.3.0")
+
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
 }

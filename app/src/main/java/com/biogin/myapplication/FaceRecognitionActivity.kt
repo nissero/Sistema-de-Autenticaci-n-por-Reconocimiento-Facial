@@ -60,7 +60,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType) {
                 "seguridad" ->
                     viewBinding.skipButton.setOnClickListener {
-                        goToSeguridadActivity("43908111")
+                        goToSeguridadActivity()
                     }
                 "rrhh" -> viewBinding.skipButton.setOnClickListener {
                     goToRRHHActivity()
@@ -90,15 +90,13 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun goToRRHHActivity() {
         camera.shutdown()
         val intent = Intent(this, RRHHActivity::class.java)
-        MasterUserDataSession.setUserDataForSession("44456445", "RRHH")
         startActivity(intent)
         finish()
     }
 
-    private fun goToSeguridadActivity(dniMaster: String) {
+    private fun goToSeguridadActivity() {
         camera.shutdown()
         val intent = Intent(this, SeguridadActivity::class.java)
-        intent.putExtra("dniMaster", dniMaster)
         startActivity(intent)
         finish()
     }
@@ -106,7 +104,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun goToAdminActivity() {
         camera.shutdown()
         val intent = Intent(this, AdminActivity::class.java)
-        MasterUserDataSession.setUserDataForSession("44456445", "RRHH")
         startActivity(intent)
         finish()
     }
@@ -114,7 +111,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
     private fun goToJerarquicoActivity() {
         camera.shutdown()
         val intent = Intent(this, JerarquicoActivity::class.java)
-        MasterUserDataSession.setUserDataForSession("40184869", "Jerarquico")
         startActivity(intent)
         finish()
     }
@@ -276,7 +272,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToJerarquicoActivity()
+                goToAdminActivity()
             }, dialogShowTime)
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
@@ -292,7 +288,7 @@ class FaceRecognitionActivity : AppCompatActivity() {
             this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
             Handler(Looper.getMainLooper()).postDelayed({
-                goToAdminActivity()
+                goToJerarquicoActivity()
             }, dialogShowTime)
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
@@ -325,6 +321,15 @@ class FaceRecognitionActivity : AppCompatActivity() {
             intent.putExtra("nombre", user.getNombre())
             intent.putExtra("categoria", user.getCategoria())
             intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            if(user.hasAreasTemporales()){
+                intent.putExtra("hasAreasTemporales", true)
+                intent.putExtra("areasTemporales", user.getAreasTemporales())
+                intent.putExtra("accesoDesde", user.getAccesoDesde())
+                intent.putExtra("accesoHasta", user.getAccesoHasta())
+            } else{
+                intent.putExtra("hasAreasTemporales", false)
+            }
 
             //LOGIN DATA
             intent.putExtra("typeOfLogIn", "visitor")

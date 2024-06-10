@@ -33,6 +33,12 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         val apellido = intent.getStringExtra("apellido")
         val dni = intent.getStringExtra("dni")
 
+        val hasAreasTemporales = intent.getBooleanExtra("hasAreasTemporales", false)
+
+        val areasTemporales = intent.getStringExtra("areasTemporales")
+        val accesoDesde = intent.getStringExtra("accesoDesde")
+        val accesoHasta = intent.getStringExtra("accesoHasta")
+
 
         val nombre = intent.getStringExtra("nombre")
         val categoria = intent.getStringExtra("categoria")
@@ -45,8 +51,20 @@ class AuthorizationMessageActivity : AppCompatActivity() {
 
         if (authorizationResult == "authorized") {
             message = if (connection == "online"){
-                SpannableString("ACCESO AUTORIZADO\n" +
-                        "DNI: $dni \n APELLIDO: $apellido \n NOMBRE: $nombre \n CATEGORIA: $categoria \n AREAS PERMITIDAS: $areasPermitidas")
+                if (hasAreasTemporales){
+                    SpannableString("ACCESO AUTORIZADO\n" +
+                            "DNI: $dni " +
+                            "\n APELLIDO: $apellido " +
+                            "\n NOMBRE: $nombre " +
+                            "\n CATEGORIA: $categoria " +
+                            "\n \n AREAS PERMITIDAS: \n $areasPermitidas" +
+                            "\n \n AREAS TEMPORALES: \n $areasTemporales" +
+                            "\n DESDE: $accesoDesde" +
+                            "\n HASTA: $accesoHasta")
+                } else{
+                    SpannableString("ACCESO AUTORIZADO\n" +
+                            "DNI: $dni \n APELLIDO: $apellido \n NOMBRE: $nombre \n CATEGORIA: $categoria \n AREAS PERMITIDAS: $areasPermitidas")
+                }
             } else {
                 SpannableString("ACCESO AUTORIZADO\n" +
                         "DNI: $dni \n APELLIDO: $apellido")
