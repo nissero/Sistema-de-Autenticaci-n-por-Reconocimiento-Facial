@@ -13,6 +13,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.doOnTextChanged
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
 import com.biogin.myapplication.utils.EmailService
@@ -101,6 +102,8 @@ class UserManagement : AppCompatActivity() {
         binding.updateUserSurname.setText(intent.getStringExtra("surname"))
         binding.updateUserEmail.setText(intent.getStringExtra("email"))
         binding.updateUserDni.setText(intent.getStringExtra("dni"))
+        binding.registerFechaDesdeUpdate.setText(intent.getStringExtra("fechaDesde"))
+        binding.registerFechaHastaUpdate.setText(intent.getStringExtra("fechaHasta"))
         if (categoryIndex != null) {
             binding.updateUserCategoriesSpinner.setSelection(categoryIndex)
         }
@@ -148,7 +151,9 @@ class UserManagement : AppCompatActivity() {
                 newDni,
                 email,
                 categorySelected,
-                getCheckboxesArray()
+                getCheckboxesArray(),
+                fechaDesdeEditText,
+                fechaHastaEditText
             )
 
             if(areAllFieldsValid) {
@@ -217,7 +222,9 @@ class UserManagement : AppCompatActivity() {
                 newDni,
                 email,
                 categorySelected,
-                getCheckboxesArray()
+                getCheckboxesArray(),
+                fechaDesdeEditText,
+                fechaHastaEditText
             )
             if (areAllFieldsValid) {
                 val checkboxes = arrayListOf(
@@ -285,6 +292,14 @@ class UserManagement : AppCompatActivity() {
 
         fechaDesdeEditText = binding.registerFechaDesdeUpdate
         fechaHastaEditText = binding.registerFechaHastaUpdate
+
+        fechaDesdeEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaDesdeEditText)
+        }
+
+        fechaHastaEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaHastaEditText)
+        }
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}

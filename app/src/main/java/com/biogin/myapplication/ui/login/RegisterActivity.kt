@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import com.biogin.myapplication.PhotoRegisterActivity
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
@@ -139,6 +140,14 @@ class RegisterActivity : AppCompatActivity() {
             validations.validateEmail(email)
         }
 
+        fechaDesdeEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaDesdeEditText)
+        }
+
+        fechaHastaEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaHastaEditText)
+        }
+
         continueButton?.setOnClickListener {
             val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
@@ -163,7 +172,9 @@ class RegisterActivity : AppCompatActivity() {
                 dni!!,
                 email!!,
                 categorySelected,
-                getCheckboxesArray()
+                getCheckboxesArray(),
+                fechaDesdeEditText,
+                fechaHastaEditText
             )
             if (areAllFieldsValid) {
                 loadingDialog.startLoadingDialog()
