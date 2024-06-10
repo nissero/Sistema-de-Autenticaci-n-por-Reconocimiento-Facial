@@ -155,13 +155,22 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    uploadPhotoToFirebase(output.savedUri, intent)
-                    output.savedUri?.let {
-                        sendImageForTraining(it, intent.getStringExtra("dni") ?: "") { result ->
-                            if (result != null) {
-                                Log.d(TAG, "Training result: $result")
+                    output.savedUri?.let { photoUri ->
+                        // Upload the photo to Firebase Storage
+                        uploadPhotoToFirebase(photoUri, intent) { success ->
+                            if (success) {
+                                // If the photo was uploaded successfully, check if it's the third photo
+                                if (currentPhotoIndex == 2) {
+                                    // If it's the third photo, upload the request document to Firestore
+                                    uploadRequestToFirestore(intent.getStringExtra("dni") ?: "", fin)
+                                } else {
+                                    // Increment the photo index
+                                    currentPhotoIndex++
+                                }
                             } else {
-                                Log.e(TAG, "Failed to make request")
+                                // Handle failure
+                                Log.e(tag, "Failed to upload photo to Firebase Storage")
+                                fin()
                             }
                         }
                     }
@@ -174,21 +183,25 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         )
     }
 
-    fun uploadPhotoToFirebase(photo: Uri?, intent: Intent) {
-        if (photo != null) {
-            val imageRef = storageRef.child("images/${intent.getStringExtra("dni")}/${intent.getStringExtra("name") + "_" + intent.getStringExtra("surname")}")
-            val uploadTask = imageRef.putFile(photo)
-            uploadTask.addOnFailureListener {
-                Log.e("Firebase", "Error al subir imagen")
-            }.addOnSuccessListener {
-                Log.d("Firebase", "Exito al subir imagen")
-                val dni = intent.getStringExtra("dni") ?: ""
-                Log.d("DNI: ", "dni: $dni") // Log the dni value
+    fun uploadPhotoToFirebase(photo: Uri, intent: Intent, callback: (Boolean) -> Unit) {
+        val dni = intent.getStringExtra("dni") ?: ""
+        val imageName = "${dni}_${currentPhotoIndex}.jpg"
+        val imageRef = storageRef.child("images/$dni/$imageName")
+
+        val uploadTask = imageRef.putFile(photo)
+        uploadTask.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // If the upload is successful, invoke the callback with true
+                callback(true)
+            } else {
+                // If the upload fails, invoke the callback with false
+                Log.e("Firebase", "Error uploading image: ${task.exception}")
+                callback(false)
             }
         }
     }
 
-    private fun sendImageForTraining(photoUri: Uri, dni: String, callback: (String?) -> Unit) {
+   /* private fun sendImageForTraining(photoUri: Uri, dni: String, callback: (String?) -> Unit) {
         val context = viewBinding.root.context
 
         // Convert the photoUri to a Bitmap
@@ -208,20 +221,27 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
         saveRequestToFirestore(imageBytes, dni)
     }
 
-    private fun saveRequestToFirestore(imageBytes: ByteArray, dni: String) {
-        val request = hashMapOf(
-            "image" to imageBytes,
+    */
+
+    fun uploadRequestToFirestore(dni: String, fin: () -> Unit) {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis())
+        val data = hashMapOf(
             "dni" to dni,
-            "timestamp" to System.currentTimeMillis()
+            "timestamp" to timestamp,
+            "photoPaths" to (0 until 3).map { index ->
+                "images/$dni/${dni}_$index.jpg"
+            }
         )
 
         firestore.collection("requests")
-            .add(request)
+            .add(data)
             .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "Request added with ID: ${documentReference.id}")
+                Log.d("Firebase", "DocumentSnapshot added with ID: ${documentReference.id}")
+                fin()
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding request", e)
+                Log.w("Firebase", "Error adding document", e)
+                fin()
             }
     }
 
