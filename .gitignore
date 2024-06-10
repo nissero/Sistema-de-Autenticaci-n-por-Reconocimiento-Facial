@@ -24,3 +24,5 @@ local.properties
 /kotlin-profile
 /native
 /wrapper
+functions/firebase-debug.log
+functions/sistema-autenticacion-firebase-74577d404c.json

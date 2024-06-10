@@ -7,17 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.R
-import com.biogin.myapplication.databinding.ActivityAbmAreaBinding
 import com.biogin.myapplication.databinding.ActivityJerarquicoBinding
 import com.biogin.myapplication.utils.DialogUtils
 import com.biogin.myapplication.utils.HierarchicalUtils
 import com.biogin.myapplication.utils.PopUpUtils
+import com.google.firebase.firestore.FirebaseFirestore
 
 class JerarquicoActivity : AppCompatActivity() {
     private var hierarchicalUtils = HierarchicalUtils()
     private lateinit var binding: ActivityJerarquicoBinding
     private val dialogUtils = DialogUtils()
     private val popUpUtils = PopUpUtils()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,12 +31,7 @@ class JerarquicoActivity : AppCompatActivity() {
         }
 
         val mailInput = binding.textInputMail
-//        val currentMail = hierarchicalUtils.getMail()
-//        if(currentMail.isNotEmpty())
-//            mailInput.setText(currentMail)
-
         val buttonMail = binding.buttonMail
-
         val checkBoxMonday = binding.checkBoxMonday
         val checkBoxTuesday = binding.checkBoxTuesday
         val checkBoxWednesday = binding.checkBoxWednesday
@@ -44,16 +40,6 @@ class JerarquicoActivity : AppCompatActivity() {
         val checkBoxSaturday = binding.checkBoxSaturday
         val checkBoxSunday = binding.checkBoxSunday
 
-//        if(currentTrainingDays.isNotEmpty()) {
-//            checkBoxMonday.isChecked = currentTrainingDays[0]
-//            checkBoxTuesday.isChecked = currentTrainingDays[1]
-//            checkBoxWednesday.isChecked = currentTrainingDays[2]
-//            checkBoxThursday.isChecked = currentTrainingDays[3]
-//            checkBoxFriday.isChecked = currentTrainingDays[4]
-//            checkBoxSaturday.isChecked = currentTrainingDays[5]
-//            checkBoxSunday.isChecked = currentTrainingDays[6]
-//        }
-
         val buttonTrainingDays = binding.buttonTrainingDays
 
         buttonMail.setOnClickListener {
@@ -61,47 +47,62 @@ class JerarquicoActivity : AppCompatActivity() {
             val newMail = mailInput.text.toString()
             if(currentMail != newMail) {
                 hierarchicalUtils.setMail(newMail)
-                popUpUtils.showPopUp(binding.root.context,
-                    "Se configuró el mail a $newMail", "Ok")
+                popUpUtils.showPopUp(binding.root.context, "Se configuró el mail a $newMail", "Ok")
                 Log.d("Jerarquico", "Se configuró el mail a $newMail")
                 mailInput.text.clear()
             } else {
-                dialogUtils.showDialog(binding.root.context,
-                    "El mail indicado es el mismo al actual")
+                dialogUtils.showDialog(binding.root.context, "El mail indicado es el mismo al actual")
                 Log.d("Jerarquico", "El mail indicado es el mismo al actual")
             }
         }
 
         buttonTrainingDays.setOnClickListener {
-            val currentTrainingDays = hierarchicalUtils.getTrainingDays()
-            val newTrainingDays = ArrayList<Boolean>()
-            newTrainingDays.add(checkBoxMonday.isChecked)
-            newTrainingDays.add((checkBoxTuesday.isChecked))
-            newTrainingDays.add((checkBoxWednesday.isChecked))
-            newTrainingDays.add((checkBoxThursday.isChecked))
-            newTrainingDays.add((checkBoxFriday.isChecked))
-            newTrainingDays.add((checkBoxSaturday.isChecked))
-            newTrainingDays.add((checkBoxSunday.isChecked))
+            val newTrainingDays = hashMapOf(
+                "monday" to checkBoxMonday.isChecked,
+                "tuesday" to checkBoxTuesday.isChecked,
+                "wednesday" to checkBoxWednesday.isChecked,
+                "thursday" to checkBoxThursday.isChecked,
+                "friday" to checkBoxFriday.isChecked,
+                "saturday" to checkBoxSaturday.isChecked,
+                "sunday" to checkBoxSunday.isChecked
+            )
 
-            if(newTrainingDays != currentTrainingDays) {
-                hierarchicalUtils.setTrainingDays(newTrainingDays)
-                popUpUtils.showPopUp(binding.root.context,
-                    "Se configuraron los nuevos días de entrenamiento", "Ok")
-                Log.d("Jerarquico", "Se configuraron los nuevos días de entrenamiento")
-                checkBoxMonday.isChecked = false
-                checkBoxTuesday.isChecked = false
-                checkBoxWednesday.isChecked = false
-                checkBoxThursday.isChecked = false
-                checkBoxFriday.isChecked = false
-                checkBoxSaturday.isChecked = false
-                checkBoxSunday.isChecked = false
-            } else {
-                dialogUtils.showDialog(binding.root.context,
-                    "Los nuevos días de entrenamiento son los mismos que los actuales")
-                Log.d("Jerarquico", "Los nuevos días de entrenamiento son los mismos " +
-                        "que los actuales")
-            }
+            val db = FirebaseFirestore.getInstance()
+            db.collection("config").document("trainingSchedule")
+                .set(newTrainingDays)
+                .addOnSuccessListener {
+                    popUpUtils.showPopUp(binding.root.context, "Se configuraron los nuevos días de entrenamiento", "Ok")
+                    Log.d("Jerarquico", "Se configuraron los nuevos días de entrenamiento")
+                }
+                .addOnFailureListener { e ->
+                    dialogUtils.showDialog(binding.root.context, "Error al configurar los días de entrenamiento")
+                    Log.d("Jerarquico", "Error al configurar los días de entrenamiento", e)
+                }
         }
+
+        fetchTrainingDays() // Call the method to fetch and set training days
+    }
+
+    private fun fetchTrainingDays() {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("config").document("trainingSchedule")
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val trainingDays = document.data
+                    binding.checkBoxMonday.isChecked = trainingDays?.get("monday") as? Boolean ?: false
+                    binding.checkBoxTuesday.isChecked = trainingDays?.get("tuesday") as? Boolean ?: false
+                    binding.checkBoxWednesday.isChecked = trainingDays?.get("wednesday") as? Boolean ?: false
+                    binding.checkBoxThursday.isChecked = trainingDays?.get("thursday") as? Boolean ?: false
+                    binding.checkBoxFriday.isChecked = trainingDays?.get("friday") as? Boolean ?: false
+                    binding.checkBoxSaturday.isChecked = trainingDays?.get("saturday") as? Boolean ?: false
+                    binding.checkBoxSunday.isChecked = trainingDays?.get("sunday") as? Boolean ?: false
+                }
+            }
+            .addOnFailureListener { e ->
+                dialogUtils.showDialog(binding.root.context, "Error al obtener los días de entrenamiento")
+                Log.d("Jerarquico", "Error al obtener los días de entrenamiento", e)
+            }
     }
 
     override fun onResume() {
