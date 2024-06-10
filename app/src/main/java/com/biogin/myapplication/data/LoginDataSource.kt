@@ -385,7 +385,6 @@ class LoginDataSource {
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
     }
 
-
     fun logout() {
         // TODO: revoke authentication
     }

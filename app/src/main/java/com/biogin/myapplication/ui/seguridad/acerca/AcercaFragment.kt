@@ -26,10 +26,6 @@ class AcercaFragment : Fragment() {
 
         _binding = FragmentAcercaBinding.inflate(inflater, container, false)
 
-//        val textView: TextView = binding.textNotifications
-//        notificationsViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         return binding.root
     }
 

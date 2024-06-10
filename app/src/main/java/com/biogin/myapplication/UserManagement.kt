@@ -13,8 +13,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.doOnTextChanged
 import com.biogin.myapplication.data.LoginDataSource
-import com.biogin.myapplication.data.LoginRepository
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
@@ -31,7 +31,6 @@ import javax.mail.internet.InternetAddress
 
 class UserManagement : AppCompatActivity() {
     private var dataSource = LoginDataSource()
-    private var loginRepo = LoginRepository(dataSource)
     private var institutesUtils = InstitutesUtils()
     private lateinit var binding: ActivityUserManagementBinding
     private var oldDni : String = ""
@@ -103,6 +102,8 @@ class UserManagement : AppCompatActivity() {
         binding.updateUserSurname.setText(intent.getStringExtra("surname"))
         binding.updateUserEmail.setText(intent.getStringExtra("email"))
         binding.updateUserDni.setText(intent.getStringExtra("dni"))
+        binding.registerFechaDesdeUpdate.setText(intent.getStringExtra("fechaDesde"))
+        binding.registerFechaHastaUpdate.setText(intent.getStringExtra("fechaHasta"))
         if (categoryIndex != null) {
             binding.updateUserCategoriesSpinner.setSelection(categoryIndex)
         }
@@ -145,13 +146,14 @@ class UserManagement : AppCompatActivity() {
             Log.d("REGISTERACTIVITY", fechaHasta)
 
             areAllFieldsValid = validations.isFormValid(
-                binding.root.context,
                 name,
                 surname,
                 newDni,
                 email,
                 categorySelected,
-                getCheckboxesArray()
+                getCheckboxesArray(),
+                fechaDesdeEditText,
+                fechaHastaEditText
             )
 
             if(areAllFieldsValid) {
@@ -198,10 +200,6 @@ class UserManagement : AppCompatActivity() {
                 }
             }
         }
-//
-//        binding.buttonTest.setOnClickListener {
-//            sendEmailOnDniChange(oldDni, binding.updateUserDni.text.toString())
-//        }
 
         binding.duplicateUserButton.setOnClickListener {
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
@@ -219,13 +217,14 @@ class UserManagement : AppCompatActivity() {
             Log.d("REGISTERACTIVITY", fechaHasta)
 
             areAllFieldsValid = validations.isFormValid(
-                binding.root.context,
                 name,
                 surname,
                 newDni,
                 email,
                 categorySelected,
-                getCheckboxesArray()
+                getCheckboxesArray(),
+                fechaDesdeEditText,
+                fechaHastaEditText
             )
             if (areAllFieldsValid) {
                 val checkboxes = arrayListOf(
@@ -293,6 +292,14 @@ class UserManagement : AppCompatActivity() {
 
         fechaDesdeEditText = binding.registerFechaDesdeUpdate
         fechaHastaEditText = binding.registerFechaHastaUpdate
+
+        fechaDesdeEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaDesdeEditText)
+        }
+
+        fechaHastaEditText.doOnTextChanged { _, _, _, _ ->
+            validations.validateEmptyDate(fechaHastaEditText)
+        }
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {
