@@ -2,7 +2,6 @@ package com.biogin.myapplication.utils
 
 import android.util.Log
 import com.biogin.myapplication.data.Category
-import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.google.firebase.firestore.FirebaseFirestore
@@ -210,7 +209,8 @@ class FirebaseCategoryMethods() {
         documentReference.get()
             .addOnSuccessListener { documents ->
                 for(document in documents) {
-                    if(document.data["categoria"] == categoryName) {
+                    if(document.data["categoria"] == categoryName &&
+                        document.data["estado"] == "Activo") {
                         documentReference.document(document.data["dni"].toString())
                             .update("estado", "Inactivo")
                             .addOnSuccessListener {

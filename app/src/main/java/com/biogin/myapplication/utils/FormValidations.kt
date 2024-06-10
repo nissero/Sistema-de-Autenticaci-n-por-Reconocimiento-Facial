@@ -92,10 +92,11 @@ class FormValidations {
         email: EditText,
         categorySelected: String,
         institutesCheckboxes: ArrayList<CheckBox>,
+        categoryIsTemprary: Boolean,
         fechaDesde : EditText,
         fechaHasta : EditText
     ): Boolean {
-        checkAllTextValidations(name, surname, dni, email, fechaDesde, fechaHasta)
+        checkAllTextValidations(name, surname, dni, email, categoryIsTemprary, fechaDesde, fechaHasta)
 
         val nameHasNoErrors = name.error == null
         val surnameHasNoErrors = surname.error == null
@@ -115,6 +116,7 @@ class FormValidations {
         surname: EditText,
         dni: EditText,
         email: EditText,
+        categoryIsTemprary: Boolean,
         fechaDesde : EditText,
         fechaHasta : EditText
     ) {
@@ -122,7 +124,9 @@ class FormValidations {
         validateSurname(surname)
         validateDNI(dni)
         validateEmail(email)
-        validateEmptyDate(fechaDesde)
-        validateEmptyDate(fechaHasta)
+        if(categoryIsTemprary) {
+            validateEmptyDate(fechaDesde)
+            validateEmptyDate(fechaHasta)
+        }
     }
 }
