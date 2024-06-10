@@ -25,9 +25,6 @@ class DatePickerDialog {
 
                 targetEditText.tag = "editted"
 
-                secondaryEditText?.setText("")
-                secondaryEditText?.visibility = View.VISIBLE
-
                 enableButton()
             },
             actualYear,

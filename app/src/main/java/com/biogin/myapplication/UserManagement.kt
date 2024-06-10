@@ -295,7 +295,10 @@ class UserManagement : AppCompatActivity() {
         fechaHastaEditText = binding.registerFechaHastaUpdate
 
         fechaDesdeEditText.setOnClickListener{
-            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {
+                fechaHastaEditText.setText("")
+                fechaHastaEditText.visibility = View.VISIBLE
+            }
         }
         fechaHastaEditText.setOnClickListener {
             datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
@@ -321,7 +324,11 @@ class UserManagement : AppCompatActivity() {
                 
                 if (temporaryCategories != null) {
                     if (temporaryCategories.contains(categorySelected)){
+                        Log.d("TEMPORAL", "SI")
                         fechaDesdeEditText.visibility = View.VISIBLE
+                        fechaHastaEditText.visibility = View.VISIBLE
+                        fechaDesdeEditText.setText(intent.getStringExtra("trabajaDesde"))
+                        fechaHastaEditText.setText(intent.getStringExtra("trabajaHasta"))
                     } else {
                         fechaDesdeEditText.visibility = View.INVISIBLE
                         fechaHastaEditText.visibility = View.INVISIBLE

@@ -175,6 +175,11 @@ class ABMFragment : Fragment() {
         intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
         intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
 
+        if (categoriesUtils.getTemporaryCategories().contains(userData.category)){
+            intent.putExtra("trabajaDesde", userData.getTrabajaDesde())
+            intent.putExtra("trabajaHasta", userData.getTrabajaHasta())
+        }
+
         if (hasDNIUpdate) {
             intent.putExtra("button_option_chosen", "UpdateDNI")
         } else {

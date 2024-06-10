@@ -68,7 +68,10 @@ class RegisterActivity : AppCompatActivity() {
         datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         fechaDesdeEditText.setOnClickListener{
-            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {
+                fechaHastaEditText.setText("")
+                fechaHastaEditText.visibility = View.VISIBLE
+            }
         }
         fechaHastaEditText.setOnClickListener {
             datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
