@@ -260,7 +260,6 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
 
             // Create a new instance of FaceContourDetectionProcessor
             val processor = FaceContourDetectionProcessor(
-                viewBinding.root.context,
                 graphicOverlay,
                 originalImage,
                 this,

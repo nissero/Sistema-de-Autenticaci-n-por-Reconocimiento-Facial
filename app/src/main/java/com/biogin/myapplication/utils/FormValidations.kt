@@ -1,6 +1,5 @@
 package com.biogin.myapplication.utils
 
-import android.content.Context
 import android.util.Patterns
 import android.widget.CheckBox
 import android.widget.EditText
@@ -44,7 +43,7 @@ class FormValidations {
         }
     }
 
-    fun validateEmail(textView: EditText) {
+    fun  validateEmail(textView: EditText) {
         val text = textView.text.toString().trim()
         if (text.isEmpty()) {
             textView.error = "El email es requerido"
@@ -53,8 +52,15 @@ class FormValidations {
         }
     }
 
+    fun validateEmptyDate(textView: EditText) {
+        val text = textView.text.toString().trim()
+        if (text.isEmpty()) {
+            textView.error = "La fecha es requerida"
+        } else {
+            textView.error = null
+        }
+    }
     private fun isCategoryValidWithInstitutesCheckboxes(
-        context: Context,
         category: String,
         institutes: ArrayList<CheckBox>
     ): Boolean {
@@ -80,35 +86,43 @@ class FormValidations {
     }
 
     fun isFormValid(
-        context: Context,
         name: EditText,
         surname: EditText,
         dni: EditText,
         email: EditText,
         categorySelected: String,
-        institutesCheckboxes: ArrayList<CheckBox>
+        institutesCheckboxes: ArrayList<CheckBox>,
+        fechaDesde : EditText,
+        fechaHasta : EditText
     ): Boolean {
-        checkAllTextValidations(name, surname, dni, email)
+        checkAllTextValidations(name, surname, dni, email, fechaDesde, fechaHasta)
 
         val nameHasNoErrors = name.error == null
         val surnameHasNoErrors = surname.error == null
         val dniHasNoErrors = dni.error == null
         val emailHasNoErrors = email.error == null
-        val institutesCheckboxesHasNoErrors =
-            isCategoryValidWithInstitutesCheckboxes(context, categorySelected, institutesCheckboxes)
+        val fechaDesdeHasNoErrors = fechaDesde.error == null
+        val fechaHastaHasNoErrors = fechaHasta.error == null
 
-        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors && institutesCheckboxesHasNoErrors
+        val institutesCheckboxesHasNoErrors =
+            isCategoryValidWithInstitutesCheckboxes(categorySelected, institutesCheckboxes)
+
+        return nameHasNoErrors && surnameHasNoErrors && dniHasNoErrors && emailHasNoErrors && institutesCheckboxesHasNoErrors && fechaDesdeHasNoErrors && fechaHastaHasNoErrors
     }
 
     private fun checkAllTextValidations(
         name: EditText,
         surname: EditText,
         dni: EditText,
-        email: EditText
+        email: EditText,
+        fechaDesde : EditText,
+        fechaHasta : EditText
     ) {
         validateName(name)
         validateSurname(surname)
         validateDNI(dni)
         validateEmail(email)
+        validateEmptyDate(fechaDesde)
+        validateEmptyDate(fechaHasta)
     }
 }

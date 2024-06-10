@@ -355,12 +355,6 @@ class LoginDataSource {
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
     }
 
-
-
-    fun logout() {
-        // TODO: revoke authentication
-    }
-
     fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
         return db.runTransaction { transaction ->

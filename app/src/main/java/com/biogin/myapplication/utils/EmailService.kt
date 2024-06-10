@@ -1,7 +1,13 @@
 package com.biogin.myapplication.utils
 
-import java.util.*
-import javax.mail.*
+import java.util.Calendar
+import java.util.Properties
+import javax.mail.Address
+import javax.mail.Authenticator
+import javax.mail.Message
+import javax.mail.PasswordAuthentication
+import javax.mail.Session
+import javax.mail.Transport
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
@@ -37,8 +43,6 @@ class EmailService(private var server: String, private var port: Int) {
         msg.setFrom(email.from)
         msg.sentDate = Calendar.getInstance().time
         msg.setRecipients(Message.RecipientType.TO, email.toList.toTypedArray())
-//      msg.setRecipients(Message.RecipientType.CC, email.ccList.toTypedArray())
-//      msg.setRecipients(Message.RecipientType.BCC, email.bccList.toTypedArray())
         msg.replyTo = arrayOf(email.from)
 
         msg.addHeader("X-Mailer", CLIENT_NAME)
@@ -48,15 +52,7 @@ class EmailService(private var server: String, private var port: Int) {
         msg.setContent(MimeMultipart().apply {
             addBodyPart(MimeBodyPart().apply {
                 setText(email.body, "iso-8859-1")
-                //setContent(email.htmlBody, "text/html; charset=UTF-8")
             })
-//            addBodyPart(MimeBodyPart().apply {
-//                val file = Environment.getExternalStorageDirectory().absolutePath + "/Download/img.jpg"
-//                val name = "img.jpg"
-//                val source: DataSource = FileDataSource(file)
-//                dataHandler = DataHandler(source)
-//                fileName = name
-//            })
         })
         Transport.send(msg)
     }
