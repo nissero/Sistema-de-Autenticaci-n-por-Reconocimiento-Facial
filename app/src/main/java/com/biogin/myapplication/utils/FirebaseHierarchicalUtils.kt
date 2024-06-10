@@ -28,20 +28,38 @@ class FirebaseHierarchicalUtils {
 
     fun getTrainingDaysFromFirebase(callback: (ArrayList<Boolean>) -> Unit) {
         val db = FirebaseFirestore.getInstance()
-        val documentReference = db.collection("data jerarquico").document("info")
+        val daysOfWeek = listOf("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")
+        val trainingDays = ArrayList<Boolean>()
 
-        documentReference.get()
-            .addOnSuccessListener { snapshot ->
-                if(snapshot.exists()) {
-                    val trainingDays = snapshot.data?.get("dias de entrenamiento") as ArrayList<Boolean>
+        var documentsFetched = 0
 
-                    callback(trainingDays)
+        for (day in daysOfWeek) {
+            val documentReference = db.collection("config").document(day)
+
+            documentReference.get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val isTrainingDay = snapshot.data?.get("isTrainingDay") as? Boolean ?: false
+                        trainingDays.add(isTrainingDay)
+                    } else {
+                        trainingDays.add(false) // Default to false if document does not exist
+                    }
+
+                    documentsFetched++
+                    if (documentsFetched == daysOfWeek.size) {
+                        callback(trainingDays)
+                    }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "No se encontró el documento", e)
-                callback(ArrayList())
-            }
+                .addOnFailureListener { e ->
+                    Log.e("Firestore", "Error fetching document for $day", e)
+
+                    trainingDays.add(false) // Default to false on error
+                    documentsFetched++
+                    if (documentsFetched == daysOfWeek.size) {
+                        callback(trainingDays)
+                    }
+                }
+        }
     }
 
     fun setMail(mail: String, callback: (Boolean) -> Unit) {
