@@ -4,12 +4,10 @@ import android.content.Context
 import android.util.Log
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.google.firebase.Firebase
-import com.google.firebase.database.*
 import com.google.firebase.firestore.firestore
 
 class FirebaseSyncService(private val context: Context) {
     private val offlineDatabaseHelper = OfflineDataBaseHelper(context)
-    private val firebaseDatabase = FirebaseDatabase.getInstance()
     private val usersReference = Firebase.firestore.collection("usuarios")
 
     init {

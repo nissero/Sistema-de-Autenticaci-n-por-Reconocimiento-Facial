@@ -1,11 +1,12 @@
 package com.biogin.myapplication.face_detection
 
 import android.content.ContentValues
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.Log
+import androidx.camera.core.CameraSelector
 import com.biogin.myapplication.BaseImageAnalyzer
+import com.biogin.myapplication.CameraHelper
 import com.biogin.myapplication.FaceContourGraphic
 import com.biogin.myapplication.GraphicOverlay
 import com.google.android.gms.tasks.Task
@@ -14,11 +15,8 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.IOException
-import androidx.camera.core.CameraSelector
-import com.biogin.myapplication.CameraHelper
 
 class FaceContourDetectionProcessor(
-    private val context: Context,
     private val view: GraphicOverlay,
     private val originalImage: Bitmap,
     private val camera: CameraHelper,

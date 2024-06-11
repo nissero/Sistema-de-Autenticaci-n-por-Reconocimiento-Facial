@@ -1,22 +1,33 @@
 package com.biogin.myapplication.data
 
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
+import com.google.firebase.firestore.dataObjects
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
@@ -63,6 +74,10 @@ class LoginDataSource {
             if (categoriesUtils.getTemporaryCategories().contains(category)) {
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
+
                 if (trabajaDesdeDate.isAfter(today)){
                     val newUser = hashMapOf(
                         "nombre" to name,
@@ -73,8 +88,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Inactivo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
 
                     transaction.set(docRefDni, newUser)
@@ -89,8 +104,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Activo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
                     transaction.set(docRefDni, newUser)
                 }
@@ -167,6 +182,9 @@ class LoginDataSource {
             } else {
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
                 if (trabajaDesdeDate.isAfter(today)){
                     val newUser = hashMapOf(
                         "nombre" to name,
@@ -177,8 +195,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Inactivo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
 
                     transaction.set(docRefNewDni, newUser)
@@ -193,8 +211,8 @@ class LoginDataSource {
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
                         "estado" to "Activo",
-                        "trabajaDesde" to fechaDesde,
-                        "trabajaHasta" to fechaHasta
+                        "trabajaDesde" to fechaDesdeTimestamp,
+                        "trabajaHasta" to fechaHastaTimestamp
                     )
                     transaction.set(docRefNewDni, newUser)
                 }
@@ -230,7 +248,7 @@ class LoginDataSource {
                     "categoria" to category,
                     "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                     "institutos" to institutesSelected,
-                    "estado" to "Activo"
+                    "estado" to state
                 )
 
                 transaction.set(docRefUserUpdated, newUser)
@@ -241,6 +259,9 @@ class LoginDataSource {
             tx = db.runTransaction { transaction ->
                 val today = LocalDate.now()
                 val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
+                val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
                 if (trabajaDesdeDate.isAfter(today)){
                     transaction.update(docRefUserUpdated,
                         "nombre", name,
@@ -250,8 +271,8 @@ class LoginDataSource {
                         "estado", "Inactivo",
                         "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesde,
-                        "trabajaHasta", fechaHasta)
+                        "trabajaDesde", fechaDesdeTimestamp,
+                        "trabajaHasta", fechaHastaTimestamp)
                 }
                 if (trabajaDesdeDate.isEqual(today)) {
                     transaction.update(docRefUserUpdated,
@@ -262,8 +283,8 @@ class LoginDataSource {
                         "estado", state,
                         "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesde,
-                        "trabajaHasta", fechaHasta)
+                        "trabajaDesde", fechaDesdeTimestamp,
+                        "trabajaHasta", fechaHastaTimestamp)
                 }
 
                 logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
@@ -334,12 +355,6 @@ class LoginDataSource {
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
     }
 
-
-
-    fun logout() {
-        // TODO: revoke authentication
-    }
-
     fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
         val db = FirebaseFirestore.getInstance()
         return db.runTransaction { transaction ->
@@ -360,10 +375,13 @@ class LoginDataSource {
                 )
             }
 
+            val fechaDesdeTimeStamp = convertStringToTimestamp(fechaDesde)
+            val fechaHastaTimeStamp = convertStringToTimestamp(fechaHasta)
+
             val data = dniDoc.data
             val nuevosAtributos = mapOf(
-                "suspendidoDesde" to fechaDesde,
-                "suspendidoHasta" to fechaHasta
+                "suspendidoDesde" to fechaDesdeTimeStamp,
+                "suspendidoHasta" to fechaHastaTimeStamp
             )
             val dataActualizada = data?.plus(nuevosAtributos)
 
@@ -371,9 +389,10 @@ class LoginDataSource {
                 transaction.update(docRefDni, dataActualizada)
             }
 
-            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_TEMPORAL_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun ifSuspensionDateEqualsToday(fechaDesde: String, dni: String): Boolean {
@@ -386,5 +405,94 @@ class LoginDataSource {
         }
         return false
     }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun convertStringToTimestamp(dateString: String): Timestamp {
+        val formatter = SimpleDateFormat("yyyy/MM/dd")
+        val parsedDate = formatter.parse(dateString) ?: return Timestamp.now() // Handle invalid format
+
+        val calendar = Calendar.getInstance()
+        calendar.time = parsedDate
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        calendar.add(Calendar.DATE, 1)
+
+        return Timestamp(calendar.timeInMillis / 1000, 0)
+    }
+
+    suspend fun getLugares(dniUser: String): Result<MutableList<String>> {
+        val ret = mutableListOf<String>()
+        val db = FirebaseFirestore.getInstance()
+        val collectionRef = db.collection("lugares")
+
+        var resultUserData: Result<LoggedInUser> = getUserFromFirebase(dniUser)
+        var userLugares = arrayListOf<String>()
+        if (resultUserData is Result.Success){
+            userLugares = resultUserData.data.areasAllowed
+        }
+
+        Log.d("getLugares", "LUGARES USUARIO: $userLugares")
+
+        // Realizar una consulta a la colección "lugares"
+        val task = collectionRef.get()
+        val result = task.await() // Esperar a que la consulta se complete
+
+        for (document in result) {
+            val id = document.id
+            if (userLugares.isNotEmpty()){
+                if (!userLugares.contains(id)){
+                    ret.add(id)
+                }
+            } else {
+                ret.add(id)
+            }
+        }
+
+        return Result.Success(ret)
+    }
+
+    fun addTemportalUserAccessToLugares(dni: String, fechaDesde: String, fechaHasta: String, placesSelected: List<String>): Task<Transaction> {
+        val db = FirebaseFirestore.getInstance()
+        return db.runTransaction { transaction ->
+            if (dni.isEmpty()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val docRefDni = db.collection("usuarios").document(dni)
+            val dniDoc = transaction.get(docRefDni)
+
+            if (!dniDoc.exists()) {
+                throw FirebaseFirestoreException(
+                    "El dni ingresado no existe",
+                    FirebaseFirestoreException.Code.NOT_FOUND
+                )
+            }
+
+            val fechaDesdeTimeStamp = convertStringToTimestamp(fechaDesde)
+            val fechaHastaTimeStamp = convertStringToTimestamp(fechaHasta)
+
+            val data = dniDoc.data
+            val nuevosAtributos = mapOf(
+                "accesoDesde" to fechaDesdeTimeStamp,
+                "accesoHasta" to fechaHastaTimeStamp,
+                "areasTemporales" to placesSelected
+            )
+            val dataActualizada = data?.plus(nuevosAtributos)
+
+            if (dataActualizada != null) {
+                transaction.update(docRefDni, dataActualizada)
+            }
+
+            logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.GRANT_TEMPORAL_ACCESS,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
+        }
+    }
+
+
 
 }

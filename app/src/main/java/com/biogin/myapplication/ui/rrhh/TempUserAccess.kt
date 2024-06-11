@@ -1,23 +1,31 @@
 package com.biogin.myapplication.ui.rrhh
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
+import com.biogin.myapplication.data.Result
+import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.utils.DatePickerDialog
 import com.biogin.myapplication.utils.PopUpUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
-class TempUserSuspensionActivity : AppCompatActivity() {
+class TempUserAccess : AppCompatActivity() {
 
     private lateinit var fechaDesdeEditText: EditText
     private lateinit var fechaHastaEditText: EditText
@@ -26,16 +34,16 @@ class TempUserSuspensionActivity : AppCompatActivity() {
 
     private lateinit var dataSource: LoginDataSource
 
+    private lateinit var options: MutableList<Option>
+    private lateinit var adapter: OptionsAdapter
+
     private lateinit var dniUser: String
 
     private val popUpUtil = PopUpUtils()
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_temp_user_suspension)
+        setContentView(R.layout.activity_temp_user_access)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -44,15 +52,45 @@ class TempUserSuspensionActivity : AppCompatActivity() {
 
         dniUser = intent.getStringExtra("dniUser").toString()
 
-        dataSource = LoginDataSource()
-
         datePickerDialog = DatePickerDialog()
 
         fechaDesdeEditText = findViewById(R.id.register_fecha_desde)
         fechaHastaEditText = findViewById(R.id.register_fecha_hasta)
 
-
         continueButton = findViewById(R.id.continue_button)
+
+        dataSource = LoginDataSource()
+
+        val recyclerView: RecyclerView = findViewById(R.id.options_recycler_view)
+
+
+
+        var result: Result<MutableList<String>>
+        runBlocking {
+            lifecycleScope.launch {
+                result = dataSource.getLugares(dniUser)
+                if (result is Result.Success) {
+                    options = mutableListOf()
+
+                    val lugares = (result as Result.Success<MutableList<String>>).data
+                    Log.d("getLugares", "LUGARES NO ACCEDIBLES X USUARIO: $lugares")
+                    for ((index, lugar) in lugares.withIndex()){
+                        options.add(index, Option(lugar))
+                    }
+
+                    adapter = OptionsAdapter(options) {enableButton()}
+
+                    recyclerView.layoutManager = LinearLayoutManager(this@TempUserAccess)
+                    recyclerView.adapter = adapter
+                } else {
+                    Log.e("getLugares", "error")
+                }
+            }
+        }
+
+        // Create and set the adapter
+
+
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) { enableButton() }
@@ -63,22 +101,15 @@ class TempUserSuspensionActivity : AppCompatActivity() {
         }
 
         continueButton.setOnClickListener {
-            dataSource.disableForSomeTime(
+            val optionsSelected = getSelectedOptions()
+            dataSource.addTemportalUserAccessToLugares(
                 dniUser,
                 datePickerDialog.formatDate(fechaDesdeEditText.text.toString()),
-                datePickerDialog.formatDate(fechaHastaEditText.text.toString()))
-                .addOnSuccessListener {
-                    if (dataSource.ifSuspensionDateEqualsToday(fechaDesdeEditText.text.toString(), dniUser)){
-                        Log.d("suspensionUsuario", "BIEN")
-                        popUpUtil.showPopUp(this,
-                        "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text} con efecto inmediato",
-                            "Salir")
-                    } else{
-                        popUpUtil.showPopUp(this,
-                            "El usuario se suspendera desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text}",
-                            "Salir")
-                    }
-                    finish()
+                datePickerDialog.formatDate(fechaHastaEditText.text.toString()),
+                optionsSelected
+            ).addOnSuccessListener {
+                popUpUtil.showPopUp(this, "El usuario tendrá acceso a $optionsSelected desde ${fechaDesdeEditText.text} hasta ${fechaHastaEditText.text}", "Salir")
+                finish()
             }.addOnFailureListener { ex ->
                 try {
                     throw ex
@@ -99,8 +130,12 @@ class TempUserSuspensionActivity : AppCompatActivity() {
         }
     }
 
+    private fun getSelectedOptions(): List<String> {
+        return options.filter { it.isSelected }.map { it.name }
+    }
+
     private fun enableButton(){
-        continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty()
+        continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty() && adapter.isAnyOptionSelected()
     }
 
     private fun String.toCalendarDate(): Calendar {
@@ -113,6 +148,4 @@ class TempUserSuspensionActivity : AppCompatActivity() {
         calendar.set(year, month, day)
         return calendar
     }
-
-
 }
