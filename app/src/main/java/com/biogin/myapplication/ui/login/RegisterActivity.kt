@@ -66,7 +66,10 @@ class RegisterActivity : AppCompatActivity() {
         datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
 
         fechaDesdeEditText.setOnClickListener{
-            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {}
+            datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) {
+                fechaHastaEditText.setText("")
+                fechaHastaEditText.visibility = View.VISIBLE
+            }
         }
         fechaHastaEditText.setOnClickListener {
             datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
@@ -152,14 +155,14 @@ class RegisterActivity : AppCompatActivity() {
             val spinner = findViewById<Spinner>(R.id.register_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
-            if (temporaryCategories != null) {
-                if(temporaryCategories.contains(categorySelected)) {
-                    if(fechaDesdeEditText.text.toString().isNotEmpty()) {
-                        fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
-                    }
-                    if(fechaHastaEditText.text.toString().isNotEmpty()) {
-                        fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
-                    }
+            val categoryIsTemporary = temporaryCategories?.contains(categorySelected)!!
+
+            if(categoryIsTemporary) {
+                if(fechaDesdeEditText.text.toString().isNotEmpty()) {
+                    fechaDesde = datePickerDialog.formatDate(fechaDesdeEditText.text.toString())
+                }
+                if(fechaHastaEditText.text.toString().isNotEmpty()) {
+                    fechaHasta = datePickerDialog.formatDate(fechaHastaEditText.text.toString())
                 }
             }
 
@@ -173,6 +176,7 @@ class RegisterActivity : AppCompatActivity() {
                 email!!,
                 categorySelected,
                 getCheckboxesArray(),
+                categoryIsTemporary,
                 fechaDesdeEditText,
                 fechaHastaEditText
             )

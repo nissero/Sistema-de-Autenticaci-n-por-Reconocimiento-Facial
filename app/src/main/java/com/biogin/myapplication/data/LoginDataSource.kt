@@ -28,6 +28,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import com.biogin.myapplication.logs.Log as LogsApp
 
 /**
@@ -338,21 +340,53 @@ class LoginDataSource {
 
         if (document.data != null) {
             val data = document.data
-            val user = LoggedInUser(
-                data?.get("dni").toString(),
-                data?.get("nombre").toString(),
-                data?.get("apellido").toString(),
-                data?.get("email").toString(),
-                data?.get("categoria").toString(),
-                data?.get("estado").toString(),
-                data?.get("institutos") as ArrayList<String>,
-                data["areasPermitidas"] as ArrayList<String>,
-            )
+            val categoryDocument = db.collection("categorias").document(data?.get("categoria").toString()).get().await()
+
+            val user: LoggedInUser
+
+            if (categoryDocument.getBoolean("temporal") == true){
+                val fechaDesdeTimeStamp = document.getTimestamp("trabajaDesde")
+                val fechaHastaTimeStamp = document.getTimestamp("trabajaHasta")
+
+                val fechaDesdeDate = fechaDesdeTimeStamp?.toDate()
+                val fechaHastaDate = fechaHastaTimeStamp?.toDate()
+
+                val fechaHastaFormateada = fechaHastaDate?.let { formatearFecha(it) }
+                val fechaDesdeFormateada = fechaDesdeDate?.let { formatearFecha(it) }
+
+                user = LoggedInUser(
+                    data?.get("dni").toString(),
+                    data?.get("nombre").toString(),
+                    data?.get("apellido").toString(),
+                    data?.get("email").toString(),
+                    data?.get("categoria").toString(),
+                    data?.get("estado").toString(),
+                    data?.get("institutos") as ArrayList<String>,
+                    data["areasPermitidas"] as ArrayList<String>,
+                    fechaDesdeFormateada,
+                    fechaHastaFormateada
+                )
+            } else{
+                user = LoggedInUser(
+                    data?.get("dni").toString(),
+                    data?.get("nombre").toString(),
+                    data?.get("apellido").toString(),
+                    data?.get("email").toString(),
+                    data?.get("categoria").toString(),
+                    data?.get("estado").toString(),
+                    data?.get("institutos") as ArrayList<String>,
+                    data["areasPermitidas"] as ArrayList<String>,
+                )
+            }
 
             return Result.Success(user)
         }
 
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
+    }
+
+    fun logout() {
+        // TODO: revoke authentication
     }
 
     fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
@@ -492,6 +526,13 @@ class LoginDataSource {
             logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.GRANT_TEMPORAL_ACCESS,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
+
+    private fun formatearFecha(fecha: Date): String {
+        val simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("America/Argentina/Buenos_Aires") // Zona horaria UTC-3
+        return simpleDateFormat.format(fecha)
+    }
+
 
 
 
