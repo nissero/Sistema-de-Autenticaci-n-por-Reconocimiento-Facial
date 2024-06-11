@@ -85,7 +85,7 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                                     dniMasterUser: "",
                                     dniUserAffected: userId,
                                     logEventName: "USER INACTIVATION",
-                                    logEventType: "INFO,
+                                    logEventType: "INFO",
                                     timestamp: admin.firestore.FieldValue.serverTimestamp()
                                 };
 
