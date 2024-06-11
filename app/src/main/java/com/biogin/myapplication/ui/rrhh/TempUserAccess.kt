@@ -2,6 +2,7 @@ package com.biogin.myapplication.ui.rrhh
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -31,6 +32,8 @@ class TempUserAccess : AppCompatActivity() {
     private lateinit var fechaHastaEditText: EditText
     private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var continueButton: Button
+
+    private var fechaDesdeWasSetted: Boolean = false
 
     private lateinit var dataSource: LoginDataSource
 
@@ -94,6 +97,7 @@ class TempUserAccess : AppCompatActivity() {
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) { enableButton() }
+            fechaDesdeWasSetted = true
         }
 
         fechaHastaEditText.setOnClickListener {
@@ -135,6 +139,13 @@ class TempUserAccess : AppCompatActivity() {
     }
 
     private fun enableButton(){
+        if (!fechaHastaEditText.isShown){
+            fechaHastaEditText.visibility = View.VISIBLE
+        }
+        if (fechaDesdeWasSetted){
+            fechaHastaEditText.setText("")
+            fechaDesdeWasSetted = false
+        }
         continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty() && adapter.isAnyOptionSelected()
     }
 

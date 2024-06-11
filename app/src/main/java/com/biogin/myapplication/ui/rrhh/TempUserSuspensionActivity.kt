@@ -3,6 +3,7 @@ package com.biogin.myapplication.ui.rrhh
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -19,6 +20,7 @@ import java.util.Calendar
 
 class TempUserSuspensionActivity : AppCompatActivity() {
 
+    private var fechaDesdeWasSetted: Boolean = false
     private lateinit var fechaDesdeEditText: EditText
     private lateinit var fechaHastaEditText: EditText
     private lateinit var datePickerDialog: DatePickerDialog
@@ -56,6 +58,7 @@ class TempUserSuspensionActivity : AppCompatActivity() {
 
         fechaDesdeEditText.setOnClickListener{
             datePickerDialog.showDatePickerDialog(fechaDesdeEditText, fechaHastaEditText, System.currentTimeMillis(), this) { enableButton() }
+            fechaDesdeWasSetted = true
         }
 
         fechaHastaEditText.setOnClickListener {
@@ -100,6 +103,13 @@ class TempUserSuspensionActivity : AppCompatActivity() {
     }
 
     private fun enableButton(){
+        if (!fechaHastaEditText.isShown){
+            fechaHastaEditText.visibility = View.VISIBLE
+        }
+        if (fechaDesdeWasSetted){
+            fechaHastaEditText.setText("")
+            fechaDesdeWasSetted = false
+        }
         continueButton.isEnabled = fechaHastaEditText.text.toString().isNotEmpty() && fechaDesdeEditText.text.toString().isNotEmpty()
     }
 
