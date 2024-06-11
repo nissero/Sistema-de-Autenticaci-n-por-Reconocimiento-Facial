@@ -2,6 +2,7 @@ package com.biogin.myapplication.data
 
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
+import com.biogin.myapplication.utils.TimestampDateUtil
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,12 +16,14 @@ import java.util.Locale
 
 class LogsRepository {
     private val LOGS_COLLECTION_NAME = "logs"
+    private val timestampUtil = TimestampDateUtil()
     suspend fun getAllLogs() : List<Log> {
         val db = FirebaseFirestore.getInstance()
         val logs : ArrayList<Log> = ArrayList()
 
         val collectionRef = db.collection(LOGS_COLLECTION_NAME)
         val logsObtained = collectionRef.
+        orderBy("timestamp").
             get().
             await()
             .documents
@@ -35,7 +38,7 @@ class LogsRepository {
                     document.get("dniMasterUser").toString(),
                     document.get("dniUserAffected").toString(),
                     document.get("category").toString(),
-                    document.get("timestamp").toString())
+                        timestampUtil.timestampToString(document.get("timestamp")!!))
                 )
             }
         }
