@@ -314,7 +314,12 @@ class UserManagement : AppCompatActivity() {
             }
         }
         fechaHastaEditText.setOnClickListener {
-            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
+            if (fechaDesdeEditText.text.toString().trim().isEmpty()){
+                fechaHastaEditText.error = "Primero selecciona una fecha de inicio."
+            } else {
+                fechaHastaEditText.error = null
+                datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
+            }
         }
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
