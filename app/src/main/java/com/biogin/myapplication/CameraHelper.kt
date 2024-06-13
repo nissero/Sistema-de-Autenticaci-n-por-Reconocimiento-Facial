@@ -230,7 +230,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
             "timestamp" to timestamp,
             "photoPaths" to (0 until 3).map { index ->
                 "images/$dni/${dni}_$index.jpg"
-            }
+            },
+            "processed" to false
         )
 
         firestore.collection("requests")

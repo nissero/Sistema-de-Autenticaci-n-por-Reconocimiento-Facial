@@ -23,9 +23,11 @@
     "nvm": "^0.0.4"
   },
   "devDependencies": {
-    "eslint": "^8.15.0",
+    "@eslint/js": "^9.4.0",
+    "eslint": "^9.4.0",
     "eslint-config-google": "^0.14.0",
-    "firebase-functions-test": "^3.1.0"
+    "firebase-functions-test": "^3.1.0",
+    "globals": "^15.4.0"
   },
   "private": true
 }
