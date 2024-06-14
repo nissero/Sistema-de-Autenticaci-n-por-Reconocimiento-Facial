@@ -139,7 +139,8 @@
     <string name="dni_user_affected">DNI user afectado</string>
     <string name="log_type">Tipo de log</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="text_view_succesful_auth_data_logs">Cantidad autenticaciones\nexitosas</string>
+    <string name="text_view_succesful_in_auth_data_logs">Cantidad de ingresos\nexitosos</string>
+    <string name="text_view_succesful_out_auth_data_logs">Cantidad de egresos\nexitosos</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
     <string name="title_categorias">Categorías</string>
     <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
