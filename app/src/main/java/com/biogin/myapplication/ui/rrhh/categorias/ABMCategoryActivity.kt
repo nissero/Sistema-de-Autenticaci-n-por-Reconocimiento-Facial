@@ -82,8 +82,7 @@ class ABMCategoryActivity : AppCompatActivity() {
                     checkboxInstitute.isChecked, true)
 
                 dialogUtils.showDialogWithFunctionOnClose(binding.root.context,
-                    "Se ha creado correctamente la" +
-                        "categoría $categoryName") {
+                    "Se ha creado correctamente la categoría $categoryName") {
                     finish()
                 }
             } else if(intent.getStringExtra("type") == "modify") {

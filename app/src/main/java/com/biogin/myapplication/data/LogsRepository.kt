@@ -1,5 +1,6 @@
 package com.biogin.myapplication.data
 
+import android.annotation.SuppressLint
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
 import com.biogin.myapplication.utils.TimestampDateUtil
@@ -82,7 +83,7 @@ class LogsRepository {
 
     }
 
-    fun replaceWhitespacesWithUnderscores(s : String) : String {
+    private fun replaceWhitespacesWithUnderscores(s : String) : String {
         return s.replace("\\s+".toRegex(), "_")
     }
 
@@ -94,6 +95,28 @@ class LogsRepository {
             whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
             whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
                 .get()
+
+    }
+
+    fun getSuccessfulInAuthenticationsOfDay() : Task<QuerySnapshot> {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection(LOGS_COLLECTION_NAME).
+        whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION IN").
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
+        whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+            .get()
+
+    }
+
+    fun getSuccessfulOutAuthenticationsOfDay() : Task<QuerySnapshot> {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection(LOGS_COLLECTION_NAME).
+        whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION OUT").
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
+        whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+            .get()
 
     }
 
@@ -151,6 +174,7 @@ class LogsRepository {
         )
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun createHashmapOfflineLog(log : Log): HashMap<String, Any> {
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
         val date =  Timestamp(formatter.parse(log.timestamp)!!).toDate()
