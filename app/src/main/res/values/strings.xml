@@ -63,7 +63,7 @@
     <string name="hora">Hora</string>
     <string name="id_autenticador">DNI\nAutenticador</string>
     <string name="id_visitante">DNI\nVisitante</string>
-    <string name="categoria">Categoria\nvisitante</string>
+    <string name="categoria">Categoria\nusuario\nafectado</string>
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
@@ -135,8 +135,8 @@
     <string name="desactivar_lugar_fisico">Desactivar\nlugar físico</string>
     <string name="mensaje_modificar_lugar">Para modificar o desactivar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
 
-    <string name="dni_rrhh">DNI\nrrhh</string>
-    <string name="dni_user_affected">DNI user afectado</string>
+    <string name="dni_master_user">DNI\nusuario\nmaestro</string>
+    <string name="dni_user_affected">DNI usuario afectado</string>
     <string name="log_type">Tipo de log</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_view_succesful_in_auth_data_logs">Cantidad de ingresos\nexitosos</string>
