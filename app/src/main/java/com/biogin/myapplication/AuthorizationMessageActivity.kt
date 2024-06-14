@@ -7,24 +7,32 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.biogin.myapplication.R.*
+import com.biogin.myapplication.data.LogsRepository
+import com.biogin.myapplication.data.userSession.MasterUserDataSession
+import com.biogin.myapplication.databinding.ActivityAuthorizationMessageBinding
 
 class AuthorizationMessageActivity : AppCompatActivity() {
 
     private lateinit var authorizationMessageTextView: TextView
+    private lateinit var binding: ActivityAuthorizationMessageBinding
+    private val logsRepository = LogsRepository()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_authorization_message)
+        binding = ActivityAuthorizationMessageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        authorizationMessageTextView = findViewById(R.id.authorization_message)
+        authorizationMessageTextView = findViewById(id.authorization_message)
 
-        val buttonContinuar = findViewById<Button>(R.id.button_continuar)
+        val buttonContinuar = binding.buttonContinuar
+        val buttonIngreso = binding.buttonIngreso
+        val buttonEgreso = binding.buttonEgreso
 
         // Get the authorization result, DNI, and apellido from the intent
         val authorizationResult = intent.getStringExtra("authorizationResult")
@@ -44,7 +52,15 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         val categoria = intent.getStringExtra("categoria")
         val areasPermitidas = intent.getStringExtra("areasPermitidas")
 
-
+        if(typeOfLogIn == "visitor" && authorizationResult == "authorized") {
+            buttonContinuar.visibility = View.INVISIBLE
+            buttonIngreso.visibility = View.VISIBLE
+            buttonEgreso.visibility = View.VISIBLE
+        } else {
+            buttonContinuar.visibility = View.VISIBLE
+            buttonIngreso.visibility = View.INVISIBLE
+            buttonEgreso.visibility = View.INVISIBLE
+        }
 
         val message: SpannableString
         val colorResource: Int
@@ -71,20 +87,18 @@ class AuthorizationMessageActivity : AppCompatActivity() {
             }
 
             message.setSpan(ForegroundColorSpan(Color.GREEN), 0, 17, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)  // Green for "ACCESO AUTORIZADO"
-            colorResource = R.color.black  // Black for details
+            colorResource = color.black  // Black for details
         } else {
             message = SpannableString("ACCESO DENEGADO")
             message.setSpan(ForegroundColorSpan(Color.RED), 0, 15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) // Red for "ACCESO DENEGADO"
-            colorResource = R.color.black  // Black for details
+            colorResource = color.black  // Black for details
         }
 
         authorizationMessageTextView.text = message
         authorizationMessageTextView.setTextColor(resources.getColor(colorResource))
 
         buttonContinuar.setOnClickListener {
-            if (typeOfLogIn == "visitor"){
-                finish()
-            } else if (authorizationResult == "authorized"){
+            if (authorizationResult == "authorized"){
                 if (typeOfLogIn == "security"){
                     val dniMaster = intent.getStringExtra("dni")
                     val intent = Intent(this, SeguridadActivity::class.java)
@@ -100,6 +114,28 @@ class AuthorizationMessageActivity : AppCompatActivity() {
             } else {
                 finish()
             }
+        }
+
+        buttonIngreso.setOnClickListener {
+            if (dni != null && categoria != null && nombre != null) {
+                logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
+                    com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_IN,
+                    MasterUserDataSession.getDniUser(), dni, categoria)
+                Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
+                        " - CATEGORIA: $categoria")
+            }
+            finish()
+        }
+
+        buttonEgreso.setOnClickListener {
+            if (dni != null && categoria != null && nombre != null) {
+                logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
+                    com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_OUT,
+                    MasterUserDataSession.getDniUser(), dni, categoria)
+                Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
+                        " - CATEGORIA: $categoria")
+            }
+            finish()
         }
     }
 }

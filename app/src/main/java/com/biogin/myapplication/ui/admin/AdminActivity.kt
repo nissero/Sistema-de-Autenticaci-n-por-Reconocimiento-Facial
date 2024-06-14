@@ -70,7 +70,7 @@ class AdminActivity : AppCompatActivity() {
                 try {
                     logsRepository.logEvent(
                         Log.LogEventType.INFO,
-                        Log.LogEventName.FIREBASE_SUCCESFUL_CONNECTION,
+                        Log.LogEventName.FIREBASE_SUCCESSFUL_CONNECTION,
                         MasterUserDataSession.getDniUser(),
                         "",
                         MasterUserDataSession.getCategoryUser()
@@ -155,7 +155,7 @@ class AdminActivity : AppCompatActivity() {
     private fun logConnectionBack4App() {
         val logsCollection = ParseObject("logs")
         logsCollection.put("logEventType", Log.LogEventType.INFO.name)
-        logsCollection.put("logEventName", Log.LogEventName.BACK4APP_SUCCESFUL_CONNECTION.value)
+        logsCollection.put("logEventName", Log.LogEventName.BACK4APP_SUCCESSFUL_CONNECTION.value)
         logsCollection.put("dniMasterUser", MasterUserDataSession.getDniUser())
         logsCollection.put("category", MasterUserDataSession.getCategoryUser())
         logsCollection.put("timestamp", Calendar.getInstance().time)

@@ -22,7 +22,6 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityMainBinding
 import com.biogin.myapplication.ui.admin.AdminActivity
 import com.biogin.myapplication.ui.jerarquico.JerarquicoActivity
-import com.biogin.myapplication.ui.seguridad.autenticacion.AutenticacionFragment
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -115,16 +114,16 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun finDeTurno() {
-        camera.shutdown()
-        val intent = Intent(this@FaceRecognitionActivity,
-            AutenticacionFragment::class.java
-        )
-        intent.putExtra("autenticado", true)
-
-        setResult(RESULT_OK, intent)
-        finish()
-    }
+//    private fun finDeTurno() {
+//        camera.shutdown()
+//        val intent = Intent(this@FaceRecognitionActivity,
+//            AutenticacionFragment::class.java
+//        )
+//        intent.putExtra("autenticado", true)
+//
+//        setResult(RESULT_OK, intent)
+//        finish()
+//    }
 
     @SuppressLint("SetTextI18n")
     fun showAuthorizationMessage(usuario: Usuario) {
@@ -296,24 +295,22 @@ class FaceRecognitionActivity : AppCompatActivity() {
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Jerárquico")
         }
     }
-
-    private fun ifFinDeTurno(user: Usuario){
-        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
-            this.showAuthorizationMessage(user)
-            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                finDeTurno()
-            }, dialogShowTime)
-        } else {
-            this.showAccessDeniedMessage()
-            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
-        }
-    }
+//
+//    private fun ifFinDeTurno(user: Usuario){
+//        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
+//            this.showAuthorizationMessage(user)
+//            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                finDeTurno()
+//            }, dialogShowTime)
+//        } else {
+//            this.showAccessDeniedMessage()
+//            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
+//        }
+//    }
 
     private fun ifAny(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getEstado()) {
-            logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), user.getDni(), user.getCategoria())
-            Log.d(TAG, "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
 
             val intent = Intent(this, AuthorizationMessageActivity::class.java)
             intent.putExtra("dni", user.getDni())
