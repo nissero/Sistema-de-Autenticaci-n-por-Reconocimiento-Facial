@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 class LogsRRHHFragment : Fragment() {
     private val logsRepository : LogsRepository = LogsRepository()
     private var _binding: FragmentLogsRrhhBinding? = null
-
+    private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -34,12 +34,22 @@ class LogsRRHHFragment : Fragment() {
     ): View {
         val dashboardViewModel =
             ViewModelProvider(this).get(LogsRRHHViewModel::class.java)
-
+        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         setRecyclerView()
+        binding.filterFechaLogsRrhh.setOnClickListener {
+            datePickerDialog.showDatePickerDialog(binding.filterFechaLogsRrhh, null, binding.root.context){}
+        }
 
+        binding.btnFilterLogsRrhh.setOnClickListener {
+            filterList(binding.filterDniUserAffected.text.toString(), binding.filterFechaLogsRrhh.text.toString())
+        }
+
+        binding.btnShowAllLogsRrhh.setOnClickListener {
+            showAllLogs()
+        }
         return root
     }
 
@@ -57,6 +67,37 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
+    fun showAllLogs() {
+        val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
+        var logs : List<com.biogin.myapplication.logs.Log> = ArrayList()
+
+        runBlocking {
+            logs = logsRepository.getAllLogs()
+        }
+        val adapter = LogsAdapter(binding.root.context, logs)
+        recyclerView.adapter = adapter
+        clearFilters()
+    }
+    fun filterList(dniUser : String, date : String) {
+        val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
+        var logs : List<com.biogin.myapplication.logs.Log> = ArrayList()
+
+        if (dniUser.isEmpty() && date.isEmpty()) {
+            val adapter = LogsAdapter(binding.root.context, logs)
+            recyclerView.adapter = adapter
+            return
+        }
+        runBlocking {
+            logs = logsRepository.getAllLogsFromUserByDate(dniUser, date)
+        }
+        val adapter = LogsAdapter(binding.root.context, logs)
+        recyclerView.adapter = adapter
+    }
+
+    fun clearFilters() {
+        binding.filterFechaLogsRrhh.setText("")
+        binding.filterDniUserAffected.setText("")
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
