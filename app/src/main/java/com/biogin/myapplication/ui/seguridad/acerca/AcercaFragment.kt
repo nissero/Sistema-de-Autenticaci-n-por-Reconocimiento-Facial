@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.databinding.FragmentAcercaBinding
 
 class AcercaFragment : Fragment() {
@@ -21,10 +20,10 @@ class AcercaFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(AcercaViewModel::class.java)
-
         _binding = FragmentAcercaBinding.inflate(inflater, container, false)
+
+        val dniSeguridadActual = binding.dniSeguridad
+        dniSeguridadActual.text = this.activity?.intent?.getStringExtra("dniMaster") ?: ""
 
         return binding.root
     }

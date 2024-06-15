@@ -114,17 +114,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-//    private fun finDeTurno() {
-//        camera.shutdown()
-//        val intent = Intent(this@FaceRecognitionActivity,
-//            AutenticacionFragment::class.java
-//        )
-//        intent.putExtra("autenticado", true)
-//
-//        setResult(RESULT_OK, intent)
-//        finish()
-//    }
-
     @SuppressLint("SetTextI18n")
     fun showAuthorizationMessage(usuario: Usuario) {
         val dialog = Dialog(this)
@@ -295,19 +284,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Jerárquico")
         }
     }
-//
-//    private fun ifFinDeTurno(user: Usuario){
-//        if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "seguridad") {
-//            this.showAuthorizationMessage(user)
-//            Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-//            Handler(Looper.getMainLooper()).postDelayed({
-//                finDeTurno()
-//            }, dialogShowTime)
-//        } else {
-//            this.showAccessDeniedMessage()
-//            Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Seguridad")
-//        }
-//    }
 
     private fun ifAny(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getEstado()) {
@@ -337,7 +313,8 @@ class FaceRecognitionActivity : AppCompatActivity() {
             camera.shutdown()
             finish()
         } else {
-            logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION, MasterUserDataSession.getDniUser(), "", "")
+            logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.USER_UNSUCCESSFUL_AUTHENTICATION,
+                dniMasterUser = MasterUserDataSession.getDniUser(), "", "")
             Log.d(TAG, "El usuario no existe en la base de datos")
 
             val intent = Intent(this, AuthorizationMessageActivity::class.java)

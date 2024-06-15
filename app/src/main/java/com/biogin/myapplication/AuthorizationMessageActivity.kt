@@ -2,6 +2,7 @@ package com.biogin.myapplication
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,17 +12,21 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.biogin.myapplication.R.*
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.ActivityAuthorizationMessageBinding
+import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 
 class AuthorizationMessageActivity : AppCompatActivity() {
 
     private lateinit var authorizationMessageTextView: TextView
     private lateinit var binding: ActivityAuthorizationMessageBinding
     private val logsRepository = LogsRepository()
+    private val offlineDataBaseHelper = OfflineDataBaseHelper(this)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,7 +71,7 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         val colorResource: Int
 
         if (authorizationResult == "authorized") {
-            message = if (connection == "online"){
+            message = if (connection == "online") {
                 if (hasAreasTemporales){
                     SpannableString("ACCESO AUTORIZADO\n" +
                             "DNI: $dni " +
@@ -117,24 +122,37 @@ class AuthorizationMessageActivity : AppCompatActivity() {
         }
 
         buttonIngreso.setOnClickListener {
-            if (dni != null && categoria != null && nombre != null) {
-                logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
-                    com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_IN,
-                    MasterUserDataSession.getDniUser(), dni, categoria)
-                Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
-                        " - CATEGORIA: $categoria")
+            if(connection == "online") {
+                if (dni != null && categoria != null && nombre != null) {
+                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
+                        com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_IN,
+                        MasterUserDataSession.getDniUser(), dni, categoria)
+                    Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
+                            " - CATEGORIA: $categoria")
+                }
+            } else {
+                if(dni != null) {
+                    offlineDataBaseHelper.registerLogForInAuthentication(dni, MasterUserDataSession.getDniUser())
+                }
             }
             finish()
         }
 
         buttonEgreso.setOnClickListener {
-            if (dni != null && categoria != null && nombre != null) {
-                logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
-                    com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_OUT,
-                    MasterUserDataSession.getDniUser(), dni, categoria)
-                Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
-                        " - CATEGORIA: $categoria")
+            if(connection == "online") {
+                if (dni != null && categoria != null && nombre != null) {
+                        logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO,
+                            com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_OUT,
+                            MasterUserDataSession.getDniUser(), dni, categoria)
+                        Log.d(FaceRecognitionActivity.TAG, "Nombre del usuario: $nombre" +
+                                " - CATEGORIA: $categoria")
+                }
+            } else {
+                if(dni != null) {
+                    offlineDataBaseHelper.registerLogForOutAuthentication(dni, MasterUserDataSession.getDniUser())
+                }
             }
+
             finish()
         }
     }
