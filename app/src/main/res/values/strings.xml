@@ -164,4 +164,5 @@
     <string name="home_text_enter_face_recognition_jerarquico">Ingresar con reconocimiento facial (JERÁRQUICO)</string>
     <string name="ayuda_mail_jerarquico">Para configurar el mail al cual se enviarán los reportes, complete el siguiente campo</string>
     <string name="ayuda_dias_entrenamiento">Seleccione los días en los que se realizará el entrenamiento para los modelos de reconocimiento facial</string>
+    <string name="text_dni_seguridad">DNI Seguridad:</string>
 </resources>

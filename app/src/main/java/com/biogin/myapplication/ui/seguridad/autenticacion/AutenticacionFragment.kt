@@ -57,6 +57,9 @@ class AutenticacionFragment : Fragment() {
         Log.d("AUTENTICATIONFRAGMENT", dniMaster)
         logsRepository = LogsRepository()
 
+        val dniSeguridadActual = binding.dniSeguridad
+        dniSeguridadActual.text = dniMaster
+
         autenticacionButton = root.findViewById(R.id.button_visitantes)
 
         autenticacionOfflineButton = root.findViewById(R.id.button_visitantes_offline)
