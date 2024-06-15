@@ -24,7 +24,7 @@
         android:id="@+id/button_continuar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/default_margin"
+        android:layout_margin="70dp"
         android:backgroundTint="@color/blue"
         android:text="@string/authorization_message_continue_button"
         app:layout_constraintBottom_toBottomOf="parent"

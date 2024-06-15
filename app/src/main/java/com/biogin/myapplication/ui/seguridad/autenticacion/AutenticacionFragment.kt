@@ -147,7 +147,6 @@ class AutenticacionFragment : Fragment() {
             }
         }
 
-
         return root
     }
 

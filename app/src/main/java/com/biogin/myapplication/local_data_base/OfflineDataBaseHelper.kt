@@ -139,17 +139,19 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun registerAuthenticationLog(dni: String, dniMaster: String): Boolean {
-        if (checkInDatabase(dni) && checkIfSecurity(dniMaster)){
-            val db = writableDatabase
-            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
-            val statement = db.compileStatement(sql)
-            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION.value)
-            statement.bindString(2, dniMaster)
-            statement.bindString(3, dni)
-            statement.bindString(4, currentTimeStamp())
-            statement.executeInsert()
-            Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
-            db.close()
+        if (checkInDatabase(dni)
+            && checkIfSecurity(dniMaster)
+            ){
+//            val db = writableDatabase
+//            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+//            val statement = db.compileStatement(sql)
+//            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION.value)
+//            statement.bindString(2, dniMaster)
+//            statement.bindString(3, dni)
+//            statement.bindString(4, currentTimeStamp())
+//            statement.executeInsert()
+//            Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
+//            db.close()
             return true
         } else{
             val db = writableDatabase
@@ -269,6 +271,35 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
         statement.executeInsert()
         db.close()
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun registerLogForInAuthentication(dni: String, dniMaster: String) {
+        val db = writableDatabase
+        val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+        val statement = db.compileStatement(sql)
+        statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_IN.value)
+        statement.bindString(2, dniMaster)
+        statement.bindString(3, dni)
+        statement.bindString(4, currentTimeStamp())
+        statement.executeInsert()
+        Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
+        db.close()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun registerLogForOutAuthentication(dni: String, dniMaster: String) {
+        val db = writableDatabase
+        val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+        val statement = db.compileStatement(sql)
+        statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_OUT.value)
+        statement.bindString(2, dniMaster)
+        statement.bindString(3, dni)
+        statement.bindString(4, currentTimeStamp())
+        statement.executeInsert()
+        Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
+        db.close()
+    }
+
     @SuppressLint("Range")
     fun getAllLogs(): String {
         val logs = StringBuilder()
