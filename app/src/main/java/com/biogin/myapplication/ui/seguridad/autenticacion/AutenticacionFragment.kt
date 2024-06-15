@@ -22,6 +22,8 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.utils.ConnectionCheck
+import java.time.LocalDate
+import com.biogin.myapplication.logs.Log as LogClass
 
 class AutenticacionFragment : Fragment() {
 
@@ -93,13 +95,13 @@ class AutenticacionFragment : Fragment() {
         }
 
         turnoButton.setOnClickListener {
-
             if(turnoIniciado == false) {
                 val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 editor?.apply {
                                     putBoolean("turnoIniciado", true)
+                                    putString("fecha", LocalDate.now().toString())
                                     apply()
                                 }
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
@@ -108,7 +110,7 @@ class AutenticacionFragment : Fragment() {
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
                                 if (connectionCheck.isOnlineNet()){
-                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(LogClass.LogEventType.INFO, LogClass.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.startOfShift(dniMaster)
@@ -126,7 +128,7 @@ class AutenticacionFragment : Fragment() {
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 if (connectionCheck.isOnlineNet()){
-                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                    logsRepository.logEvent(LogClass.LogEventType.INFO, LogClass.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.endOfShift(dniMaster)
