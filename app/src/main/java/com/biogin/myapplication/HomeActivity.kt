@@ -46,7 +46,8 @@ class HomeActivity : AppCompatActivity() {
         val editor = sharedPref?.edit()
 
         val fecha = sharedPref?.getString("fecha", LocalDate.now().toString())
-        if(LocalDate.now() > LocalDate.parse(fecha)) {
+        val turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
+        if(LocalDate.now() > LocalDate.parse(fecha) && turnoIniciado == true) {
             editor?.putBoolean("turnoIniciado", false)
             editor?.commit()
 
