@@ -140,7 +140,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun registerAuthenticationLog(dni: String, dniMaster: String): Boolean {
-        return if (checkInDatabase(dni) && checkIfSecurity(dniMaster)) {
+        return if (checkInDatabase(dni)) {
             true
         } else {
             val db = writableDatabase

@@ -1,19 +1,12 @@
 package com.biogin.myapplication
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.view.Window
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -28,7 +21,6 @@ import java.util.concurrent.Executors
 
 class FaceRecognitionActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
-    private var dialogShowTime = 10000L
     private var analyzeAgain = 12000L
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: CameraHelper
@@ -49,28 +41,32 @@ class FaceRecognitionActivity : AppCompatActivity() {
         // Request camera permissions
         if (allPermissionsGranted()) {
             when(authenticationType){
-                "seguridad" -> initCamera(:: ifSecurity)
-                "rrhh" -> initCamera(:: ifRRHH)
-                "admin" -> initCamera(:: ifAdmin)
-                "jerarquico" -> initCamera(:: ifJerarquico)
-                else -> initCamera(:: ifAny)
-            }
-
-            when(authenticationType) {
-                "seguridad" ->
+                "seguridad" -> {
+                    initCamera(:: ifSecurity)
                     viewBinding.skipButton.setOnClickListener {
                         goToSeguridadActivity()
                     }
-                "rrhh" -> viewBinding.skipButton.setOnClickListener {
-                    goToRRHHActivity()
                 }
-                "admin" -> viewBinding.skipButton.setOnClickListener {
-                    goToAdminActivity()
+                "rrhh" -> {
+                    initCamera(:: ifRRHH)
+                    viewBinding.skipButton.setOnClickListener {
+                        goToRRHHActivity()
+                    }
                 }
-                "jerarquico" -> viewBinding.skipButton.setOnClickListener {
-                    goToJerarquicoActivity()
+                "jerarquico" -> {
+                    initCamera(:: ifJerarquico)
+                    viewBinding.skipButton.setOnClickListener {
+                        goToJerarquicoActivity()
+                    }
+                }
+                "admin" -> {
+                    initCamera(:: ifAdmin)
+                    viewBinding.skipButton.setOnClickListener {
+                        goToAdminActivity()
+                    }
                 }
                 else -> {
+                    initCamera(:: ifAny)
                     viewBinding.skipButton.visibility = View.INVISIBLE
                 }
             }
@@ -114,64 +110,13 @@ class FaceRecognitionActivity : AppCompatActivity() {
         finish()
     }
 
-    @SuppressLint("SetTextI18n")
-    fun showAuthorizationMessage(usuario: Usuario) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(false)
-        dialog.setContentView(R.layout.dialog_authorization)
-
-        // Configurar los datos del usuario en el diálogo
-        dialog.findViewById<TextView>(R.id.textViewName).text = "Nombre: ${usuario.getNombre()}"
-        dialog.findViewById<TextView>(R.id.textViewLastName).text = "Apellido: ${usuario.getApellido()}"
-        dialog.findViewById<TextView>(R.id.textViewDNI).text = "DNI: ${usuario.getDni()}"
-        dialog.findViewById<TextView>(R.id.textViewCategoria).text = "Categoria: ${usuario.getCategoria()}"
-        dialog.findViewById<TextView>(R.id.textViewAreasPermitidas).text = "Areas Permitidas: ${usuario.getAreasPermitidas()}"
-
-        Log.d(TAG, usuario.getAreasPermitidas())
-
-        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_authorization)
-        mediaPlayer.start()
-
-        dialog.window?.decorView?.findViewById<View>(android.R.id.content)?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        // Mostrar el diálogo por unos segundos y luego cerrarlo
-        Handler().postDelayed({
-            dialog.dismiss()
-        }, dialogShowTime) // 3000 milisegundos (3 segundos)
-    }
-
-    @SuppressLint("SetTextI18n")
-    fun showAccessDeniedMessage() {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(false)
-        dialog.setContentView(R.layout.dialog_access_denied)
-
-        val mediaPlayer = MediaPlayer.create(this, R.raw.sound_denied)
-        mediaPlayer.start()
-
-        dialog.window?.decorView?.findViewById<View>(android.R.id.content)?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        // Mostrar el diálogo por unos segundos y luego cerrarlo
-        Handler().postDelayed({
-            dialog.dismiss()
-        }, dialogShowTime) // 3000 milisegundos (3 segundos)
-
-        dialog.show()
-    }
-
     override fun onResume() {
         super.onResume()
         when(authenticationType){
             "seguridad" -> initCamera(:: ifSecurity)
             "rrhh" -> initCamera(:: ifRRHH)
             "admin" -> initCamera(:: ifAdmin)
+            "jerarquico" -> initCamera(:: ifJerarquico)
             else -> initCamera(:: ifAny)
         }
     }
@@ -253,19 +198,42 @@ class FaceRecognitionActivity : AppCompatActivity() {
         }
     }
 
-    private fun ifAdmin(user: Usuario){
+    private fun ifAdmin(user: Usuario) {
         if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "administrador") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
-            this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                goToAdminActivity()
-            }, dialogShowTime)
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+
+            //USER DATA
+            intent.putExtra("dni", user.getDni())
+            intent.putExtra("apellido", user.getApellido())
+            intent.putExtra("nombre", user.getNombre())
+            intent.putExtra("categoria", user.getCategoria())
+            intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            //LOGIN DATA
+            intent.putExtra("typeOfLogIn", "admin")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("connection", "online")
+
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
+
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.ADMIN_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
-            this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Admin")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "admin")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         }
     }
 
@@ -273,21 +241,42 @@ class FaceRecognitionActivity : AppCompatActivity() {
         if (user.getNombre().isNotEmpty() && user.getEstado() && user.getCategoria().lowercase() == "jerarquico") {
             MasterUserDataSession.setUserDataForSession(user.getDni(), user.getCategoria())
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_SUCCESSFUL_LOGIN, user.getDni(), "", user.getCategoria())
-            this.showAuthorizationMessage(user)
             Log.d("AUTORIZACION", "Nombre del usuario: ${user.getNombre()} - CATEGORIA: ${user.getCategoria()}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                goToJerarquicoActivity()
-            }, dialogShowTime)
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+
+            //USER DATA
+            intent.putExtra("dni", user.getDni())
+            intent.putExtra("apellido", user.getApellido())
+            intent.putExtra("nombre", user.getNombre())
+            intent.putExtra("categoria", user.getCategoria())
+            intent.putExtra("areasPermitidas", user.getAreasPermitidas())
+
+            //LOGIN DATA
+            intent.putExtra("typeOfLogIn", "jerarquico")
+            intent.putExtra("authorizationResult", "authorized")
+            intent.putExtra("connection", "online")
+
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         } else {
             logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.WARN, com.biogin.myapplication.logs.Log.LogEventName.HIERARCHICAL_UNSUCCESSFUL_LOGIN, user.getDni(), "", "")
-            this.showAccessDeniedMessage()
             Log.d("AUTORIZACION", "El usuario no existe en la base de datos/No es Jerárquico")
+
+            val intent = Intent(this, AuthorizationMessageActivity::class.java)
+            intent.putExtra("typeOfLogIn", "jerarquico")
+            intent.putExtra("authorizationResult", "denied")
+            startActivity(intent)
+
+            camera.shutdown()
+            finish()
         }
     }
 
     private fun ifAny(user: Usuario){
         if (user.getNombre().isNotEmpty() && user.getEstado()) {
-
             val intent = Intent(this, AuthorizationMessageActivity::class.java)
             intent.putExtra("dni", user.getDni())
             intent.putExtra("apellido", user.getApellido())
@@ -341,7 +330,6 @@ class FaceRecognitionActivity : AppCompatActivity() {
         super.onDestroy()
         camera.shutdown()
     }
-
 
     companion object {
         const val TAG = "FaceRecognitionActivity"
