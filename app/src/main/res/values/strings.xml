@@ -35,7 +35,7 @@
     </string-array>
     <string-array name="rrhh_logs_detail_options">
         <item>Con detalle</item>
-        <item>Sin Detalle</item>
+        <item>Sin detalle</item>
     </string-array>
     <string name="title_activity_admin_autenticacion">AdminAutenticacionActivity</string>
     <string name="title_autenticacion">Autenticación</string>

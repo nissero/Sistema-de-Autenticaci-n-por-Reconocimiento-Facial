@@ -1,10 +1,12 @@
 package com.biogin.myapplication.ui.rrhh.logs
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.databinding.FragmentLogsRrhhBinding
+import com.biogin.myapplication.utils.DatePickerDialog
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import java.util.Calendar
@@ -19,7 +22,7 @@ import java.util.Calendar
 class LogsRRHHFragment : Fragment() {
     private val logsRepository : LogsRepository = LogsRepository()
     private var _binding: FragmentLogsRrhhBinding? = null
-    private lateinit var datePickerDialog: com.biogin.myapplication.utils.DatePickerDialog
+    private lateinit var datePickerDialog: DatePickerDialog
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -29,6 +32,7 @@ class LogsRRHHFragment : Fragment() {
     data class Log(val fecha: String, val hora: String, val idAutenticador:
     Int, val idVisitante : Int, val lugarFisico: String)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,9 +40,11 @@ class LogsRRHHFragment : Fragment() {
     ): View {
         val dashboardViewModel =
             ViewModelProvider(this).get(LogsRRHHViewModel::class.java)
-        datePickerDialog = com.biogin.myapplication.utils.DatePickerDialog()
+        datePickerDialog = DatePickerDialog()
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        binding.tableDetailedLogsRrhhView.visibility = View.VISIBLE
+        binding.nonDetailedLogsRrhhView.visibility = View.GONE
 
         val logDetailOptions = resources.getStringArray(R.array.rrhh_logs_detail_options)
         binding.spinnerFilterDetailOption.adapter = ArrayAdapter(root.context, R.layout.spinner_item_logs_rrhh, logDetailOptions.toList())
@@ -57,11 +63,16 @@ class LogsRRHHFragment : Fragment() {
         }
 
         binding.btnFilterLogsRrhh.setOnClickListener {
-            filterList(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+            val detailOption = binding.spinnerFilterDetailOption.selectedItem.toString()
+            if (detailOption == "Con detalle") {
+                filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+            } else if (detailOption == "Sin detalle") {
+                filterNonDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+            }
         }
 
         binding.btnShowAllLogsRrhh.setOnClickListener {
-            showAllLogs()
+            showAllDetailedLogs()
         }
 
         binding.btnClearFiltersLogsRrhh.setOnClickListener {
@@ -74,7 +85,8 @@ class LogsRRHHFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         clearFilters()
-        showAllLogs()
+        enableDetailedView()
+        showAllDetailedLogs()
     }
     private fun String.toCalendarDate(): Calendar {
         val splitDate = split("/")
@@ -86,7 +98,7 @@ class LogsRRHHFragment : Fragment() {
         calendar.set(year, month, day)
         return calendar
     }
-    fun setRecyclerView() {
+    private fun setRecyclerView() {
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(binding.root.context)
@@ -99,7 +111,8 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
-    fun showAllLogs() {
+    private fun showAllDetailedLogs() {
+        enableDetailedView()
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
         var logs : List<com.biogin.myapplication.logs.Log> = ArrayList()
 
@@ -110,7 +123,9 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.adapter = adapter
         clearFilters()
     }
-    fun filterList(dniUser : String, dateFrom : String, dateTo : String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun filterDetailedLogs(dniUser : String, dateFrom : String, dateTo : String) {
+        enableDetailedView()
         lateinit var adapter : LogsAdapter
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
         var logs : List<com.biogin.myapplication.logs.Log>
@@ -133,7 +148,30 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
-    fun clearFilters() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun filterNonDetailedLogs(dniUser : String, dateFrom : String, dateTo : String) {
+        enableNonDetailedView()
+        var amountOfInSuccesfulAuths : Int
+        var amountOfOutSuccesfulAuths : Int
+        runBlocking {
+            amountOfInSuccesfulAuths = logsRepository.getAmountOfSuccesfulAuthenticationsInOfUser(dniUser, dateFrom, dateTo)
+            amountOfOutSuccesfulAuths = logsRepository.getAmountOfSuccesfulAuthenticationsOutOfUser(dniUser, dateFrom, dateTo)
+        }
+
+        binding.amountOfInSuccessfulAuthsUserRrhh.text = amountOfInSuccesfulAuths.toString()
+        binding.amountOfOutSuccessfulAuthsUserRrhh.text = amountOfOutSuccesfulAuths.toString()
+    }
+
+    private fun enableDetailedView() {
+        binding.tableDetailedLogsRrhhView.visibility = View.VISIBLE
+        binding.nonDetailedLogsRrhhView.visibility = View.GONE
+    }
+
+    private fun enableNonDetailedView() {
+        binding.tableDetailedLogsRrhhView.visibility = View.GONE
+        binding.nonDetailedLogsRrhhView.visibility = View.VISIBLE
+    }
+    private fun clearFilters() {
         binding.filterFechaDesdeLogsRrhh.setText("")
         binding.filterFechaHastaLogsRrhh.setText("")
         binding.filterFechaHastaLogsRrhh.isEnabled = false

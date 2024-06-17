@@ -123,8 +123,63 @@ android:orientation="vertical">
             app:layout_constraintStart_toEndOf="@+id/btn_show_all_logs_rrhh"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/non_detailed_logs_rrhh_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/data_successful_auths_logs_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="120dp"
+            android:text="Cantidad de ingresos\nexitosos usuario"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/data_successful_out_auths_logs_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:layout_marginEnd="50dp"
+            android:text="Cantidad de egresos\nexitosos"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/amount_of_in_successful_auths_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="0"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs_user_rrhh"
+            app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs_user_rrhh"
+            app:layout_constraintTop_toBottomOf="@+id/data_successful_auths_logs_user_rrhh" />
+
+        <TextView
+            android:id="@+id/amount_of_out_successful_auths_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="0"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/data_successful_out_auths_logs_user_rrhh"
+            app:layout_constraintStart_toStartOf="@+id/data_successful_out_auths_logs_user_rrhh"
+            app:layout_constraintTop_toBottomOf="@+id/data_successful_out_auths_logs_user_rrhh" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 <HorizontalScrollView
-    android:id="@+id/scroll_view"
+    android:id="@+id/table_detailed_logs_rrhh_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/table_logs_border">
