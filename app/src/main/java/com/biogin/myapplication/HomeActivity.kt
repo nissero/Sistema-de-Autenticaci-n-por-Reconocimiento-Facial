@@ -69,4 +69,9 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        MasterUserDataSession.clearUserData()
+    }
 }
