@@ -1,12 +1,9 @@
 package com.biogin.myapplication
 
+import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -32,29 +29,18 @@ class SeguridadActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = binding.navView
 
+        onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val intent = Intent(binding.root.context, HomeActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finishAffinity()
+                finish()
+            }
+        })
+
         val navController = findNavController(R.id.nav_host_fragment_activity_admin_autenticacion)
         navController.navigate(R.id.navigation_autenticacion, bundle)
         navView.setupWithNavController(navController)
-    }
-
-    private fun showAuthorizationDialog() {
-        val inflater = LayoutInflater.from(this)
-        val view = inflater.inflate(R.layout.dialog_authorization, null) //
-
-        val alertDialog = AlertDialog.Builder(this)
-            .setView(view)
-            .setCancelable(false)
-            .create()
-
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            alertDialog.dismiss()
-        }, 5000)
-
-        alertDialog.window?.decorView?.findViewById<View>(android.R.id.content)?.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        alertDialog.show()
     }
 }
