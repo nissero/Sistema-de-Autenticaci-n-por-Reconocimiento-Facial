@@ -24,80 +24,75 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
 
       const currentDate = new Date();
 
-      console.log("Ejecutando usuario: ", userId)
-
       const logsCollection = admin.firestore().collection("logs");
 
       if (userCategoria) {
-        categoriasCollection.doc(userCategoria).get().then((categoriaDoc) => {
-            if (categoriaDoc.exists) {
-                const categoriaData = categoriaDoc.data();
-                if (categoriaData && categoriaData.temporal) {
-                    const trabajaDesdeTimestamp = userData.trabajaDesde;
-                    const trabajaHastaTimestamp = userData.trabajaHasta;
-
-                    if (userData.trabajaDesde && userData.trabajaHasta){
-
-                        const trabajaDesdeDate = trabajaDesdeTimestamp.toDate();
-                        const trabajaHastaDate = trabajaHastaTimestamp.toDate();
-                        
-                        if (currentDate >= trabajaDesdeDate && currentDate <= trabajaHastaDate){
-                            console.log(
-                                "User:",
-                                userId,
-                                "EL USUARIO ESTA HABILITADO A TRABAJAR EN EL DIA DE LA FECHA"
-                              );
-                            if (currentUserEstado == "Inactivo"){
-                                usuariosCollection.doc(userId).update({ estado: "Activo" });
-                                console.log(
-                                    "User:",
-                                    userId,
-                                    "USUARIO HA SIDO HABILITADO PARA TRABAJAR EXTERNAMENTE"
-                                  );
-
-                                const newLog = {
-                                    category: userCategoria,
-                                    dniMasterUser: "",
-                                    dniUserAffected: userId,
-                                    logEventName: "USER ACTIVATION",
-                                    logEventType: "INFO",
-                                    timestamp: admin.firestore.FieldValue.serverTimestamp()
-                                };
-
-                                logsCollection.add(newLog);
-                            }
-                        } else {
-                            console.log(
-                                "User:",
-                                userId,
-                                "EL USUARIO NO ESTA HABILITADO A TRABAJAR"
-                              );
-                              if (currentUserEstado == "Activo"){
-                                usuariosCollection.doc(userId).update({ estado: "Inactivo" });
-                                console.log(
-                                    "User:",
-                                    userId,
-                                    "USUARIO HA SIDO DESHABILITADO PARA TRABAJAR EXTERNAMENTE"
-                                  );
-
-                                const newLog = {
-                                    category: userCategoria,
-                                    dniMasterUser: "",
-                                    dniUserAffected: userId,
-                                    logEventName: "USER INACTIVATION",
-                                    logEventType: "INFO",
-                                    timestamp: admin.firestore.FieldValue.serverTimestamp()
-                                };
-
-                                logsCollection.add(newLog);
+        try {
+            categoriasCollection.doc(userCategoria).get().then((categoriaDoc) => {
+                if (categoriaDoc.exists) {
+                    const categoriaData = categoriaDoc.data();
+                    if (categoriaData && categoriaData.temporal) {
+                        const trabajaDesdeTimestamp = userData.trabajaDesde;
+                        const trabajaHastaTimestamp = userData.trabajaHasta;
+    
+                        if (userData.trabajaDesde && userData.trabajaHasta){
+    
+                            const trabajaDesdeDate = trabajaDesdeTimestamp.toDate();
+                            const trabajaHastaDate = trabajaHastaTimestamp.toDate();
+                            
+                            if (currentDate >= trabajaDesdeDate && currentDate <= trabajaHastaDate){
+                                if (currentUserEstado == "Inactivo"){
+                                    usuariosCollection.doc(userId).update({ estado: "Activo" });
+                                    console.log(
+                                        "User:",
+                                        userId,
+                                        "USUARIO HA SIDO HABILITADO PARA TRABAJAR EXTERNAMENTE"
+                                      );
+                                    const newLog = {
+                                        category: userCategoria,
+                                        dniMasterUser: "",
+                                        dniUserAffected: userId,
+                                        logEventName: "USER ACTIVATION",
+                                        logEventType: "INFO",
+                                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                    };
+    
+                                    logsCollection.add(newLog);
+                                }
+                            } else {
+                                  if (currentUserEstado == "Activo"){
+                                    usuariosCollection.doc(userId).update({ estado: "Inactivo" });
+                                    console.log(
+                                        "User:",
+                                        userId,
+                                        "USUARIO HA SIDO DESHABILITADO PARA TRABAJAR EXTERNAMENTE"
+                                      );
+    
+                                    const newLog = {
+                                        category: userCategoria,
+                                        dniMasterUser: "",
+                                        dniUserAffected: userId,
+                                        logEventName: "USER INACTIVATION",
+                                        logEventType: "INFO",
+                                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                    };
+    
+                                    logsCollection.add(newLog);
+                                }
                             }
                         }
                     }
                 }
-            }
-        }).catch((error) => {
-            console.error("ERROR FETCHING CATEGORIA ARGUMENT", error);
-        });
+            }).catch((error) => {
+                console.error("ERROR FETCHING CATEGORIA ARGUMENT", error);
+            });
+        } catch (e){
+            console.log(
+                "ERROR CON USUARIO - User:",
+                userId,
+                e
+              );
+        }
       } else {
         console.log("ERROR - User:", userId, "NO TIENE CATEGORIA.");
       }
@@ -109,21 +104,7 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
         try {
             const suspendidoDesdeDate = suspendidoDesde.toDate();
             const suspendidoHastaDate = suspendidoHasta.toDate();
-
-            console.log(
-                "User:",
-                userId,
-                "TIENE FECHA DE SUSPENSION",
-                suspendidoDesdeDate,
-                suspendidoHastaDate
-              );
-    
             if (currentDate >= suspendidoDesdeDate && currentDate <= suspendidoHastaDate){
-                console.log(
-                    "User:",
-                    userId,
-                    "EL DIA DE LA FECHA ESTA DENTRO DEL PERIODO DE SUSPENSION"
-                  );
                 if (currentUserEstado == "Activo"){
                     usuariosCollection.doc(userId).update({ estado: "Inactivo" });
                     console.log(
@@ -143,18 +124,13 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
 
                     logsCollection.add(newLog);
                 }
-            } else {
-                console.log(
-                    "User:",
-                    userId,
-                    "EL PERIODO DE SUSPENSION HA TERMINADO/EL DIA ACTUAL ESTA FUERA DEL PERIODO DE SUSPENSION"
-                  );
+            } else if (currentDate > suspendidoHastaDate){
                 if (currentUserEstado == "Inactivo"){
-                    usuariosCollection.doc(userId).update({ estado: "Activo" });
+                    usuariosCollection.doc(userId).update({estado: "Activo"});
                     console.log(
                         "User:",
                         userId,
-                        "USUARIO HA SIDO HABILITADO YA QUE EL PERIODO DE SUSPENSION HA TERMINADO"
+                        "HA SIDO HABILITADO DEBIDO A QUE SU SUSPENSION HA TERMINADO"
                       );
 
                     const newLog = {
@@ -167,6 +143,10 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
                     };
 
                     logsCollection.add(newLog);
+                    usuariosCollection.doc(userId).update({
+                        suspendidoDesde: admin.firestore.FieldValue.delete(),
+                        suspendidoHasta: admin.firestore.FieldValue.delete(),
+                    });
                 }
             }
         } catch (e){
@@ -177,7 +157,6 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
               );
         }
       }
-
     });
 
     logger.log("Daily scheduled function executed successfully!");
