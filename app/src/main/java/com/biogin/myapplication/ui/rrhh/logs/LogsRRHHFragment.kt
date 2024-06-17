@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -14,23 +15,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LogsRepository
 import com.biogin.myapplication.databinding.FragmentLogsRrhhBinding
+import com.biogin.myapplication.logs.Log
+import com.biogin.myapplication.utils.CsvCreator
 import com.biogin.myapplication.utils.DatePickerDialog
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
 import java.util.Calendar
 
 class LogsRRHHFragment : Fragment() {
     private val logsRepository : LogsRepository = LogsRepository()
     private var _binding: FragmentLogsRrhhBinding? = null
     private lateinit var datePickerDialog: DatePickerDialog
+    private lateinit var logsDataDisplayed : List<Log>
+    private val csvCreator = CsvCreator()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
-
-    @Serializable
-    data class Log(val fecha: String, val hora: String, val idAutenticador:
-    Int, val idVisitante : Int, val lugarFisico: String)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -79,15 +78,28 @@ class LogsRRHHFragment : Fragment() {
             clearFilters()
         }
 
+        binding.btnExportCsvLogsRrhh.setOnClickListener {
+            val detailOption = binding.spinnerFilterDetailOption.selectedItem.toString()
+
+            if (detailOption == "Con detalle") {
+                try {
+                    csvCreator.createAndSaveCsvFileToExportLogs(binding.root.context, logsDataDisplayed)
+                    Toast.makeText(context, "CSV exportado exitosamente", Toast.LENGTH_SHORT).show()
+                } catch (e : Exception) {
+                    Toast.makeText(context, "No fue posible exportar el CSV", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+        }
         return root
     }
-
     override fun onResume() {
         super.onResume()
         clearFilters()
         enableDetailedView()
         showAllDetailedLogs()
     }
+
     private fun String.toCalendarDate(): Calendar {
         val splitDate = split("/")
         val year = splitDate[2].toInt()
@@ -103,12 +115,14 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(binding.root.context)
 
-        var listaLogs : List<com.biogin.myapplication.logs.Log>
+        var logs : List<com.biogin.myapplication.logs.Log>
         runBlocking {
-            listaLogs = logsRepository.getAllLogs()
+            logs = logsRepository.getAllLogs()
         }
-        val adapter = LogsAdapter(binding.root.context, listaLogs)
+        val adapter = LogsAdapter(binding.root.context, logs)
         recyclerView.adapter = adapter
+
+        logsDataDisplayed = logs
     }
 
     private fun showAllDetailedLogs() {
@@ -122,6 +136,7 @@ class LogsRRHHFragment : Fragment() {
         val adapter = LogsAdapter(binding.root.context, logs)
         recyclerView.adapter = adapter
         clearFilters()
+        logsDataDisplayed = logs
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun filterDetailedLogs(dniUser : String, dateFrom : String, dateTo : String) {
@@ -146,6 +161,7 @@ class LogsRRHHFragment : Fragment() {
 
         adapter = LogsAdapter(binding.root.context, logs)
         recyclerView.adapter = adapter
+        logsDataDisplayed = logs
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,5 +1,7 @@
 package com.biogin.myapplication.utils
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -23,6 +25,7 @@ class TimestampDateUtil {
         return timestamp.toString()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun stringDateToLocalDate(date : String) : LocalDate {
         var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return LocalDate.parse(date, formatter)
@@ -57,6 +60,12 @@ class TimestampDateUtil {
         return endOfDay
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    public fun nowAsStringFileFormat() : String {
+        var date = LocalDateTime.now()
+        return "${date.dayOfMonth}-${date.monthValue}_${date.year}_${date.hour}-${date.minute}-${date.second}"
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun asDate(localDateTime: LocalDateTime): Date {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())
     }
