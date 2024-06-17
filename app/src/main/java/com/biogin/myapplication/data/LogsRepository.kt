@@ -48,19 +48,51 @@ class LogsRepository {
         return logs
     }
 
-    suspend fun getAllLogsFromUserByDate(dniUser : String, date : String) : List<Log> {
+    suspend fun getAllLogsFromUser(dniUser : String) : List<Log> {
         val db = FirebaseFirestore.getInstance()
         val logs : ArrayList<Log> = ArrayList()
-        val formatedDate = timestampUtil.stringDateToLocalDate(date)
-        val startOfDayFromDate = formatedDate.atStartOfDay()
-        val endOfDayFromDate = formatedDate.atTime(23, 59, 59)
 
+        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
+        val logsObtained = collectionRef.
+        whereEqualTo("dniUserAffected", dniUser).
+        orderBy("timestamp", Query.Direction.DESCENDING).
+        get().
+        await()
+            .documents
+
+        for (logDocument in logsObtained) {
+            val document = logDocument.data
+            if (document != null) {
+                logs.add(
+                    Log(
+                        Log.LogEventType.valueOf(document.get("logEventType").toString()),
+                        Log.getLogEventNameFromValue(document.get("logEventName").toString()),
+                        document.get("dniMasterUser").toString(),
+                        document.get("dniUserAffected").toString(),
+                        document.get("category").toString(),
+                        timestampUtil.timestampToString(document.get("timestamp")!!))
+                )
+            }
+        }
+
+        return logs
+    }
+
+    suspend fun getAllLogsFromUserByDate(dniUser : String, dateFrom : String, dateTo : String) : List<Log> {
+        val db = FirebaseFirestore.getInstance()
+        val logs : ArrayList<Log> = ArrayList()
+
+        val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
+        val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+
+        val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
+        val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
 
         val collectionRef = db.collection(LOGS_COLLECTION_NAME)
         val logsObtained = collectionRef.
             whereEqualTo("dniUserAffected", dniUser).
-            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayFromDate))).
-            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayFromDate))).
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate))).
             orderBy("timestamp", Query.Direction.DESCENDING).
         get().
         await()

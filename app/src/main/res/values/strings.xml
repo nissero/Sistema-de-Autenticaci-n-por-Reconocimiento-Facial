@@ -29,24 +29,13 @@
     <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
     <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
     <string name="authorization_message_continue_button">OK</string>
-    <!--    <string-array name="user_categories">-->
-    <!--        <item>Docente</item>-->
-    <!--        <item>No docente</item>-->
-    <!--        <item>Estudiante</item>-->
-    <!--        <item>Externo</item>-->
-    <!--        <item>Jerarquico</item>-->
-    <!--        <item>RRHH</item>-->
-    <!--        <item>Temporal</item>-->
-    <!--    </string-array>-->
-    <!--    <string-array name="user_categories_with_no_institute">-->
-    <!--        <item>Externo</item>-->
-    <!--        <item>Temporal</item>-->
-    <!--        <item>RRHH</item>-->
-    <!--        <item>Jerarquico</item>-->
-    <!--    </string-array>-->
     <string-array name="user_active_options">
         <item>Activo</item>
         <item>Inactivo</item>
+    </string-array>
+    <string-array name="rrhh_logs_detail_options">
+        <item>Con detalle</item>
+        <item>Sin Detalle</item>
     </string-array>
     <string name="title_activity_admin_autenticacion">AdminAutenticacionActivity</string>
     <string name="title_autenticacion">Autenticación</string>
