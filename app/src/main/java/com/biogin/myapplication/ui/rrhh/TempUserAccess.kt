@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,12 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.data.Result
-import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.utils.DatePickerDialog
 import com.biogin.myapplication.utils.PopUpUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Calendar

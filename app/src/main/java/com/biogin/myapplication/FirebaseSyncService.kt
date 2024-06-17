@@ -6,7 +6,7 @@ import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class FirebaseSyncService(private val context: Context) {
+class FirebaseSyncService(context: Context) {
     private val offlineDatabaseHelper = OfflineDataBaseHelper(context)
     private val usersReference = Firebase.firestore.collection("usuarios")
 

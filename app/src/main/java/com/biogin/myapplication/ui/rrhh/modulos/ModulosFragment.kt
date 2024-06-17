@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
@@ -30,9 +29,6 @@ class ModulosFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(ModulosViewModel::class.java)
-
         _binding = FragmentModulosBinding.inflate(inflater, container, false)
         val root: View = binding.root
 

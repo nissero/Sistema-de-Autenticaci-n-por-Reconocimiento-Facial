@@ -5,22 +5,15 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.lifecycleScope
 import com.biogin.myapplication.data.model.LoggedInUser
 import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Transaction
-import com.google.firebase.firestore.dataObjects
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -327,11 +320,11 @@ class LoginDataSource {
             logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_INACTIVATION,MasterUserDataSession.getDniUser(), dni, dniDoc.data?.get("categoria").toString())
         }
     }
-
-    fun getDocument(dni: String): Task<DocumentSnapshot> {
-        val db = FirebaseFirestore.getInstance()
-        return db.collection("usuarios").document(dni).get()
-    }
+//
+//    fun getDocument(dni: String): Task<DocumentSnapshot> {
+//        val db = FirebaseFirestore.getInstance()
+//        return db.collection("usuarios").document(dni).get()
+//    }
 
     suspend fun getUserFromFirebase(dni: String): Result<LoggedInUser> {
         val db = FirebaseFirestore.getInstance()
@@ -383,10 +376,6 @@ class LoginDataSource {
         }
 
         return Result.Error(Exception("Error al obtener el usuario con el dni ingresado"))
-    }
-
-    fun logout() {
-        // TODO: revoke authentication
     }
 
     fun disableForSomeTime(dni: String, fechaDesde: String, fechaHasta: String): Task<Transaction> {
@@ -462,7 +451,7 @@ class LoginDataSource {
         val db = FirebaseFirestore.getInstance()
         val collectionRef = db.collection("lugares")
 
-        var resultUserData: Result<LoggedInUser> = getUserFromFirebase(dniUser)
+        val resultUserData: Result<LoggedInUser> = getUserFromFirebase(dniUser)
         var userLugares = arrayListOf<String>()
         if (resultUserData is Result.Success){
             userLugares = resultUserData.data.areasAllowed

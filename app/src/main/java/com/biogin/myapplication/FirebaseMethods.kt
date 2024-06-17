@@ -2,10 +2,7 @@ package com.biogin.myapplication
 
 import android.icu.text.SimpleDateFormat
 import android.util.Log
-import com.biogin.myapplication.data.Category
-import com.biogin.myapplication.data.Institute
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseMethods {

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
@@ -32,9 +31,6 @@ class LogsRRHHFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(LogsRRHHViewModel::class.java)
-
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -44,7 +40,7 @@ class LogsRRHHFragment : Fragment() {
     }
 
 
-    fun setRecyclerView() {
+    private fun setRecyclerView() {
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(binding.root.context)

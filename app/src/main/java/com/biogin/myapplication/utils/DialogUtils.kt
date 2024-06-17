@@ -2,19 +2,15 @@ package com.biogin.myapplication.utils
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-
-
-
 
 class DialogUtils {
     fun showDialog(context: Context, text: String) {
         val builder = AlertDialog.Builder(context)
         builder.setMessage(text)
             .setCancelable(false)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+            .setPositiveButton("OK") { _, _ ->
 
-            })
+            }
         val alert: AlertDialog = builder.create()
         alert.show()
     }
@@ -23,9 +19,9 @@ class DialogUtils {
         val builder = AlertDialog.Builder(context)
         builder.setMessage(text)
             .setCancelable(false)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { dialog, id ->
+            .setPositiveButton("OK") { _, _ ->
                 function()
-            })
+            }
         val alert: AlertDialog = builder.create()
         alert.show()
     }
@@ -35,10 +31,10 @@ class DialogUtils {
         val builder = AlertDialog.Builder(context)
         builder.setMessage(text)
             .setCancelable(false)
-            .setPositiveButton("Si", DialogInterface.OnClickListener { dialog, id ->
+            .setPositiveButton("Si") { _, _ ->
                 onYesFunction()
-            })
-            .setNegativeButton("No") { dialog, id ->
+            }
+            .setNegativeButton("No") { _, _ ->
                 onNoFunction()
             }
         val alert: AlertDialog = builder.create()

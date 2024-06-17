@@ -10,6 +10,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import com.biogin.myapplication.databinding.ActivityAuthorizationMessageBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.ui.admin.AdminActivity
 import com.biogin.myapplication.ui.jerarquico.JerarquicoActivity
+import com.biogin.myapplication.utils.DialogUtils
 
 class AuthorizationMessageActivity : AppCompatActivity() {
 
@@ -28,6 +30,7 @@ class AuthorizationMessageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAuthorizationMessageBinding
     private val logsRepository = LogsRepository()
     private val offlineDataBaseHelper = OfflineDataBaseHelper(this)
+    private val dialogUtils = DialogUtils()
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +66,22 @@ class AuthorizationMessageActivity : AppCompatActivity() {
             buttonContinuar.visibility = View.INVISIBLE
             buttonIngreso.visibility = View.VISIBLE
             buttonEgreso.visibility = View.VISIBLE
+            onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Presione alguno de los botones (Ingreso/Egreso) para volver")
+                }
+            })
         } else {
             buttonContinuar.visibility = View.VISIBLE
             buttonIngreso.visibility = View.INVISIBLE
             buttonEgreso.visibility = View.INVISIBLE
+            onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    dialogUtils.showDialog(binding.root.context,
+                        "Presione el botón OK para continuar a la pantalla correpsondiente")
+                }
+            })
         }
 
         val message: SpannableString
