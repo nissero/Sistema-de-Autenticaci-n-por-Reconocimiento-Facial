@@ -33,16 +33,40 @@ class ModulosFragment : Fragment() {
         val root: View = binding.root
 
         binding.areasIci.setOnClickListener {
-            getAreas("ICI")
+            try {
+                getAreas("ICI")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIco.setOnClickListener {
-            getAreas("ICO")
+            try {
+                getAreas("ICO")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIdei.setOnClickListener {
-            getAreas("IDEI")
+            try {
+                getAreas("IDEI")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIdh.setOnClickListener {
-            getAreas("IDH")
+            try {
+                getAreas("IDH")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
 
         binding.agregarButton.setOnClickListener {
