@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
 import com.biogin.myapplication.logs.Log
 
-class LogsAdapter(val context : Context, val logList : List<Log>): RecyclerView.Adapter<LogsAdapter.ViewHolder>() {
+class LogsAdapter(val context : Context, private val logList : List<Log>): RecyclerView.Adapter<LogsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v: View = LayoutInflater.from(context)

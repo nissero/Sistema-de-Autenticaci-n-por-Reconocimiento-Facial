@@ -6,7 +6,7 @@ import com.biogin.myapplication.R
 
 class LoadingDialog (myActivity : Activity) {
     var activity : Activity = myActivity
-    lateinit var dialog : AlertDialog
+    private lateinit var dialog : AlertDialog
 
     fun startLoadingDialog() {
         val builder = AlertDialog.Builder(activity)

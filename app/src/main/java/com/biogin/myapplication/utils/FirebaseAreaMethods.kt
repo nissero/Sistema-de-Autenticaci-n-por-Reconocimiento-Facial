@@ -15,8 +15,8 @@ class FirebaseAreaMethods {
                 val areas = ArrayList<String>()
                 for(document in documents) {
                     val areaData = document.data
-                    if(areaData.get(instituteName) == true &&
-                        areaData.get("activo") == true) {
+                    if(areaData[instituteName] == true &&
+                        areaData["activo"] == true) {
                         areas.add(document.id)
                     }
                 }
@@ -38,8 +38,8 @@ class FirebaseAreaMethods {
                 val areas = ArrayList<String>()
                 for(document in documents) {
                     val areaData = document.data
-                    if(areaData.get(instituteName) == true &&
-                        areaData.get("activo") == false) {
+                    if(areaData[instituteName] == true &&
+                        areaData["activo"] == false) {
                         areas.add(document.id)
                     }
                 }

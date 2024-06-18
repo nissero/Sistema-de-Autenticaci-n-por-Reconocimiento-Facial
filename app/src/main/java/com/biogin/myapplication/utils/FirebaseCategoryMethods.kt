@@ -7,7 +7,7 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.google.firebase.firestore.FirebaseFirestore
 import com.biogin.myapplication.logs.Log as LogsApp
 
-class FirebaseCategoryMethods() {
+class FirebaseCategoryMethods {
     private val logsRepository = LogsRepository()
 
     fun getCategories(callback: (HashMap<String, Category>) -> Unit) {

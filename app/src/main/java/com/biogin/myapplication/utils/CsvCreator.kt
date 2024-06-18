@@ -10,19 +10,23 @@ import java.io.File
 import java.io.FileWriter
 
 class CsvCreator {
-    val timestampDateUtil = TimestampDateUtil()
+    private val timestampDateUtil = TimestampDateUtil()
     @RequiresApi(Build.VERSION_CODES.O)
-    public fun createAndSaveCsvFileToExportLogs(context : Context, logData: List<Log>) {
+    fun createAndSaveCsvFileToExportLogs(context : Context, logData: List<Log>) {
         if (logData.isEmpty()) {
             throw Exception("No se puede exportar un CSV vacío")
         }
-        Thread(Runnable {
-            val fileName = "${logData[0].dniUserAffected}_${timestampDateUtil.nowAsStringFileFormat()}.csv"
+        Thread {
+            val fileName =
+                "${logData[0].dniUserAffected}_${timestampDateUtil.nowAsStringFileFormat()}.csv"
             val file = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 fileName
             )
-            android.util.Log.e("CSV Creator", "Ubicacion CSV ${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}")
+            android.util.Log.e(
+                "CSV Creator",
+                "Ubicacion CSV ${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}"
+            )
             android.util.Log.e("CSV Creator", "File name CSV export $fileName")
 
             try {
@@ -32,14 +36,23 @@ class CsvCreator {
                         writer.append("${timestampDateUtil.utcTimestampToLocalString(log.timestamp)},${log.logEventType},${log.logEventName.value},${log.dniUserAffected},${log.dniMasterUser},${log.userCategory}\n")
                     }
                 }
-                val downloadManager =   context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                downloadManager.addCompletedDownload(fileName, "Reporte logs", true, "application/json", file.getAbsolutePath(),file.length(),true)
+                val downloadManager =
+                    context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                downloadManager.addCompletedDownload(
+                    fileName,
+                    "Reporte logs",
+                    true,
+                    "application/json",
+                    file.absolutePath,
+                    file.length(),
+                    true
+                )
                 android.util.Log.e("CSV Creator", "CSV exportado exitosamente")
 
             } catch (e: Exception) {
                 android.util.Log.e("CSV Creator", "Error al exportar el CSV de logs: $e")
             }
-        }).start()
+        }.start()
     }
 
 }

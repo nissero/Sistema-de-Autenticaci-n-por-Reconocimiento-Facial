@@ -29,21 +29,7 @@ class HierarchicalUtils {
         }
     }
 
-    fun setTrainingDays(days: ArrayList<Boolean>) {
-        firebaseHierarchicalUtils.setTrainingDays(days) {
-            success ->
-            run {
-                if(success)
-                    trainingDays = days
-            }
-        }
-    }
-
     fun getMail(): String {
         return mail
-    }
-
-    fun getTrainingDays(): ArrayList<Boolean> {
-        return trainingDays
     }
 }

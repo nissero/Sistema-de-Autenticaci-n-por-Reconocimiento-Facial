@@ -17,19 +17,17 @@ class TimestampDateUtil {
 
     fun utcTimestampToLocalString(timestamp : Any) : String{
         val threeHoursInMiliseconds = 10800000
-        if (timestamp is Timestamp) {
+        return if (timestamp is Timestamp) {
             val sfd = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-            return sfd.format(timestamp.seconds*1000 - threeHoursInMiliseconds)
+            sfd.format(timestamp.seconds*1000 - threeHoursInMiliseconds)
         } else {
-            return ""
+            ""
         }
-
-        return timestamp.toString()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun stringDateToLocalDate(date : String) : LocalDate {
-        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return LocalDate.parse(date, formatter)
     }
 
@@ -42,7 +40,7 @@ class TimestampDateUtil {
         return android.icu.util.Calendar.getInstance().time
     }
 
-    public fun getStartOfDay() : Calendar {
+    fun getStartOfDay() : Calendar {
         val startOfDay: Calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -52,7 +50,7 @@ class TimestampDateUtil {
         return startOfDay
     }
 
-    public fun getEndOfDay() : Calendar {
+    fun getEndOfDay() : Calendar {
         val endOfDay: Calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 23)
             set(Calendar.MINUTE, 59)
@@ -63,8 +61,8 @@ class TimestampDateUtil {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    public fun nowAsStringFileFormat() : String {
-        var date = LocalDateTime.now()
+    fun nowAsStringFileFormat() : String {
+        val date = LocalDateTime.now()
         return "${date.dayOfMonth}-${date.monthValue}_${date.year}_${date.hour}-${date.minute}-${date.second}"
     }
     @RequiresApi(Build.VERSION_CODES.O)

@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.biogin.myapplication.R
@@ -37,8 +36,6 @@ class LogsRRHHFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(LogsRRHHViewModel::class.java)
         datePickerDialog = DatePickerDialog()
         _binding = FragmentLogsRrhhBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -115,7 +112,7 @@ class LogsRRHHFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(binding.root.context)
 
-        var logs : List<com.biogin.myapplication.logs.Log>
+        var logs : List<Log>
         runBlocking {
             logs = logsRepository.getAllLogs()
         }
@@ -128,7 +125,7 @@ class LogsRRHHFragment : Fragment() {
     private fun showAllDetailedLogs() {
         enableDetailedView()
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
-        var logs : List<com.biogin.myapplication.logs.Log> = ArrayList()
+        var logs : List<Log>
 
         runBlocking {
             logs = logsRepository.getAllLogs()
@@ -143,7 +140,7 @@ class LogsRRHHFragment : Fragment() {
         enableDetailedView()
         lateinit var adapter : LogsAdapter
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
-        var logs : List<com.biogin.myapplication.logs.Log>
+        var logs : List<Log>
 
         if (dniUser.isNotEmpty() && dateFrom.isNotEmpty() && dateTo.isNotEmpty()) {
             runBlocking {

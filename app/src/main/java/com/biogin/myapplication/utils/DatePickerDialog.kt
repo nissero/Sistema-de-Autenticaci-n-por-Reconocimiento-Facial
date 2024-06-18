@@ -12,7 +12,7 @@ class DatePickerDialog {
         val actualMonth = calendar.get(Calendar.MONTH)
         val actualDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-        var selectedDate = ""
+        var selectedDate: String
 
         val datePickerDialog = DatePickerDialog(context,
             { _, year, monthOfYear, dayOfMonth ->
@@ -40,7 +40,7 @@ class DatePickerDialog {
         val actualMonth = calendar.get(Calendar.MONTH)
         val actualDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-        var selectedDate = ""
+        var selectedDate: String
 
         val datePickerDialog = DatePickerDialog(context,
             { _, year, monthOfYear, dayOfMonth ->
