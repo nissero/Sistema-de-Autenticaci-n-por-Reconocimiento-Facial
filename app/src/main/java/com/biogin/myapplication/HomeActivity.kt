@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.biogin.myapplication.data.LogsRepository
@@ -29,6 +30,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         MasterUserDataSession.clearUserData()
         viewBinding = ActivityHomeBinding.inflate(layoutInflater)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(viewBinding.root)
         enableEdgeToEdge()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -97,5 +99,10 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("authenticationType", "jerarquico")
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MasterUserDataSession.clearUserData()
     }
 }
