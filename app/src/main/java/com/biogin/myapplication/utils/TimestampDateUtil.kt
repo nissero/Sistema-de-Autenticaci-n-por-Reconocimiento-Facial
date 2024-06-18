@@ -15,11 +15,13 @@ import java.util.Locale
 
 class TimestampDateUtil {
 
-    fun timestampToString(timestamp : Any) : String{
+    fun utcTimestampToLocalString(timestamp : Any) : String{
         val threeHoursInMiliseconds = 10800000
         if (timestamp is Timestamp) {
             val sfd = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
             return sfd.format(timestamp.seconds*1000 - threeHoursInMiliseconds)
+        } else {
+            return ""
         }
 
         return timestamp.toString()

@@ -29,7 +29,7 @@ class CsvCreator {
                 FileWriter(file).use { writer ->
                     writer.append("Fecha,Tipo log,Nombre Log,Dni usuario afectado,Dni usuario maestro,Categoria usuario afectado\n")
                     for (log in logData) {
-                        writer.append("${timestampDateUtil.timestampToString(log.timestamp)},${log.logEventType},${log.logEventName.value},${log.dniUserAffected},${log.dniMasterUser},${log.userCategory}\n")
+                        writer.append("${timestampDateUtil.utcTimestampToLocalString(log.timestamp)},${log.logEventType},${log.logEventName.value},${log.dniUserAffected},${log.dniMasterUser},${log.userCategory}\n")
                     }
                 }
                 val downloadManager =   context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager

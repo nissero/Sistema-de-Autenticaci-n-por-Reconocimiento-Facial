@@ -42,7 +42,7 @@ class LogsRepository {
                     document.get("dniMasterUser").toString(),
                     document.get("dniUserAffected").toString(),
                     document.get("category").toString(),
-                        timestampUtil.timestampToString(document.get("timestamp")!!))
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
                 )
             }
         }
@@ -76,7 +76,7 @@ class LogsRepository {
                         document.get("dniMasterUser").toString(),
                         document.get("dniUserAffected").toString(),
                         document.get("category").toString(),
-                        timestampUtil.timestampToString(document.get("timestamp")!!))
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
                 )
             }
         }
@@ -119,7 +119,7 @@ class LogsRepository {
                         document.get("dniMasterUser").toString(),
                         document.get("dniUserAffected").toString(),
                         document.get("category").toString(),
-                        timestampUtil.timestampToString(document.get("timestamp")!!))
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
                 )
             }
         }
