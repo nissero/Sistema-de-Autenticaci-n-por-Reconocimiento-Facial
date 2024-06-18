@@ -1,17 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:orientation="vertical">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
 
+        <EditText
+            android:id="@+id/filter_fecha_desde_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:textSize="13sp"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Fecha desde"
+            app:layout_constraintBottom_toBottomOf="@+id/filter_fecha_hasta_logs_rrhh"
+            app:layout_constraintEnd_toStartOf="@+id/filter_fecha_hasta_logs_rrhh"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/filter_fecha_hasta_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="false"
+            android:enabled="false"
+            android:focusable="false"
+            android:textSize="13sp"
+            android:hint="Fecha hasta"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/filter_dni_user_affected"
+            app:layout_constraintStart_toEndOf="@+id/filter_fecha_desde_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/filter_dni_user_affected"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:hint="DNI usuario\nafectado"
+            android:inputType="text"
+            android:maxWidth="60dp"
+            android:maxLines="1"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="@+id/filter_fecha_hasta_logs_rrhh"
+            app:layout_constraintEnd_toStartOf="@+id/spinner_filter_detail_option"
+            app:layout_constraintStart_toEndOf="@+id/filter_fecha_hasta_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/spinner_filter_detail_option"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/filter_dni_user_affected"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_filter_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/blue"
+            android:text="Filtrar"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_clear_filters_logs_rrhh"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_clear_filters_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/blue"
+            android:text="Limpiar\nfiltros"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_show_all_logs_rrhh"
+            app:layout_constraintStart_toEndOf="@+id/btn_filter_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_show_all_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="5dp"
+            android:backgroundTint="@color/blue"
+            android:text="Mostrar\ntodos los logs"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_export_csv_logs_rrhh"
+            app:layout_constraintStart_toEndOf="@+id/btn_clear_filters_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_export_csv_logs_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/blue"
+            android:text="Exportar\nCSV"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_show_all_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/non_detailed_logs_rrhh_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/data_successful_auths_logs_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="120dp"
+            android:text="Cantidad de ingresos\nexitosos usuario"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/data_successful_out_auths_logs_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:layout_marginEnd="50dp"
+            android:text="Cantidad de egresos\nexitosos"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/amount_of_in_successful_auths_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="0"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/data_successful_auths_logs_user_rrhh"
+            app:layout_constraintStart_toStartOf="@+id/data_successful_auths_logs_user_rrhh"
+            app:layout_constraintTop_toBottomOf="@+id/data_successful_auths_logs_user_rrhh" />
+
+        <TextView
+            android:id="@+id/amount_of_out_successful_auths_user_rrhh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="0"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/data_successful_out_auths_logs_user_rrhh"
+            app:layout_constraintStart_toStartOf="@+id/data_successful_out_auths_logs_user_rrhh"
+            app:layout_constraintTop_toBottomOf="@+id/data_successful_out_auths_logs_user_rrhh" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 <HorizontalScrollView
-    android:id="@+id/scroll_view"
+    android:id="@+id/table_detailed_logs_rrhh_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:background="@drawable/table_logs_border">
 
     <TableLayout
         android:id="@+id/tablaRegistrosRRHH"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="8dp"
         android:stretchColumns="1">
@@ -40,7 +215,7 @@ android:orientation="vertical">
                 android:id="@+id/column_master_user_dni_rrhh"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="@string/dni_rrhh"
+                android:text="@string/dni_master_user"
                 android:textSize="13sp"
                 android:layout_height="match_parent"
                 android:layout_width="80dp"/>
@@ -66,8 +241,8 @@ android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewLogs"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             />
     </TableLayout>
 

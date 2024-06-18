@@ -1,6 +1,8 @@
 package com.biogin.myapplication.data
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.logs.Log
 import com.biogin.myapplication.utils.TimestampDateUtil
@@ -13,12 +15,12 @@ import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+
 
 class LogsRepository {
     private val LOGS_COLLECTION_NAME = "logs"
     private val timestampUtil = TimestampDateUtil()
+
     suspend fun getAllLogs() : List<Log> {
         val db = FirebaseFirestore.getInstance()
         val logs : ArrayList<Log> = ArrayList()
@@ -40,7 +42,7 @@ class LogsRepository {
                     document.get("dniMasterUser").toString(),
                     document.get("dniUserAffected").toString(),
                     document.get("category").toString(),
-                        timestampUtil.timestampToString(document.get("timestamp")!!))
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
                 )
             }
         }
@@ -48,6 +50,134 @@ class LogsRepository {
         return logs
     }
 
+    suspend fun getAllLogsFromUser(dniUser : String) : List<Log> {
+        if (dniUser.isEmpty()) {
+            return ArrayList()
+        }
+
+        val db = FirebaseFirestore.getInstance()
+        val logs : ArrayList<Log> = ArrayList()
+
+        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
+        val logsObtained = collectionRef.
+        whereEqualTo("dniUserAffected", dniUser).
+        orderBy("timestamp", Query.Direction.DESCENDING).
+        get().
+        await()
+            .documents
+
+        for (logDocument in logsObtained) {
+            val document = logDocument.data
+            if (document != null) {
+                logs.add(
+                    Log(
+                        Log.LogEventType.valueOf(document.get("logEventType").toString()),
+                        Log.getLogEventNameFromValue(document.get("logEventName").toString()),
+                        document.get("dniMasterUser").toString(),
+                        document.get("dniUserAffected").toString(),
+                        document.get("category").toString(),
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
+                )
+            }
+        }
+
+        return logs
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAllLogsFromUserByDate(dniUser : String, dateFrom : String, dateTo : String) : List<Log> {
+        if (dateFrom.isEmpty() || dateTo.isEmpty() || dniUser.isEmpty()) {
+            return ArrayList()
+        }
+
+        val db = FirebaseFirestore.getInstance()
+        val logs : ArrayList<Log> = ArrayList()
+
+        val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
+        val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+
+        val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
+        val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
+
+        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
+        val logsObtained = collectionRef.
+            whereEqualTo("dniUserAffected", dniUser).
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate))).
+            orderBy("timestamp", Query.Direction.DESCENDING).
+        get().
+        await()
+            .documents
+
+        for (logDocument in logsObtained) {
+            val document = logDocument.data
+            if (document != null) {
+                logs.add(
+                    Log(
+                        Log.LogEventType.valueOf(document.get("logEventType").toString()),
+                        Log.getLogEventNameFromValue(document.get("logEventName").toString()),
+                        document.get("dniMasterUser").toString(),
+                        document.get("dniUserAffected").toString(),
+                        document.get("category").toString(),
+                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
+                )
+            }
+        }
+
+        return logs
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAmountOfSuccesfulAuthenticationsInOfUser(dniUser: String, dateFrom: String, dateTo: String) : Int {
+        if (dateFrom.isEmpty() || dateTo.isEmpty() || dniUser.isEmpty()) {
+            return 0
+        }
+
+        val db = FirebaseFirestore.getInstance()
+
+        val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
+        val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+
+        val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
+        val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
+
+        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
+
+        return collectionRef.
+        whereEqualTo("dniUserAffected", dniUser).
+        whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION IN").
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+        whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate))).
+        get().
+        await()
+            .count()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAmountOfSuccesfulAuthenticationsOutOfUser(dniUser: String, dateFrom: String, dateTo: String) : Int {
+        if (dateFrom.isEmpty() || dateTo.isEmpty() || dniUser.isEmpty()) {
+            return 0
+        }
+
+        val db = FirebaseFirestore.getInstance()
+
+        val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
+        val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+
+        val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
+        val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
+
+        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
+
+        return collectionRef.
+        whereEqualTo("dniUserAffected", dniUser).
+        whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION OUT").
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+        whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate))).
+        get().
+        await()
+            .count()
+    }
     fun syncLogsOfflineWithOnline(sqlDb : OfflineDataBaseHelper) {
         val logsToUpload = ArrayList<HashMap<String, Any>>()
         val db = FirebaseFirestore.getInstance()
@@ -92,8 +222,8 @@ class LogsRepository {
 
         return db.collection(LOGS_COLLECTION_NAME).
             whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION").
-            whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
-            whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.getStartOfDay().time)).
+            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.getEndOfDay().time))
                 .get()
 
     }
@@ -103,8 +233,8 @@ class LogsRepository {
 
         return db.collection(LOGS_COLLECTION_NAME).
         whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION IN").
-        whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
-        whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.getStartOfDay().time)).
+        whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.getEndOfDay().time))
             .get()
 
     }
@@ -114,8 +244,8 @@ class LogsRepository {
 
         return db.collection(LOGS_COLLECTION_NAME).
         whereEqualTo("logEventName", "USER SUCCESSFUL AUTHENTICATION OUT").
-        whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
-        whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+        whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.getStartOfDay().time)).
+        whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.getEndOfDay().time))
             .get()
 
     }
@@ -125,8 +255,8 @@ class LogsRepository {
 
         return db.collection(LOGS_COLLECTION_NAME).
             whereEqualTo("logEventName", "USER UNSUCCESSFUL AUTHENTICATION").
-            whereGreaterThanOrEqualTo("timestamp", Timestamp(getStartOfDay().time)).
-            whereLessThanOrEqualTo("timestamp", Timestamp(getEndOfDay().time))
+            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.getStartOfDay().time)).
+            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.getEndOfDay().time))
             .get()
     }
 
@@ -188,33 +318,5 @@ class LogsRepository {
             "category" to log.userCategory
         )
     }
-    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
-        val formatter = SimpleDateFormat(format, locale)
-        return formatter.format(this)
-    }
 
-    private fun getCurrentDateTime(): Date {
-        return android.icu.util.Calendar.getInstance().time
-    }
-
-    private fun getStartOfDay() : Calendar {
-        val startOfDay: Calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        return startOfDay
-    }
-
-
-    private fun getEndOfDay() : Calendar {
-        val endOfDay: Calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }
-        return endOfDay
-    }
 }
