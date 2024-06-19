@@ -432,16 +432,18 @@ class LoginDataSource {
     @SuppressLint("SimpleDateFormat")
     private fun convertStringToTimestamp(dateString: String): Timestamp {
         val formatter = SimpleDateFormat("yyyy/MM/dd")
+        formatter.timeZone = TimeZone.getTimeZone("America/Argentina/Buenos_Aires")
         val parsedDate = formatter.parse(dateString) ?: return Timestamp.now() // Handle invalid format
 
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Argentina/Buenos_Aires"))
         calendar.time = parsedDate
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
 
-        calendar.add(Calendar.DATE, 1)
+        // Optional: Uncomment the next line if you still need to add a day
+        // calendar.add(Calendar.DATE, 1)
 
         return Timestamp(calendar.timeInMillis / 1000, 0)
     }

@@ -32,10 +32,12 @@ class FirebaseSyncService(context: Context) {
                         if (categoria == "Seguridad"){
                             if (!offlineDatabaseHelper.checkIfSecurity(dni)){
                                 offlineDatabaseHelper.registerSecurity(dni)
+                                Log.d(TAG, "User: $dni, $estado, $categoria REGISTRADO COMO SEGURIDAD")
                             }
                         } else {
                             if (!offlineDatabaseHelper.checkInDatabase(dni)){
                                 offlineDatabaseHelper.registerUser(dni)
+                                Log.d(TAG, "User: $dni, $estado, $categoria REGISTRADO COMO USUARIO")
                             }
                         }
                     }
@@ -43,10 +45,12 @@ class FirebaseSyncService(context: Context) {
                         if (categoria == "Seguridad"){
                             if (offlineDatabaseHelper.checkIfSecurity(dni)){
                                 offlineDatabaseHelper.deleteSecurityByDni(dni)
+                                Log.d(TAG, "User: $dni, $estado, $categoria BORRADO DE SEGURIDAD")
                             }
                         } else {
                             if (offlineDatabaseHelper.checkInDatabase(dni)){
                                 offlineDatabaseHelper.deleteUserByDni(dni)
+                                Log.d(TAG, "User: $dni, $estado, $categoria BORRADO DE USUARIOS")
                             }
                         }
                     }
