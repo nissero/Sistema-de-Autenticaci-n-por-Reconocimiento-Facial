@@ -141,6 +141,17 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
     @RequiresApi(Build.VERSION_CODES.O)
     fun registerAuthenticationLog(dni: String, dniMaster: String): Boolean {
         return if (checkInDatabase(dni)) {
+            val db = writableDatabase
+            val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
+            val statement = db.compileStatement(sql)
+            statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION.value)
+            statement.bindString(2, dniMaster)
+            statement.bindString(3, dni)
+            statement.bindString(4, currentTimeStamp())
+            statement.executeInsert()
+            Log.d(TAG, "DNI USER: $dni")
+            Log.d(TAG, "LOG REGISTRADO CORRECTAMENTE")
+            db.close()
             true
         } else {
             val db = writableDatabase
@@ -168,6 +179,7 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             statement.bindString(3, "")
             statement.bindString(4, currentTimeStamp())
             statement.executeInsert()
+            Log.d(TAG, "DNI USER: $dni")
             Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
             db.close()
             return true
@@ -176,10 +188,11 @@ class OfflineDataBaseHelper(context: Context) : SQLiteOpenHelper(context, "Offli
             val sql = "INSERT INTO OfflineLogs(tipo, dniMaster, dni, timestamp) VALUES(?, ?, ?, ?)"
             val statement = db.compileStatement(sql)
             statement.bindString(1, com.biogin.myapplication.logs.Log.LogEventName.SECURITY_UNSUCCESSFUL_LOGIN.value)
-            statement.bindString(2, dni)
+            statement.bindString(2, "")
             statement.bindString(3, "")
             statement.bindString(4, currentTimeStamp())
             statement.executeInsert()
+            Log.d(TAG, "DNI USER: $dni")
             Log.d(TAG, "LOG SEGURIDAD REGISTRADO CORRECTAMENTE")
             db.close()
             return false

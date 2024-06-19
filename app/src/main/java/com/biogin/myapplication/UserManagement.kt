@@ -314,13 +314,9 @@ class UserManagement : AppCompatActivity() {
             }
         }
         fechaHastaEditText.setOnClickListener {
-            if (fechaDesdeEditText.text.toString().trim().isEmpty()){
-                fechaHastaEditText.error = "Primero selecciona una fecha de inicio."
-            } else {
-                fechaHastaEditText.error = null
-                datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
-            }
+            datePickerDialog.showDatePickerDialog(fechaHastaEditText, null, fechaDesdeEditText.text.toString().toCalendarDate().timeInMillis, this) {}
         }
+
         categoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -344,7 +340,11 @@ class UserManagement : AppCompatActivity() {
                     if (temporaryCategories.contains(categorySelected)){
                         Log.d("TEMPORAL", "SI")
                         fechaDesdeEditText.visibility = View.VISIBLE
-                        fechaHastaEditText.visibility = View.VISIBLE
+                        if (fechaDesdeEditText.text.toString().trim().isEmpty()){
+                            fechaHastaEditText.visibility = View.INVISIBLE
+                        } else {
+                            fechaHastaEditText.visibility = View.VISIBLE
+                        }
                         fechaDesdeEditText.setText(intent.getStringExtra("trabajaDesde"))
                         fechaHastaEditText.setText(intent.getStringExtra("trabajaHasta"))
                     } else {
