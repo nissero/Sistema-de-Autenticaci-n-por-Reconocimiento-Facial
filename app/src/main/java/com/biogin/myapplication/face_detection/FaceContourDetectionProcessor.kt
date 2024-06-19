@@ -18,10 +18,10 @@ import java.io.IOException
 
 class FaceContourDetectionProcessor(
     private val view: GraphicOverlay,
-    private val originalImage: Bitmap,
+    originalImage: Bitmap,
     private val camera: CameraHelper,
     private val sendDataToAPI: Boolean,
-    private val cameraSelector: CameraSelector
+    cameraSelector: CameraSelector
 ) : BaseImageAnalyzer<List<Face>>() {
     private val apiManager = APIManager(originalImage, cameraSelector)
 

@@ -36,8 +36,14 @@ class CategoriasFragment : Fragment() {
 
         binding.buttonConsultarCategorias.setOnClickListener {
             var text = "Las categorías son:\n"
-            for(category in categoriesUtils.getActiveCategories()) {
-                text += category + "\n"
+            try {
+                for(category in categoriesUtils.getActiveCategories()) {
+                    text += category + "\n"
+                }
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
             }
             dialogUtils.showDialog(binding.root.context, text)
         }

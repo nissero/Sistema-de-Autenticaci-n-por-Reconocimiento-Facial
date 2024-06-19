@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.databinding.FragmentModulosBinding
 import com.biogin.myapplication.utils.AllowedAreasUtils
 import com.biogin.myapplication.utils.DialogUtils
@@ -30,23 +29,44 @@ class ModulosFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(ModulosViewModel::class.java)
-
         _binding = FragmentModulosBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.areasIci.setOnClickListener {
-            getAreas("ICI")
+            try {
+                getAreas("ICI")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIco.setOnClickListener {
-            getAreas("ICO")
+            try {
+                getAreas("ICO")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIdei.setOnClickListener {
-            getAreas("IDEI")
+            try {
+                getAreas("IDEI")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
         binding.areasIdh.setOnClickListener {
-            getAreas("IDH")
+            try {
+                getAreas("IDH")
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
 
         binding.agregarButton.setOnClickListener {

@@ -1,6 +1,7 @@
 package com.biogin.myapplication.ui.seguridad.autenticacion
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
@@ -13,7 +14,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.biogin.myapplication.FaceRecognitionActivity
 import com.biogin.myapplication.OfflineLogInActivity
 import com.biogin.myapplication.R
@@ -22,18 +22,19 @@ import com.biogin.myapplication.data.userSession.MasterUserDataSession
 import com.biogin.myapplication.databinding.FragmentAutenticacionBinding
 import com.biogin.myapplication.local_data_base.OfflineDataBaseHelper
 import com.biogin.myapplication.utils.ConnectionCheck
+import java.time.LocalDate
+import com.biogin.myapplication.logs.Log as LogClass
 
 class AutenticacionFragment : Fragment() {
 
     private var _binding: FragmentAutenticacionBinding? = null
-    private var turnoIniciado = false
     private lateinit var autenticacionButton: Button
     private lateinit var autenticacionOfflineButton: Button
     private lateinit var turnoButton: Button
     private lateinit var mensaje: TextView
     private lateinit var dniMaster: String
     private lateinit var logsRepository : LogsRepository
-    private lateinit var ConnectionCheck: ConnectionCheck
+    private lateinit var connectionCheck: ConnectionCheck
 
 
     // This property is only valid between onCreateView and
@@ -46,8 +47,8 @@ class AutenticacionFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(AutenticacionViewModel::class.java)
+        val sharedPref = this.activity?.getSharedPreferences("turno", Context.MODE_PRIVATE)
+        val editor = sharedPref?.edit()
 
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -56,16 +57,22 @@ class AutenticacionFragment : Fragment() {
         Log.d("AUTENTICATIONFRAGMENT", dniMaster)
         logsRepository = LogsRepository()
 
+        val dniSeguridadActual = binding.dniSeguridad
+        dniSeguridadActual.text = dniMaster
+
         autenticacionButton = root.findViewById(R.id.button_visitantes)
 
-        autenticacionOfflineButton = root.findViewById<Button>(R.id.button_visitantes_offline)
+        autenticacionOfflineButton = root.findViewById(R.id.button_visitantes_offline)
 
         turnoButton = root.findViewById(R.id.button_turno)
 
-        ConnectionCheck = ConnectionCheck(requireActivity())
+        connectionCheck = ConnectionCheck(requireActivity())
 
         mensaje = root.findViewById(R.id.message_main_screen)
-        if(turnoIniciado) {
+
+        val turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
+
+        if(turnoIniciado == true) {
             turnoButton.text = this.context?.getString(R.string.finalizar_turno)
             mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
             autenticacionButton.visibility = View.VISIBLE
@@ -91,52 +98,52 @@ class AutenticacionFragment : Fragment() {
         }
 
         turnoButton.setOnClickListener {
-
-            if(!turnoIniciado) {
-                val dialogClickListener =
-                    DialogInterface.OnClickListener { dialog, which ->
-                        when (which) {DialogInterface.BUTTON_POSITIVE -> {
-                                turnoIniciado = true
+            if(turnoIniciado == false) {
+                val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        when (which) {
+                            DialogInterface.BUTTON_POSITIVE -> {
+                                editor?.apply {
+                                    putBoolean("turnoIniciado", true)
+                                    putString("fecha", LocalDate.now().toString())
+                                    apply()
+                                }
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
                                 mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                                 autenticacionOfflineButton.visibility = View.VISIBLE
 
-                                if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                if (connectionCheck.isOnlineNet()){
+                                    logsRepository.logEvent(LogClass.LogEventType.INFO, LogClass.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.startOfShift(dniMaster)
                                 }
                             }
-                            DialogInterface.BUTTON_NEGATIVE -> {
-
-                            }
                         }
-                    }
+                }
 
                 val builder = AlertDialog.Builder(context)
                 builder.setMessage("Quiere iniciar el turno?").setPositiveButton("Si", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show()
             } else {
                 val dialogClickListener =
-                    DialogInterface.OnClickListener { dialog, which ->
+                    DialogInterface.OnClickListener { _, which ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                if (ConnectionCheck.isOnlineNet()){
-                                    logsRepository.logEvent(com.biogin.myapplication.logs.Log.LogEventType.INFO, com.biogin.myapplication.logs.Log.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
+                                if (connectionCheck.isOnlineNet()){
+                                    logsRepository.logEvent(LogClass.LogEventType.INFO, LogClass.LogEventName.END_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
                                 } else {
                                     val database = OfflineDataBaseHelper(requireActivity())
                                     database.endOfShift(dniMaster)
                                 }
-                                turnoIniciado = false
+                                editor?.apply {
+                                    putBoolean("turnoIniciado", false)
+                                    apply()
+                                }
                                 autenticacionButton.visibility = View.INVISIBLE
                                 autenticacionOfflineButton.visibility = View.INVISIBLE
                                 turnoButton.text = this.context?.getString(R.string.iniciar_turno)
                                 mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
-                            }
-                            DialogInterface.BUTTON_NEGATIVE -> {
-
                             }
                         }
                     }
@@ -146,7 +153,6 @@ class AutenticacionFragment : Fragment() {
                     .setNegativeButton("No", dialogClickListener).show()
             }
         }
-
 
         return root
     }

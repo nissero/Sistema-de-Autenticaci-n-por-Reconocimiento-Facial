@@ -23,8 +23,8 @@ async function accessSecretVersion(name) {
  * @return {object} An object containing Firestore and Storage Bucket instances.
  */
 async function initializeFirebase() {
-  const secretName = "projects/620958752168/" +
-  "secrets/FirebaseServiceAccount/versions/2";
+  const secretName = "projects/620958752168/secrets" +
+  "/FirebaseServiceAccount/versions/2";
   const secretValue = await accessSecretVersion(secretName);
   admin.initializeApp({
     credential: admin.credential.cert(secretValue),
@@ -35,12 +35,13 @@ async function initializeFirebase() {
   return {db, bucket};
 }
 
-// Initialize Firebase Admin SDK, Firestore and Storage Bucket
+// Initialize Firebase Admin SDK, Firestore, and Storage Bucket
 const firebaseInitializationPromise = initializeFirebase();
 
 exports.sendTrainingRequests = functions.pubsub
     .schedule("every day 00:00")
     .onRun(async (context) => {
+      console.log("Function execution started with context:", context);
       try {
         const {db, bucket} = await firebaseInitializationPromise;
 
@@ -65,14 +66,15 @@ exports.sendTrainingRequests = functions.pubsub
         const todayString = daysOfWeek[today];
 
         if (!config[todayString]) {
-          console.log(`Today is ${todayString}, 
-            which is not a configured training day.`);
+          console.log(`Today is ${todayString},
+             which is not a configured training day.`);
           return;
         }
 
-        const snapshot = await db.collection("requests").get();
-        const requests = snapshot.docs.map(
-            (doc) => ({id: doc.id, ...doc.data()}));
+        const snapshot = await db.collection("requests")
+            .where("processed", "==", false).get();
+        const requests = snapshot.docs
+            .map((doc) => ({id: doc.id, ...doc.data()}));
 
         for (let i = 0; i < requests.length; i += 5) {
           const batch = requests.slice(i, i + 5);
@@ -145,7 +147,8 @@ async function processRequest(request, db, bucket) {
     console.log(`Training result for ${request.dni}: 
       ${JSON.stringify(apiResponse.data, null, 2)}`);
 
-    await db.collection("requests").doc(request.id).delete();
+    // Mark the request as processed
+    await db.collection("requests").doc(request.id).update({processed: true});
   } catch (error) {
     console.error(`Failed to send training request for ${request.dni}:`, error);
     if (error.response) {

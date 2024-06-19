@@ -19,7 +19,7 @@ import com.biogin.myapplication.ui.login.RegisterActivity
 import com.biogin.myapplication.utils.CategoriesUtils
 import com.biogin.myapplication.utils.PopUpUtils
 import com.biogin.myapplication.ui.rrhh.TempUserSuspensionActivity
-import com.biogin.myapplication.utils.StringUtils
+import com.biogin.myapplication.utils.DialogUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -33,6 +33,7 @@ class ABMFragment : Fragment() {
     private lateinit var loginRepo: LoginRepository
     private lateinit var dataSource : LoginDataSource
     private val popUpUtils = PopUpUtils()
+    private val dialogUtils = DialogUtils()
     private var categoriesUtils = CategoriesUtils()
 
     override fun onCreateView(
@@ -117,11 +118,17 @@ class ABMFragment : Fragment() {
         }
 
         binding.registerUserOptionButton.setOnClickListener {
-            val intent = Intent(binding.root.context, RegisterActivity::class.java)
-            intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
-            intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
-            intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
-            startActivity(intent)
+            try {
+                val intent = Intent(binding.root.context, RegisterActivity::class.java)
+                intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
+                intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+                intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
+                startActivity(intent)
+            } catch (e: UninitializedPropertyAccessException) {
+                dialogUtils.showDialog(binding.root.context,
+                    "Ocurrio un error, intente nuevamente en unos instantes")
+                return@setOnClickListener
+            }
         }
 
         binding.deactivateUserOption.setOnClickListener {
@@ -171,9 +178,15 @@ class ABMFragment : Fragment() {
         intent.putExtra("category", userData.category)
         intent.putStringArrayListExtra("institutes", userData.institutes)
 
-        intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
-        intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
-        intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
+        try {
+            intent.putStringArrayListExtra("categories", categoriesUtils.getActiveCategories())
+            intent.putStringArrayListExtra("temporary categories", categoriesUtils.getTemporaryCategories())
+            intent.putStringArrayListExtra("categories with no institutes", categoriesUtils.getNoInstitutesCategories())
+        } catch (e: UninitializedPropertyAccessException) {
+            dialogUtils.showDialog(binding.root.context,
+                "Ocurrio un error, intente nuevamente en unos instantes")
+            return
+        }
 
         if (categoriesUtils.getTemporaryCategories().contains(userData.category)){
             intent.putExtra("trabajaDesde", userData.getTrabajaDesde())

@@ -35,9 +35,6 @@ class OfflineLogInActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        //resultTextView = findViewById(R.id.result_text_view)
-
-
 
         database = OfflineDataBaseHelper(this)
 
@@ -53,6 +50,7 @@ class OfflineLogInActivity : AppCompatActivity() {
         integrator.initiateScan()
     }
 
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
@@ -65,7 +63,6 @@ class OfflineLogInActivity : AppCompatActivity() {
                 val dni = getDNINumber(result.contents.toString())
                 when(authenticationType){
                     "seguridad" -> securityScan(dni, apellido)
-                    "fin" -> finDeTurno(dni, apellido)
                     else -> noCategoryScan(dni, apellido)
                 }
             }
@@ -149,10 +146,6 @@ class OfflineLogInActivity : AppCompatActivity() {
             }
         }
         return result
-    }
-
-    private fun finDeTurno(dni: String, apellido: String) {
-        //FALTA IMPLEMENTAR
     }
 
     private fun getDNINumber(data: String): String {

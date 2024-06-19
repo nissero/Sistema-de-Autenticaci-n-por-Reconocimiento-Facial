@@ -30,15 +30,7 @@ import androidx.viewbinding.ViewBinding
 import com.biogin.myapplication.face_detection.FaceContourDetectionProcessor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -72,7 +64,7 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
     private var cameraNumber: Int = 1
 
 
-    val firebaseMethods = FirebaseMethods()
+    private val firebaseMethods = FirebaseMethods()
 
     private var currentPhotoIndex = 0
 
@@ -230,7 +222,8 @@ class CameraHelper(private val typeOfAuthorization: ((Usuario) -> Unit)?,
             "timestamp" to timestamp,
             "photoPaths" to (0 until 3).map { index ->
                 "images/$dni/${dni}_$index.jpg"
-            }
+            },
+            "processed" to false
         )
 
         firestore.collection("requests")
