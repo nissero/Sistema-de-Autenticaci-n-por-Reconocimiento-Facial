@@ -104,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="200dp"
         android:backgroundTint="@color/blue"
-        android:textSize="17sp"
+        android:textSize="@dimen/button_text_size"
         android:text="@string/agregar_lugar_fisico"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
