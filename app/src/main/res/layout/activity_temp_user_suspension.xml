@@ -14,16 +14,16 @@
 
     <TextView
         android:id="@+id/user_instruction_message"
-        android:layout_width="278dp"
-        android:layout_height="109dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:text="Ingrese el periodo de tiempo de suspensión. Luego de ingresar la fecha inicial podrá ingresar la fecha final"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
+        android:justificationMode="inter_word"
+        android:paddingHorizontal="10dp"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.451"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -61,7 +61,9 @@
         android:layout_height="52dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
+        android:textSize="17sp"
+        android:textColor="@color/white"
         android:enabled="false"
         android:text="Continuar"
         app:layout_constraintBottom_toBottomOf="parent"

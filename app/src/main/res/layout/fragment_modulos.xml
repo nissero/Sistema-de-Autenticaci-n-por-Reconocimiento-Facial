@@ -9,14 +9,15 @@
 
     <TextView
         android:id="@+id/mensaje_text_view"
+        android:paddingHorizontal="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:textSize="20sp"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
+        android:justificationMode="inter_word"
         android:text="@string/mensaje_ver_lugares_fisicos"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,11 +25,12 @@
         android:id="@+id/areas_ici"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="110dp"
+        android:textSize="17sp"
         android:backgroundTint="@color/blue"
         android:text="@string/lugares_fisicos_ici"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.150"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,11 +38,12 @@
         android:id="@+id/areas_ico"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="110dp"
+        android:textSize="17sp"
         android:backgroundTint="@color/blue"
         android:text="@string/lugares_fisicos_ico"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.850"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,11 +51,12 @@
         android:id="@+id/areas_idei"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="190dp"
+        android:layout_marginTop="180dp"
         android:backgroundTint="@color/blue"
+        android:textSize="17sp"
         android:text="@string/lugares_fisicos_idei"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.150"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,11 +64,12 @@
         android:id="@+id/areas_idh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="190dp"
+        android:layout_marginTop="180dp"
         android:backgroundTint="@color/blue"
+        android:textSize="17sp"
         android:text="@string/lugares_fisicos_idh"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.850"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,7 +79,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="160dp"
         android:textSize="20sp"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
+        android:paddingHorizontal="10dp"
+        android:justificationMode="inter_word"
         android:text="@string/mensaje_agregar_lugar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -87,6 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
+        android:textSize="17sp"
         android:text="@string/agregar_lugar_fisico"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -97,9 +105,11 @@
         android:id="@+id/modificar_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:textSize="20sp"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
+        android:paddingHorizontal="10dp"
+        android:justificationMode="inter_word"
         android:text="@string/mensaje_modificar_lugar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -108,7 +118,7 @@
     <EditText
         android:id="@+id/modificar_input"
         android:layout_width="300dp"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginTop="20dp"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
@@ -123,7 +133,8 @@
         android:backgroundTint="@color/blue"
         android:text="@string/modificar_lugar_fisico"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.250"
+        android:textSize="17sp"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/modificar_input" />
 
@@ -133,9 +144,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:backgroundTint="@color/blue"
+        android:textSize="17sp"
         android:text="@string/desactivar_lugar_fisico"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.750"
+        app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/modificar_input" />
 
