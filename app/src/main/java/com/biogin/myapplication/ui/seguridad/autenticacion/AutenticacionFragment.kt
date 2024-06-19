@@ -52,8 +52,7 @@ class AutenticacionFragment : Fragment() {
 
         _binding = FragmentAutenticacionBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        val bundle = arguments
-        dniMaster = bundle?.getString("dniMaster").toString()
+        dniMaster = this.activity?.intent?.getStringExtra("dniMaster") ?: ""
         Log.d("AUTENTICATIONFRAGMENT", dniMaster)
         logsRepository = LogsRepository()
 
