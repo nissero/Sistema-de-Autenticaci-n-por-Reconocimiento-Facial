@@ -21,7 +21,6 @@
         android:textColorHint="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.44" />
@@ -31,10 +30,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
+        android:textSize="15sp"
         android:text="Suspender usuario momentaneamente"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/deactivate_user_option" />
 
@@ -43,10 +42,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:backgroundTint="#0D99FF"
+        android:backgroundTint="@color/blue"
+        android:textSize="@dimen/button_text_size"
         android:text="Dar acceso momentaneamente"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/deactivate_user_for_x_time" />
 
@@ -56,9 +55,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:backgroundTint="@color/blue"
+        android:textSize="@dimen/button_text_size"
         android:text="Inactivar usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/update_user_dni_option_button" />
 
@@ -68,9 +67,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:backgroundTint="@color/blue"
+        android:textSize="@dimen/button_text_size"
         android:text="Modificar DNI usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/update_user_option_button" />
 
@@ -80,10 +79,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="Modificaciones/Baja"
-        android:textSize="20sp"
+        android:textSize="25sp"
         app:layout_constraintBottom_toTopOf="@+id/dni_user_to_find"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find" />
 
     <Button
@@ -92,9 +90,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:backgroundTint="@color/blue"
+        android:textSize="@dimen/button_text_size"
         android:text="Modificar usuario"
         app:layout_constraintEnd_toEndOf="@+id/dni_user_to_find"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dni_user_to_find"
         app:layout_constraintTop_toBottomOf="@+id/dni_user_to_find" />
 
@@ -106,6 +104,7 @@
         android:layout_marginTop="116dp"
         android:layout_marginEnd="50dp"
         android:backgroundTint="@color/blue"
+        android:textSize="@dimen/button_text_size"
         android:text="Registrar usuario"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,7 +116,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:text="Alta"
-        android:textSize="20sp"
+        android:textSize="25sp"
         app:layout_constraintBottom_toTopOf="@+id/register_user_option_button"
         app:layout_constraintEnd_toEndOf="@+id/update_user_dni_option_button"
         app:layout_constraintStart_toStartOf="@+id/update_user_dni_option_button" />

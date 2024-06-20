@@ -13,7 +13,7 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="register">Registrarse</string>
-    <string name="switch_camera">Cambiar camara</string>
+    <string name="switch_camera">Cambiar cámara</string>
     <string name="prompt_name">Nombre</string>
     <string name="prompt_area">Area/s</string>
     <string name="prompt_confirm_password">Confirmar contraseña</string>
@@ -24,10 +24,10 @@
     <string name="title_main_activity">Main Activity</string>
     <string name="text_view_person_name">[Nombre persona]</string>
     <string name="home_text_enter_face_recognition">Ingresar con reconocimiento facial (SEGURIDAD)</string>
-    <string name="home_text_enter_face_recognition_rrhh">Ingresar con\nreconocimiento facial (RRHH)</string>
+    <string name="home_text_enter_face_recognition_rrhh">Ingresar con reconocimiento facial (RRHH)</string>
     <string name="home_text_enter_dni_scanner">Ingresar con DNI</string>
-    <string name="face_recognition_visitors">Autenticacion de\nvisitantes con reconocimiento facial</string>
-    <string name="face_recognition_visitors_dni">Autenticacion de\nvisitantes con DNI</string>
+    <string name="face_recognition_visitors">Autenticación de\nvisitantes con reconocimiento facial</string>
+    <string name="face_recognition_visitors_dni">Autenticación de\nvisitantes con DNI</string>
     <string name="authorization_message_continue_button">OK</string>
     <string-array name="user_active_options">
         <item>Activo</item>
@@ -46,13 +46,12 @@
     <string name="finalizar_turno">Finalizar turno</string>
     <string name="mansaje_turno_no_iniciado">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
     <string name="mensaje_turno_iniciado">Presione alguno de los botones\npara autenticar visitantes</string>
-    <string name="mansaje_inicio_turno">Para comenzar con la autenticación\nde visitantes, inicie el turno</string>
     <string name="fechaHora">Fecha y \nhora</string>
 
     <string name="hora">Hora</string>
     <string name="id_autenticador">DNI\nAutenticador</string>
     <string name="id_visitante">DNI\nVisitante</string>
-    <string name="categoria">Categoria\nusuario\nafectado</string>
+    <string name="categoria">Categoría\nusuario\nafectado</string>
     <string name="title_activity_rrhhactivity">RRHHActivity</string>
     <string name="title_abm">ABM</string>
     <string name="title_modulos">Modulos</string>
@@ -68,12 +67,12 @@
         • Verón, Adrián Gustavo
     </string>
     <string name="skip">Skip</string>
-    <string name="lugares_fisicos_ici">Lugares Físicos\ndel ICI</string>
+    <string name="lugares_fisicos_ici">Lugares físicos\ndel ICI</string>
     <string name="lugares_fisicos_ico">Lugares físicos\ndel ICO</string>
     <string name="lugares_fisicos_idei">Lugares físicos\ndel IDEI</string>
     <string name="lugares_fisicos_idh">Lugares físicos\ndel IDH</string>
-    <string name="mensaje_ver_lugares_fisicos">Para ver los lugares físicos de un\ninstituto, presione el botón\ncorrespondiente al mismo</string>
-    <string name="mensaje_agregar_lugar">Para agregar un nuevo lugar físico\npresione el botón de abajo</string>
+    <string name="mensaje_ver_lugares_fisicos">Para ver los lugares físicos de un instituto, presione el botón correspondiente al mismo</string>
+    <string name="mensaje_agregar_lugar">Para agregar un nuevo lugar físico presione el botón de abajo</string>
     <string name="agregar_lugar_fisico">Agregar\nlugar físico</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -117,12 +116,12 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    <string name="texto_ayuda_agregar">Para agregar un nuevo lugar\nfísico, ingrese un nombre y seleccione\na que institutos pertenece</string>
-    <string name="texto_ayuda_modificar">Para un lugar físico ya existente,\npuede cambiar el nombre y modificar\na que institutos pertenece</string>
+    <string name="texto_ayuda_agregar">Para agregar un nuevo lugar físico, ingrese un nombre y seleccione a que institutos pertenece</string>
+    <string name="texto_ayuda_modificar">Para un lugar físico ya existente, puede cambiar el nombre y modificar a que institutos pertenece</string>
     <string name="nombre">Nombre</string>
     <string name="modificar_lugar_fisico">Modificar\nlugar físico</string>
     <string name="desactivar_lugar_fisico">Desactivar\nlugar físico</string>
-    <string name="mensaje_modificar_lugar">Para modificar o desactivar un lugar físico,\ningrese el nombre y luego presione\nel botón correspondiente</string>
+    <string name="mensaje_modificar_lugar">Para modificar o desactivar un lugar físico, ingrese el nombre y luego presione el botón correspondiente</string>
 
     <string name="dni_master_user">DNI\nusuario\nmaestro</string>
     <string name="dni_user_affected">DNI usuario afectado</string>
@@ -132,16 +131,16 @@
     <string name="text_view_succesful_out_auth_data_logs">Cantidad de egresos\nexitosos</string>
     <string name="text_view_unsuccesful_auth_data_logs">Cantidad autenticaciones\nfallidas</string>
     <string name="title_categorias">Categorías</string>
-    <string name="info_consulta_categorias">Presione el botón para ver las\ncategorías actuales</string>
+    <string name="info_consulta_categorias">Presione el botón para ver las categorías actuales</string>
     <string name="consultar_categorias">Consultar categorías</string>
     <string name="modificar_categoria">Modificar\ncategoría</string>
     <string name="desactivar_categoria">Desactivar\ncategoría</string>
-    <string name="info_agregar_categoria">Para agregar una nueva categoría,\npresione el botón de abajo</string>
-    <string name="texto_ayuda_categorias">Para crear una nueva categoría,\ningrese el nombre y complete los\ncampos correspondiente</string>
-    <string name="info_modificar_categoria">Para modificar o desactivar una categoría,\ningrese el nombre y luego presione\nel botón correspondiente</string>
-    <string name="texto_ayuda_modificacion_categorias">La modificación de categorías existentes\npermite cambiar únicamente el nombre de\nla misma</string>
-    <string name="ayuda_categoria_temporal">Tilde la siguiente opción si las\npersonas que tengan asignada esta\ncategoría tendrán permitido el acceso\ndurante un plazo determinado</string>
-    <string name="ayuda_categoria__institutos">Tilde la siguiente opcioón si las\npersonas que tengan asignada esta\ncategoría tendrán institutos a los\nque pertenecen</string>
+    <string name="info_agregar_categoria">Para agregar una nueva categoría, presione el botón de abajo</string>
+    <string name="texto_ayuda_categorias">Para crear una nueva categoría, ingrese el nombre y complete los campos correspondiente</string>
+    <string name="info_modificar_categoria">Para modificar o desactivar una categoría, ingrese el nombre y luego presione el botón correspondiente</string>
+    <string name="texto_ayuda_modificacion_categorias">La modificación de categorías existentes permite cambiar únicamente el nombre de la misma</string>
+    <string name="ayuda_categoria_temporal">Tilde la siguiente opción si las personas que tengan asignada esta categoría tendrán permitido el acceso durante un plazo determinado</string>
+    <string name="ayuda_categoria__institutos">Tilde la siguiente opcioón si las personas que tengan asignada esta categoría tendrán institutos a los que pertenecen</string>
     <string name="agregar_categoria">Agregar categoría</string>
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
     <string name="back4app_app_id">ZIalbZmTNhF7KsEZhq6iGJS1F970qM7A4csbNIEn</string>

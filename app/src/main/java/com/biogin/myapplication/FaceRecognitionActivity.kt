@@ -113,11 +113,34 @@ class FaceRecognitionActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         when(authenticationType){
-            "seguridad" -> initCamera(:: ifSecurity)
-            "rrhh" -> initCamera(:: ifRRHH)
-            "admin" -> initCamera(:: ifAdmin)
-            "jerarquico" -> initCamera(:: ifJerarquico)
-            else -> initCamera(:: ifAny)
+            "seguridad" -> {
+                initCamera(:: ifSecurity)
+                viewBinding.skipButton.setOnClickListener {
+                    goToSeguridadActivity()
+                }
+            }
+            "rrhh" -> {
+                initCamera(:: ifRRHH)
+                viewBinding.skipButton.setOnClickListener {
+                    goToRRHHActivity()
+                }
+            }
+            "jerarquico" -> {
+                initCamera(:: ifJerarquico)
+                viewBinding.skipButton.setOnClickListener {
+                    goToJerarquicoActivity()
+                }
+            }
+            "admin" -> {
+                initCamera(:: ifAdmin)
+                viewBinding.skipButton.setOnClickListener {
+                    goToAdminActivity()
+                }
+            }
+            else -> {
+                initCamera(:: ifAny)
+                viewBinding.skipButton.visibility = View.INVISIBLE
+            }
         }
     }
 

@@ -22,17 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-<!--    <ImageView-->
-<!--        android:id="@+id/imageView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        android:scaleType="fitXY"-->
-<!--        app:srcCompat="@drawable/oval_test" />-->
-
     <Button
         android:id="@+id/skip_button"
         android:layout_width="wrap_content"
@@ -49,6 +38,7 @@
         android:layout_height="81dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
+        android:textSize="@dimen/button_text_size"
         android:elevation="10dp"
         android:backgroundTint="@color/blue"
         android:text="@string/switch_camera"
