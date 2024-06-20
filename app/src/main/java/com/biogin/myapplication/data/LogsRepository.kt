@@ -50,8 +50,13 @@ class LogsRepository {
         return logs
     }
 
-    suspend fun getAllLogsFromUser(dniUser : String) : List<Log> {
-        if (dniUser.isEmpty()) {
+    private fun isFilterByBothMasterUserAndUserAffected(dniUserAffected: String, dniMasterUser: String): Boolean {
+        return dniUserAffected.isNotEmpty() && dniMasterUser.isNotEmpty()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getFilteredLogs(dniUserAffected : String, dniMasterUser : String, dateFrom : String, dateTo : String) : List<Log> {
+        if (!isFilterValid(dniUserAffected, dniMasterUser, dateFrom, dateTo)) {
             return ArrayList()
         }
 
@@ -59,9 +64,42 @@ class LogsRepository {
         val logs : ArrayList<Log> = ArrayList()
 
         val collectionRef = db.collection(LOGS_COLLECTION_NAME)
-        val logsObtained = collectionRef.
-        whereEqualTo("dniUserAffected", dniUser).
-        orderBy("timestamp", Query.Direction.DESCENDING).
+        lateinit var query : Query
+
+        if (isFilterByUserAffected(dniUserAffected, dniMasterUser)) {
+            query = collectionRef.
+                whereEqualTo("dniUserAffected", dniUserAffected)
+        } else if (isFilterByMasterUser(dniUserAffected, dniMasterUser)){
+            query = collectionRef.
+                whereEqualTo("dniMasterUser", dniMasterUser)
+        } else if (isFilterByBothMasterUserAndUserAffected(dniUserAffected, dniMasterUser)) {
+            query = collectionRef.
+                whereEqualTo("dniUserAffected", dniUserAffected).
+                whereEqualTo("dniMasterUser", dniMasterUser)
+        }
+
+        if (isFilterWithDateRange(dateFrom, dateTo)) {
+            val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
+            val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+
+            val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
+            val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
+
+            if(dniUserAffected.isEmpty() && dniMasterUser.isEmpty()) {
+                query = collectionRef.
+                    whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+                    whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate)))
+            } else {
+                query.
+                    whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
+                    whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate)))
+            }
+
+        }
+
+        query.orderBy("timestamp", Query.Direction.DESCENDING)
+
+        val logsObtained = query.
         get().
         await()
             .documents
@@ -84,47 +122,25 @@ class LogsRepository {
         return logs
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun getAllLogsFromUserByDate(dniUser : String, dateFrom : String, dateTo : String) : List<Log> {
-        if (dateFrom.isEmpty() || dateTo.isEmpty() || dniUser.isEmpty()) {
-            return ArrayList()
+    private fun isFilterValid(dniUserAffected : String, dniMasterUser : String, dateFrom : String, dateTo : String) : Boolean {
+        if(dateFrom.isNotEmpty() && dateTo.isEmpty() && dniMasterUser.isEmpty() && dniUserAffected.isEmpty()) {
+            return false
+        } else if (dateFrom.isEmpty() && dateTo.isEmpty() && dniMasterUser.isEmpty() && dniUserAffected.isEmpty()) {
+            return false
         }
 
-        val db = FirebaseFirestore.getInstance()
-        val logs : ArrayList<Log> = ArrayList()
+        return true
+    }
+    private fun isFilterWithDateRange(dateFrom: String, dateTo: String): Boolean {
+        return dateFrom.isNotEmpty() && dateTo.isNotEmpty()
+    }
 
-        val formatedDateFrom = timestampUtil.stringDateToLocalDate(dateFrom)
-        val startOfDayOfFromDate = formatedDateFrom.atStartOfDay()
+    fun isFilterByUserAffected(dniUserAffected : String, dniMasterUser : String) : Boolean {
+        return dniUserAffected.isNotEmpty() && dniMasterUser.isEmpty()
+    }
 
-        val formatedDateTo = timestampUtil.stringDateToLocalDate(dateTo)
-        val endOfDayOfToDate = formatedDateTo.atTime(23, 59, 59)
-
-        val collectionRef = db.collection(LOGS_COLLECTION_NAME)
-        val logsObtained = collectionRef.
-            whereEqualTo("dniUserAffected", dniUser).
-            whereGreaterThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(startOfDayOfFromDate))).
-            whereLessThanOrEqualTo("timestamp", Timestamp(timestampUtil.asDate(endOfDayOfToDate))).
-            orderBy("timestamp", Query.Direction.DESCENDING).
-        get().
-        await()
-            .documents
-
-        for (logDocument in logsObtained) {
-            val document = logDocument.data
-            if (document != null) {
-                logs.add(
-                    Log(
-                        Log.LogEventType.valueOf(document.get("logEventType").toString()),
-                        Log.getLogEventNameFromValue(document.get("logEventName").toString()),
-                        document.get("dniMasterUser").toString(),
-                        document.get("dniUserAffected").toString(),
-                        document.get("category").toString(),
-                        timestampUtil.utcTimestampToLocalString(document.get("timestamp")!!))
-                )
-            }
-        }
-
-        return logs
+    fun isFilterByMasterUser(dniUserAffected : String, dniMasterUser : String) : Boolean {
+        return dniUserAffected.isEmpty() && dniMasterUser.isNotEmpty()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -18,6 +18,7 @@ import com.biogin.myapplication.databinding.FragmentLogsRrhhBinding
 import com.biogin.myapplication.logs.Log
 import com.biogin.myapplication.utils.CsvCreator
 import com.biogin.myapplication.utils.DatePickerDialog
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
@@ -64,7 +65,7 @@ class LogsRRHHFragment : Fragment() {
         binding.btnFilterLogsRrhh.setOnClickListener {
             val detailOption = binding.spinnerFilterDetailOption.selectedItem.toString()
             if (detailOption == "Con detalle") {
-                filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+                filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterDniMasterUser.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
             } else if (detailOption == "Sin detalle") {
                 filterNonDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
             }
@@ -139,24 +140,15 @@ class LogsRRHHFragment : Fragment() {
         logsDataDisplayed = logs
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun filterDetailedLogs(dniUser : String, dateFrom : String, dateTo : String) {
+    private fun filterDetailedLogs(dniUserAffected : String, dniMasterUser : String, dateFrom : String, dateTo : String) {
         enableDetailedView()
         lateinit var adapter : LogsAdapter
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
-        var logs : List<com.biogin.myapplication.logs.Log>
-
-        if (dniUser.isNotEmpty() && dateFrom.isNotEmpty() && dateTo.isNotEmpty()) {
-            runBlocking {
-                logs = logsRepository.getAllLogsFromUserByDate(dniUser, dateFrom, dateTo)
+        lateinit var logs : List<com.biogin.myapplication.logs.Log>
+        runBlocking {
+            launch {
+                logs = logsRepository.getFilteredLogs(dniUserAffected, dniMasterUser, dateFrom, dateTo)
             }
-        }
-        else if (dniUser.isNotEmpty() && dateFrom.isEmpty() && dateTo.isEmpty()) {
-            runBlocking {
-                logs = logsRepository.getAllLogsFromUser(dniUser)
-            }
-        }
-        else {
-            logs =  ArrayList()
         }
 
         adapter = LogsAdapter(binding.root.context, logs)
@@ -193,6 +185,7 @@ class LogsRRHHFragment : Fragment() {
         binding.filterFechaHastaLogsRrhh.isEnabled = false
         binding.filterFechaHastaLogsRrhh.isClickable = false
         binding.filterDniUserAffected.setText("")
+        binding.filterDniMasterUser.setText("")
     }
 
     override fun onDestroyView() {
