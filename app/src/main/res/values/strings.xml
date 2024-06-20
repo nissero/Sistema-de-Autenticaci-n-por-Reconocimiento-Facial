@@ -34,8 +34,8 @@
         <item>Inactivo</item>
     </string-array>
     <string-array name="rrhh_logs_detail_options">
-        <item>Con detalle</item>
-        <item>Sin detalle</item>
+        <item>Con\ndetalle</item>
+        <item>Sin\ndetalle</item>
     </string-array>
     <string name="title_activity_admin_autenticacion">AdminAutenticacionActivity</string>
     <string name="title_autenticacion">Autenticación</string>

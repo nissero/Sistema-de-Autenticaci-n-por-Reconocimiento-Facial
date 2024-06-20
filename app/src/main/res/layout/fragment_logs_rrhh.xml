@@ -39,39 +39,53 @@ android:orientation="vertical">
 
         <EditText
             android:id="@+id/filter_dni_user_affected"
-            android:layout_width="80dp"
+            android:layout_width="113dp"
             android:layout_height="wrap_content"
-            android:hint="DNI usuario\nafectado"
+            android:hint="DNI user afectado"
             android:inputType="text"
             android:maxWidth="60dp"
             android:maxLines="1"
             android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/spinner_filter_detail_option"
-            app:layout_constraintStart_toEndOf="@+id/filter_dni_master_user"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintEnd_toEndOf="@+id/filter_dni_master_user"
+            app:layout_constraintStart_toStartOf="@+id/filter_dni_master_user"
+            app:layout_constraintTop_toBottomOf="@+id/filter_dni_master_user" />
 
         <EditText
             android:id="@+id/filter_dni_master_user"
-            android:layout_width="80dp"
+            android:layout_width="113dp"
             android:layout_height="wrap_content"
-            android:hint="DNI usuario\nmaestro"
+            android:hint="DNI user maestro"
             android:inputType="text"
             android:maxWidth="60dp"
             android:maxLines="1"
             android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/filter_dni_user_affected"
+            app:layout_constraintBottom_toTopOf="@+id/filter_dni_user_affected"
+            app:layout_constraintEnd_toStartOf="@+id/filter_user_category"
             app:layout_constraintStart_toEndOf="@+id/filter_fecha_desde_logs_rrhh"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/filter_user_category"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Categoria\nuser\nafectado"
+            android:inputType="text"
+            android:maxWidth="60dp"
+            android:maxLines="1"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toStartOf="@+id/spinner_filter_detail_option"
+            app:layout_constraintStart_toEndOf="@+id/filter_dni_master_user"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
             android:id="@+id/spinner_filter_detail_option"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/filter_user_category"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

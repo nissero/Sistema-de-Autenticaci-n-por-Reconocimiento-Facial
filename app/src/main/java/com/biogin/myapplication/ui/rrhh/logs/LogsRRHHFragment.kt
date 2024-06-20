@@ -48,8 +48,11 @@ class LogsRRHHFragment : Fragment() {
 
         val logDetailOptions = resources.getStringArray(R.array.rrhh_logs_detail_options)
         binding.spinnerFilterDetailOption.adapter = ArrayAdapter(root.context, R.layout.spinner_item_logs_rrhh, logDetailOptions.toList())
-
         setRecyclerView()
+        val rrhhLogsDetailOptions = resources.getStringArray(R.array.rrhh_logs_detail_options)
+        val filterOptionWithDetail = rrhhLogsDetailOptions[0]
+        val filterOptionWithoutDetail = rrhhLogsDetailOptions[1]
+
         binding.filterFechaDesdeLogsRrhh.setOnClickListener {
             datePickerDialog.showDatePickerDialog(binding.filterFechaDesdeLogsRrhh, null, binding.root.context){
                 binding.filterFechaHastaLogsRrhh.setText("")
@@ -64,9 +67,10 @@ class LogsRRHHFragment : Fragment() {
 
         binding.btnFilterLogsRrhh.setOnClickListener {
             val detailOption = binding.spinnerFilterDetailOption.selectedItem.toString()
-            if (detailOption == "Con detalle") {
-                filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterDniMasterUser.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
-            } else if (detailOption == "Sin detalle") {
+
+            if (detailOption == filterOptionWithDetail) {
+                filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterDniMasterUser.text.toString(), binding.filterUserCategory.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+            } else if (detailOption == filterOptionWithoutDetail) {
                 filterNonDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
             }
         }
@@ -82,7 +86,7 @@ class LogsRRHHFragment : Fragment() {
         binding.btnExportCsvLogsRrhh.setOnClickListener {
             val detailOption = binding.spinnerFilterDetailOption.selectedItem.toString()
 
-            if (detailOption == "Con detalle") {
+            if (detailOption == filterOptionWithDetail) {
                 try {
                     csvCreator.createAndSaveCsvFileToExportLogs(binding.root.context, logsDataDisplayed)
                     Toast.makeText(context, "CSV exportado exitosamente", Toast.LENGTH_SHORT).show()
@@ -140,14 +144,14 @@ class LogsRRHHFragment : Fragment() {
         logsDataDisplayed = logs
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun filterDetailedLogs(dniUserAffected : String, dniMasterUser : String, dateFrom : String, dateTo : String) {
+    private fun filterDetailedLogs(dniUserAffected : String, dniMasterUser : String, categoryUserAffected : String,dateFrom : String, dateTo : String) {
         enableDetailedView()
         lateinit var adapter : LogsAdapter
         val recyclerView = binding.root.findViewById<RecyclerView>(R.id.recyclerViewLogs)
         lateinit var logs : List<com.biogin.myapplication.logs.Log>
         runBlocking {
             launch {
-                logs = logsRepository.getFilteredLogs(dniUserAffected, dniMasterUser, dateFrom, dateTo)
+                logs = logsRepository.getFilteredLogs(dniUserAffected, dniMasterUser, categoryUserAffected, dateFrom, dateTo)
             }
         }
 
@@ -186,6 +190,7 @@ class LogsRRHHFragment : Fragment() {
         binding.filterFechaHastaLogsRrhh.isClickable = false
         binding.filterDniUserAffected.setText("")
         binding.filterDniMasterUser.setText("")
+        binding.filterUserCategory.setText("")
     }
 
     override fun onDestroyView() {
