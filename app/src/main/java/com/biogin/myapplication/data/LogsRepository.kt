@@ -171,7 +171,7 @@ class LogsRepository {
         dateFrom: String,
         dateTo: String
     ): Int {
-        if (dateFrom.isEmpty() || dateTo.isEmpty() || dniUser.isEmpty()) {
+        if (dateFrom.isEmpty() && dateTo.isEmpty() && dniUser.isEmpty()) {
             return 0
         }
 

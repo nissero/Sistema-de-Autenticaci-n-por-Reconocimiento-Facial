@@ -48,6 +48,21 @@ class Log (val logEventType : LogEventType, val logEventName : LogEventName,
 
             return LogEventName.EMPTY_LOG
         }
+
+        fun filterLogsByEventName(logs : List<Log>, eventName: LogEventName) : List<Log> {
+            val filteredLogs = ArrayList<Log>()
+            if (logs.isEmpty()) {
+                return filteredLogs
+            }
+
+            for (log in logs) {
+                if(log.logEventName.value == eventName.value) {
+                    filteredLogs.add(log)
+                }
+            }
+
+            return filteredLogs
+        }
     }
     enum class LogEventType(s: String) {
         INFO("INFO"),

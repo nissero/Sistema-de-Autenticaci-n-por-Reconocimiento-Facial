@@ -71,7 +71,7 @@ class LogsRRHHFragment : Fragment() {
             if (detailOption == filterOptionWithDetail) {
                 filterDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterDniMasterUser.text.toString(), binding.filterUserCategory.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
             } else if (detailOption == filterOptionWithoutDetail) {
-                filterNonDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
+                filterNonDetailedLogs(binding.filterDniUserAffected.text.toString(), binding.filterDniMasterUser.text.toString(), binding.filterUserCategory.text.toString(), binding.filterFechaDesdeLogsRrhh.text.toString(), binding.filterFechaHastaLogsRrhh.text.toString())
             }
         }
 
@@ -88,12 +88,28 @@ class LogsRRHHFragment : Fragment() {
 
             if (detailOption == filterOptionWithDetail) {
                 try {
-                    csvCreator.createAndSaveCsvFileToExportLogs(binding.root.context, logsDataDisplayed)
+                    csvCreator.createAndSaveCsvFileDetailedLogs(binding.root.context, logsDataDisplayed)
                     Toast.makeText(context, "CSV exportado exitosamente", Toast.LENGTH_SHORT).show()
                 } catch (e : Exception) {
                     Toast.makeText(context, "No fue posible exportar el CSV", Toast.LENGTH_SHORT).show()
                 }
 
+            } else if (detailOption == filterOptionWithoutDetail) {
+                try {
+                    csvCreator.createAndSaveCsvFileNonDetailedLogs(
+                        binding.root.context,
+                        binding.filterDniUserAffected.text.toString(),
+                        binding.filterDniMasterUser.text.toString(),
+                        binding.filterUserCategory.text.toString(),
+                        binding.filterFechaDesdeLogsRrhh.text.toString(),
+                        binding.filterFechaHastaLogsRrhh.text.toString(),
+                        binding.amountOfInSuccessfulAuthsUserRrhh.text.toString(),
+                        binding.amountOfOutSuccessfulAuthsUserRrhh.text.toString())
+
+                    Toast.makeText(context, "CSV exportado exitosamente", Toast.LENGTH_SHORT).show()
+                } catch (e : Exception) {
+                    Toast.makeText(context, "No fue posible exportar el CSV", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return root
@@ -161,14 +177,18 @@ class LogsRRHHFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun filterNonDetailedLogs(dniUser : String, dateFrom : String, dateTo : String) {
+    fun filterNonDetailedLogs(dniUserAffected : String, dniMasterUser : String, categoryUserAffected : String,dateFrom : String, dateTo : String) {
         enableNonDetailedView()
-        var amountOfInSuccesfulAuths : Int
-        var amountOfOutSuccesfulAuths : Int
+        lateinit var logs : List<com.biogin.myapplication.logs.Log>
+
         runBlocking {
-            amountOfInSuccesfulAuths = logsRepository.getAmountOfSuccesfulAuthenticationsInOfUser(dniUser, dateFrom, dateTo)
-            amountOfOutSuccesfulAuths = logsRepository.getAmountOfSuccesfulAuthenticationsOutOfUser(dniUser, dateFrom, dateTo)
+            launch {
+                logs = logsRepository.getFilteredLogs(dniUserAffected, dniMasterUser, categoryUserAffected, dateFrom, dateTo)
+            }
         }
+
+        val amountOfInSuccesfulAuths = Log.filterLogsByEventName(logs, Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_IN).size
+        val amountOfOutSuccesfulAuths = Log.filterLogsByEventName(logs, Log.LogEventName.USER_SUCCESSFUL_AUTHENTICATION_OUT).size
 
         binding.amountOfInSuccessfulAuthsUserRrhh.text = amountOfInSuccesfulAuths.toString()
         binding.amountOfOutSuccessfulAuthsUserRrhh.text = amountOfOutSuccesfulAuths.toString()

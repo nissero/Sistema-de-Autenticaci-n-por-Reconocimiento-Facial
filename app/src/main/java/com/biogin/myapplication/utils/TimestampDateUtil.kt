@@ -64,7 +64,7 @@ class TimestampDateUtil {
     @RequiresApi(Build.VERSION_CODES.O)
     public fun nowAsStringFileFormat() : String {
         var date = LocalDateTime.now()
-        return "${date.dayOfMonth}-${date.monthValue}_${date.year}_${date.hour}-${date.minute}-${date.second}"
+        return "${date.dayOfMonth}-${date.monthValue}-${date.year}_${date.hour}-${date.minute}-${date.second}"
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun asDate(localDateTime: LocalDateTime): Date {
