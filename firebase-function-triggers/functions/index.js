@@ -1,6 +1,8 @@
 // The Cloud Functions for Firebase SDK to set up triggers and logging.
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {logger} = require("firebase-functions");
+const functions = require("firebase-functions");
+const nodemailer = require('nodemailer');
 
 // The Firebase Admin SDK to access Firestore (if needed).
 const admin = require("firebase-admin");
@@ -161,4 +163,52 @@ exports.changeUsersEstado = onSchedule("every day 00:00", async (context) => {
 
     logger.log("Daily scheduled function executed successfully!");
   });
+});
+
+const gmailEmail = functions.config().email.user;
+const gmailPassword = functions.config().email.pass;
+
+const transporter = nodemailer.createTransport({
+    service: "gmail", // Puedes usar otros servicios de correo
+    auth: {
+        user: gmailEmail,
+        pass: gmailPassword // Es recomendable usar variables de entorno para seguridad
+    }
+});
+
+exports.scheduledEmail = functions.pubsub.schedule("0 23 * * *").timeZone("America/Argentina/Buenos_Aires").onRun(async (context) => {
+    const db = admin.firestore();
+    const doc = await db.collection('data jerarquico').doc('info').get();
+    const recipientEmail = doc.data().mail;
+
+    const docLogs = db.collection('logs');
+
+    let emailContent = 'RESUMEN DIARIO DE AUTENTICACIONES FALLIDAS: \n';
+
+    const currentDate = new Date();
+    const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0);
+    const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59);
+
+    const logs = await docLogs.where('timestamp', '>=', startOfDay)
+        .where('timestamp', '<=', endOfDay)
+        .where('logEventName', 'in', ['USER UNSUCCESSFUL AUTHENTICATION', 'RRHH UNSUCCESSFUL LOGIN', 'SECURITY UNSUCCESSFUL LOGIN']).get();
+
+    for (const logDoc of logs.docs) {
+        const logData = logDoc.data();
+        emailContent += `Categoría: ${logData.category} | DNI Usuario Maestro: ${logData.dniMasterUser} | DNI Usuario Afectado: ${logData.dniUserAffected} | Evento: ${logData.logEventName} | Tipo de Evento: ${logData.logEventType} | Fecha y Hora: ${logData.timestamp.toDate()}\n`;
+    }
+
+    const mailOptions = {
+        from: gmailEmail,
+        to: recipientEmail.toString(),
+        subject: "PRUEBA EMAIL",
+        text: emailContent
+    };
+
+    return transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error.toString());
+        }
+        console.log("Email sent: " + info.response);
+    });
 });
