@@ -201,7 +201,7 @@ exports.scheduledEmail = functions.pubsub.schedule("0 23 * * *").timeZone("Ameri
     const mailOptions = {
         from: gmailEmail,
         to: recipientEmail.toString(),
-        subject: "PRUEBA EMAIL",
+        subject: `RESUMEN DIARIO DE AUTENTICACIONES FALLIDAS - ${currentDate.toLocaleDateString()}`,
         text: emailContent
     };
 
