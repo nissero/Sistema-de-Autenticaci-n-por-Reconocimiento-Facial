@@ -15,6 +15,8 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -181,27 +183,45 @@ class RegisterActivity : AppCompatActivity() {
                 fechaHastaEditText
             )
             if (areAllFieldsValid) {
-                loadingDialog.startLoadingDialog()
                 val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
                 val normalizedName = stringUtils.normalizeAndSentenceCase(name.text.toString())
                 val normalizedSurname = stringUtils.normalizeAndSentenceCase(surname.text.toString())
+
+                val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+                intent.putExtra("name", normalizedName)
+                intent.putExtra("surname", normalizedSurname)
+                intent.putExtra("dni", dni.text.toString())
+                intent.putExtra("email", email.text.toString())
+                intent.putExtra("category", spinner?.selectedItem.toString())
+                intent.putStringArrayListExtra("institutes", institutesSelected)
+                onActivityResultLauncherRegisterActivity.launch(intent)
+            }
+        }
+
+        onResume()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val onActivityResultLauncherRegisterActivity = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { activityResult ->
+        val result = activityResult.resultCode
+        val data = activityResult.data
+        if (data != null) {
+            if (result == RESULT_OK) {
+                loadingDialog.startLoadingDialog()
                 dataSource.uploadUserToFirebase(
-                    normalizedName,
-                    normalizedSurname,
-                    dni.text.toString(),
-                    email.text.toString(),
-                    spinner?.selectedItem.toString(),
-                    institutesSelected,
+                    data.getStringExtra("name")!!,
+                    data.getStringExtra("surname")!! ,
+                    data.getStringExtra("dni")!!,
+                    data.getStringExtra("email")!!,
+                    data.getStringExtra("category")!!,
+                    data.getStringArrayListExtra("institutes")!!,
                     fechaDesde,
                     fechaHasta
                 ).addOnSuccessListener {
                     loadingDialog.dismissDialog()
-                    val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                    intent.putExtra("name", normalizedName)
-                    intent.putExtra("surname", normalizedSurname)
-                    intent.putExtra("dni", dni.text.toString())
-                    intent.putExtra("email", email.text.toString())
-                    startActivity(intent)
+                    Toast.makeText(this, "Usuario registrado exitosamente", Toast.LENGTH_LONG)
                 }.addOnFailureListener { ex ->
                     loadingDialog.dismissDialog()
                     try {
@@ -227,12 +247,11 @@ class RegisterActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
         }
-
-        onResume()
+        } else {
+            Toast.makeText(binding.root.context, "No se pudo registrar al usuario", Toast.LENGTH_LONG)
+        }
     }
-
 
 
     private fun String.toCalendarDate(): Calendar {
