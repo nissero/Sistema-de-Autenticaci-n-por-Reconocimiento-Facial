@@ -16,18 +16,19 @@ import java.util.Locale
 class TimestampDateUtil {
 
     fun utcTimestampToLocalString(timestamp : Any) : String{
-        val threeHoursInMiliseconds = 10800000
-        return if (timestamp is Timestamp) {
+        if (timestamp is Timestamp) {
             val sfd = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-            sfd.format(timestamp.seconds*1000 - threeHoursInMiliseconds)
+            return sfd.format(timestamp.seconds*1000)
         } else {
-            ""
+            return ""
         }
+
+        return timestamp.toString()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun stringDateToLocalDate(date : String) : LocalDate {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return LocalDate.parse(date, formatter)
     }
 
@@ -40,7 +41,7 @@ class TimestampDateUtil {
         return android.icu.util.Calendar.getInstance().time
     }
 
-    fun getStartOfDay() : Calendar {
+    public fun getStartOfDay() : Calendar {
         val startOfDay: Calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -50,7 +51,7 @@ class TimestampDateUtil {
         return startOfDay
     }
 
-    fun getEndOfDay() : Calendar {
+    public fun getEndOfDay() : Calendar {
         val endOfDay: Calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 23)
             set(Calendar.MINUTE, 59)
@@ -61,9 +62,9 @@ class TimestampDateUtil {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun nowAsStringFileFormat() : String {
-        val date = LocalDateTime.now()
-        return "${date.dayOfMonth}-${date.monthValue}_${date.year}_${date.hour}-${date.minute}-${date.second}"
+    public fun nowAsStringFileFormat() : String {
+        var date = LocalDateTime.now()
+        return "${date.dayOfMonth}-${date.monthValue}-${date.year}_${date.hour}-${date.minute}-${date.second}"
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun asDate(localDateTime: LocalDateTime): Date {

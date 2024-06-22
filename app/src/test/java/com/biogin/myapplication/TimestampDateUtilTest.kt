@@ -13,7 +13,7 @@ class TimestampDateUtilTest {
     val timestampDateUtil = TimestampDateUtil()
     @Test
     fun utcTimestampToLocalStringIsCorrectTimestamp() {
-        val utcExpectedDateInMilis = 1728612000000
+        val utcExpectedDateInMilis = 1728601200000
         val date = Timestamp(Date.from(Instant.ofEpochMilli(utcExpectedDateInMilis)))
         val expectedDateString = "10-10-2024 20:00:00"
         assertEquals(expectedDateString, timestampDateUtil.utcTimestampToLocalString(date))
@@ -21,14 +21,14 @@ class TimestampDateUtilTest {
 
     @Test
     fun utcTimestampToLocalStringAtStartOfDay() {
-        val utcExpectedDateInMilis = 1727762400000
+        val utcExpectedDateInMilis = 1727751600000
         val date = Timestamp(Date.from(Instant.ofEpochMilli(utcExpectedDateInMilis)))
         val expectedDateString = "01-10-2024 00:00:00"
         assertEquals(expectedDateString, timestampDateUtil.utcTimestampToLocalString(date))
     }
     @Test
     fun utcTimestampToLocalStringAtEndOfDay() {
-        val utcExpectedDateInMilis = 1727848799000
+        val utcExpectedDateInMilis = 1727837999000
         val date = Timestamp(Date.from(Instant.ofEpochMilli(utcExpectedDateInMilis)))
         val expectedDateString = "01-10-2024 23:59:59"
         assertEquals(expectedDateString, timestampDateUtil.utcTimestampToLocalString(date))

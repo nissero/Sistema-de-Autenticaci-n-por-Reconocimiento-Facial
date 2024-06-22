@@ -69,7 +69,7 @@ class AutenticacionFragment : Fragment() {
 
         mensaje = root.findViewById(R.id.message_main_screen)
 
-        val turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
+        var turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
 
         if(turnoIniciado == true) {
             turnoButton.text = this.context?.getString(R.string.finalizar_turno)
@@ -104,12 +104,14 @@ class AutenticacionFragment : Fragment() {
                                 editor?.apply {
                                     putBoolean("turnoIniciado", true)
                                     putString("fecha", LocalDate.now().toString())
-                                    apply()
+                                    commit()
                                 }
                                 turnoButton.text = this.context?.getString(R.string.finalizar_turno)
                                 autenticacionButton.visibility = View.VISIBLE
                                 mensaje.text = this.context?.getString(R.string.mensaje_turno_iniciado)
                                 autenticacionOfflineButton.visibility = View.VISIBLE
+
+                                turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
 
                                 if (connectionCheck.isOnlineNet()){
                                     logsRepository.logEvent(LogClass.LogEventType.INFO, LogClass.LogEventName.START_OF_SHIFT, dniMaster, "", MasterUserDataSession.getCategoryUser())
@@ -137,12 +139,14 @@ class AutenticacionFragment : Fragment() {
                                 }
                                 editor?.apply {
                                     putBoolean("turnoIniciado", false)
-                                    apply()
+                                    commit()
                                 }
                                 autenticacionButton.visibility = View.INVISIBLE
                                 autenticacionOfflineButton.visibility = View.INVISIBLE
                                 turnoButton.text = this.context?.getString(R.string.iniciar_turno)
                                 mensaje.text = this.context?.getString(R.string.mansaje_turno_no_iniciado)
+
+                                turnoIniciado = sharedPref?.getBoolean("turnoIniciado", false)
                             }
                         }
                     }
