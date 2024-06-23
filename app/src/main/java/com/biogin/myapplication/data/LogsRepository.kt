@@ -379,25 +379,4 @@ class LogsRepository {
             "category" to log.userCategory
         )
     }
-
-    private fun getStartOfDay() : Calendar {
-        val startOfDay: Calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        return startOfDay
-    }
-
-
-    private fun getEndOfDay() : Calendar {
-        val endOfDay: Calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }
-        return endOfDay
-    }
 }
