@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import com.biogin.myapplication.data.LoginDataSource
 import com.biogin.myapplication.databinding.ActivityUserManagementBinding
+import com.biogin.myapplication.ui.LoadingDialog
 import com.biogin.myapplication.utils.EmailService
 import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.HierarchicalUtils
@@ -47,6 +48,7 @@ class UserManagement : AppCompatActivity() {
     private val hierarchicalUtils = HierarchicalUtils()
     private var fechaDesde = ""
     private var fechaHasta = ""
+    private var loadingDialog = LoadingDialog(this)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,6 +106,9 @@ class UserManagement : AppCompatActivity() {
         binding.updateUserDni.setText(intent.getStringExtra("dni"))
         binding.registerFechaDesdeUpdate.setText(intent.getStringExtra("fechaDesde"))
         binding.registerFechaHastaUpdate.setText(intent.getStringExtra("fechaHasta"))
+
+        val currentEmail = intent.getStringExtra("email").toString()
+
         if (categoryIndex != null) {
             binding.updateUserCategoriesSpinner.setSelection(categoryIndex)
         }
@@ -160,6 +165,7 @@ class UserManagement : AppCompatActivity() {
             )
 
             if(areAllFieldsValid) {
+                loadingDialog.startLoadingDialog()
                 val checkboxes = arrayListOf(
                     binding.checkboxICI,
                     binding.checkboxICO,
@@ -171,19 +177,19 @@ class UserManagement : AppCompatActivity() {
                     stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
                 val normalizedSurname =
                     stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
-                val task = dataSource.modifyUserFirebase(
+                dataSource.modifyUserFirebase(
                     normalizedName,
                     normalizedSurname,
                     binding.updateUserDni.text.toString(),
+                    currentEmail,
                     binding.updateUserEmail.text.toString(),
                     binding.updateUserCategoriesSpinner.selectedItem.toString(),
                     binding.updateUserStateSpinner.selectedItem.toString(),
                     selectedInstitutes,
                     fechaDesde,
                     fechaHasta
-                )
-
-                task.addOnSuccessListener {
+                ).addOnSuccessListener {
+                    loadingDialog.dismissDialog()
                     Log.e("Firebase", "Update usuario exitoso")
                     popUpUtil.showPopUp(
                         binding.root.context,
@@ -191,20 +197,31 @@ class UserManagement : AppCompatActivity() {
                     )
                     finish()
                 }.addOnFailureListener { ex ->
+                    loadingDialog.dismissDialog()
                     try {
                         throw ex
                     } catch (e: FirebaseFirestoreException) {
-                        popUpUtil.showPopUp(
-                            binding.root.context,
-                            "Error al modificar el usuario, intente nuevamente",
-                            "Reintentar"
-                        )
+                        if(e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
+                            popUpUtil.showPopUp(
+                                binding.root.context,
+                                e.message.toString(),
+                                "Reintentar"
+                            )
+                        } else {
+                            popUpUtil.showPopUp(
+                                binding.root.context,
+                                "Error al modificar el usuario, intente nuevamente",
+                                "Reintentar"
+                            )
+                        }
+
                     }
                 }
             }
         }
 
         binding.duplicateUserButton.setOnClickListener {
+            loadingDialog.startLoadingDialog()
             val spinner = findViewById<Spinner>(R.id.update_user_categories_spinner)
             val categorySelected = spinner.selectedItem.toString()
 
@@ -244,20 +261,20 @@ class UserManagement : AppCompatActivity() {
                     stringUtils.normalizeAndSentenceCase(binding.updateUserName.text.toString())
                 val normalizedSurname =
                     stringUtils.normalizeAndSentenceCase(binding.updateUserSurname.text.toString())
-                val task = dataSource.duplicateUserInFirebase(
+                dataSource.duplicateUserInFirebase(
                     normalizedName,
                     normalizedSurname,
                     oldDni,
                     binding.updateUserDni.text.toString(),
+                    currentEmail,
                     binding.updateUserEmail.text.toString(),
                     binding.updateUserCategoriesSpinner.selectedItem.toString(),
                     binding.updateUserStateSpinner.selectedItem.toString(),
                     selectedInstitutes,
                     fechaDesde,
                     fechaHasta
-                )
-
-                task.addOnSuccessListener {
+                ).addOnSuccessListener {
+                    loadingDialog.dismissDialog()
                     Log.e("Firebase", "Duplicacion usuario/update dni exitoso")
                     popUpUtil.showPopUp(
                         binding.root.context,
@@ -272,13 +289,14 @@ class UserManagement : AppCompatActivity() {
                     }
                     finish()
                 }.addOnFailureListener { ex ->
+                    loadingDialog.dismissDialog()
                     try {
                         throw ex
                     } catch (e: FirebaseFirestoreException) {
                         if (e.code == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
                             popUpUtil.showPopUp(
                                 binding.root.context,
-                                "El DNI ingresado ya existe, compruebe el dato ingresado",
+                                e.message.toString(),
                                 "Reintentar"
                             )
                         } else {

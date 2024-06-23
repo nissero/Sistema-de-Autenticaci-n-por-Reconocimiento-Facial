@@ -61,6 +61,7 @@ class PhotoRegisterActivity : AppCompatActivity() {
                 showOverlayMessage(photoCount)
                 if (photoCount >= 3) {
                     Handler().postDelayed({
+                        setResult(RESULT_OK, intent) // Seteamos el resultado a OK y devolvemos la data del intent originalmente enviado para subir el usuario a firebase en RegisterActivity
                         finish() // End the activity after the third photo
                     }, 5000)
                 }
