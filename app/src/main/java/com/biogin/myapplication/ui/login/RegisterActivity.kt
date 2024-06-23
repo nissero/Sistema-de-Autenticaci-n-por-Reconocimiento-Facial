@@ -29,6 +29,7 @@ import com.biogin.myapplication.utils.FormValidations
 import com.biogin.myapplication.utils.InstitutesUtils
 import com.biogin.myapplication.utils.StringUtils
 import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 
@@ -186,15 +187,41 @@ class RegisterActivity : AppCompatActivity() {
                 val institutesSelected = institutesUtils.getInstitutesSelected(checkboxes)
                 val normalizedName = stringUtils.normalizeAndSentenceCase(name.text.toString())
                 val normalizedSurname = stringUtils.normalizeAndSentenceCase(surname.text.toString())
+                var existsUserWithGivenEmail : Boolean
+                var existsUserWithGivenDni : Boolean
+                val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+                    when (which) {
+                        DialogInterface.BUTTON_NEUTRAL -> {
+                        }
+                    }
+                }
 
-                val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
-                intent.putExtra("name", normalizedName)
-                intent.putExtra("surname", normalizedSurname)
-                intent.putExtra("dni", dni.text.toString())
-                intent.putExtra("email", email.text.toString())
-                intent.putExtra("category", spinner?.selectedItem.toString())
-                intent.putStringArrayListExtra("institutes", institutesSelected)
-                onActivityResultLauncherRegisterActivity.launch(intent)
+                runBlocking {
+                    existsUserWithGivenEmail = dataSource.existsUserWithGivenEmail(email.text.toString())
+                    existsUserWithGivenDni = dataSource.existsUserWithGivenDni(dni.text.toString())
+                    if(existsUserWithGivenEmail) {
+                        val builder = AlertDialog.Builder(binding.root.context)
+                        builder.setMessage("El email ingresado ya existe, intente nuevamente")
+                            .setNeutralButton("Reintentar", dialogClickListener).show()
+                    } else if (existsUserWithGivenDni) {
+                        val builder = AlertDialog.Builder(binding.root.context)
+                        builder.setMessage("El dni ingresado ya existe, intente nuevamente")
+                            .setNeutralButton("Reintentar", dialogClickListener).show()
+                    } else {
+
+                    }
+                }
+
+                if(!existsUserWithGivenDni && !existsUserWithGivenEmail) {
+                    val intent = Intent(this@RegisterActivity, PhotoRegisterActivity::class.java)
+                    intent.putExtra("name", normalizedName)
+                    intent.putExtra("surname", normalizedSurname)
+                    intent.putExtra("dni", dni.text.toString())
+                    intent.putExtra("email", email.text.toString())
+                    intent.putExtra("category", spinner?.selectedItem.toString())
+                    intent.putStringArrayListExtra("institutes", institutesSelected)
+                    onActivityResultLauncherRegisterActivity.launch(intent)
+                }
             }
         }
 

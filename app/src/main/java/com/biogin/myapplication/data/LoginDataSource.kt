@@ -124,11 +124,23 @@ class LoginDataSource {
         }
     }
 
-    private suspend fun existsUserWithGivenEmail(email : String) : Boolean {
+    public suspend fun existsUserWithGivenEmail(email : String) : Boolean {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection("usuarios")
             .whereEqualTo("email", email)
+            .whereEqualTo("estado", "Activo")
+            .get()
+            .await()
+            .size() != 0
+    }
+
+    public suspend fun existsUserWithGivenDni(dni : String) : Boolean {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection("usuarios")
+            .whereEqualTo("dni", dni)
+            .whereEqualTo("estado", "Activo")
             .get()
             .await()
             .size() != 0
