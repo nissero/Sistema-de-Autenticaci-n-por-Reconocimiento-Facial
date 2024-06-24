@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -43,31 +42,18 @@ class FaceRecognitionActivity : AppCompatActivity() {
             when(authenticationType){
                 "seguridad" -> {
                     initCamera(:: ifSecurity)
-                    viewBinding.skipButton.setOnClickListener {
-                        goToSeguridadActivity()
-                    }
                 }
                 "rrhh" -> {
                     initCamera(:: ifRRHH)
-                    viewBinding.skipButton.setOnClickListener {
-                        goToRRHHActivity()
-                    }
                 }
                 "jerarquico" -> {
                     initCamera(:: ifJerarquico)
-                    viewBinding.skipButton.setOnClickListener {
-                        goToJerarquicoActivity()
-                    }
                 }
                 "admin" -> {
                     initCamera(:: ifAdmin)
-                    viewBinding.skipButton.setOnClickListener {
-                        goToAdminActivity()
-                    }
                 }
                 else -> {
                     initCamera(:: ifAny)
-                    viewBinding.skipButton.visibility = View.INVISIBLE
                 }
             }
         } else {
@@ -115,31 +101,18 @@ class FaceRecognitionActivity : AppCompatActivity() {
         when(authenticationType){
             "seguridad" -> {
                 initCamera(:: ifSecurity)
-                viewBinding.skipButton.setOnClickListener {
-                    goToSeguridadActivity()
-                }
             }
             "rrhh" -> {
                 initCamera(:: ifRRHH)
-                viewBinding.skipButton.setOnClickListener {
-                    goToRRHHActivity()
-                }
             }
             "jerarquico" -> {
                 initCamera(:: ifJerarquico)
-                viewBinding.skipButton.setOnClickListener {
-                    goToJerarquicoActivity()
-                }
             }
             "admin" -> {
                 initCamera(:: ifAdmin)
-                viewBinding.skipButton.setOnClickListener {
-                    goToAdminActivity()
-                }
             }
             else -> {
                 initCamera(:: ifAny)
-                viewBinding.skipButton.visibility = View.INVISIBLE
             }
         }
     }

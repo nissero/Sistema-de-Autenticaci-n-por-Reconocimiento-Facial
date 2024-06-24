@@ -124,11 +124,35 @@ class LoginDataSource {
         }
     }
 
-    private suspend fun existsUserWithGivenEmail(email : String) : Boolean {
+    public suspend fun existsUserWithGivenEmail(email : String) : Boolean {
         val db = FirebaseFirestore.getInstance()
 
         return db.collection("usuarios")
             .whereEqualTo("email", email)
+            .whereEqualTo("estado", "Activo")
+            .get()
+            .await()
+            .size() != 0
+    }
+
+    public suspend fun existsUserWithGivenDni(dni : String) : Boolean {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection("usuarios")
+            .whereEqualTo("dni", dni)
+            .whereEqualTo("estado", "Activo")
+            .get()
+            .await()
+            .size() != 0
+    }
+
+    private suspend fun existsUserWithGivenEmailButDifferentGivenDni(currentDni: String, email : String) : Boolean {
+        val db = FirebaseFirestore.getInstance()
+
+        return db.collection("usuarios")
+            .whereEqualTo("email", email)
+            .whereEqualTo("estado", "Activo")
+            .whereNotEqualTo("dni", currentDni)
             .get()
             .await()
             .size() != 0
@@ -139,7 +163,8 @@ class LoginDataSource {
         surname: String,
         oldDni: String,
         newDni: String,
-        email: String,
+        currentEmail: String,
+        newEmail: String,
         category: String,
         state: String,
         institutesSelected: ArrayList<String>,
@@ -153,11 +178,21 @@ class LoginDataSource {
             val newDniDoc = transaction.get(docRefNewDni)
             if (newDniDoc.exists()) {
                 throw FirebaseFirestoreException(
-                    "El dni ingresado ya existe",
+                    "El dni ingresado ya existe, intente nuevamente",
                     FirebaseFirestoreException.Code.ALREADY_EXISTS
                 )
             }
 
+            if (currentEmail != newEmail) {
+                runBlocking {
+                    if (existsUserWithGivenEmailButDifferentGivenDni(oldDni, newEmail)) {
+                        throw FirebaseFirestoreException(
+                            "El email ingresado ya existe, intente nuevamente",
+                            FirebaseFirestoreException.Code.ALREADY_EXISTS
+                        )
+                    }
+                }
+            }
             val docRefOldDni = db.collection("usuarios").document(oldDni)
             val transactionInstance = transaction.update(docRefOldDni, "estado", "Inactivo")
 
@@ -166,7 +201,7 @@ class LoginDataSource {
                     "nombre" to name,
                     "apellido" to surname,
                     "dni" to newDni,
-                    "email" to email,
+                    "email" to newEmail,
                     "categoria" to category,
                     "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                     "institutos" to institutesSelected,
@@ -185,7 +220,7 @@ class LoginDataSource {
                         "nombre" to name,
                         "apellido" to surname,
                         "dni" to newDni,
-                        "email" to email,
+                        "email" to newEmail,
                         "categoria" to category,
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
@@ -201,7 +236,7 @@ class LoginDataSource {
                         "nombre" to name,
                         "apellido" to surname,
                         "dni" to newDni,
-                        "email" to email,
+                        "email" to newEmail,
                         "categoria" to category,
                         "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
                         "institutos" to institutesSelected,
@@ -222,7 +257,8 @@ class LoginDataSource {
         name: String,
         surname: String,
         dni: String,
-        email: String,
+        currentEmail: String,
+        newEmail: String,
         category: String,
         state: String,
         institutesSelected: ArrayList<String>,
@@ -232,60 +268,110 @@ class LoginDataSource {
         val db = FirebaseFirestore.getInstance()
         val docRefUserUpdated = db.collection("usuarios").document(dni)
         lateinit var tx: Task<Transaction>
-        if(!categoriesUtils.getTemporaryCategories().contains(category)) {
-            tx = db.runTransaction { transaction ->
+
+        return db.runTransaction { transaction ->
+            if (currentEmail != newEmail) {
+                runBlocking {
+                    if (existsUserWithGivenEmailButDifferentGivenDni(dni, newEmail)) {
+                        throw FirebaseFirestoreException(
+                            "El email ingresado ya existe, intente nuevamente",
+                            FirebaseFirestoreException.Code.ALREADY_EXISTS
+                        )
+                    }
+                }
+            }
+
+            if (!categoriesUtils.getTemporaryCategories().contains(category)) {
 
                 val newUser = hashMapOf(
                     "nombre" to name,
                     "apellido" to surname,
                     "dni" to dni,
-                    "email" to email,
+                    "email" to newEmail,
                     "categoria" to category,
-                    "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                    "areasPermitidas" to allowedAreasUtils.getAllowedAreas(institutesSelected)
+                        .toList(),
                     "institutos" to institutesSelected,
                     "estado" to state
                 )
 
                 transaction.set(docRefUserUpdated, newUser)
 
-                logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
-            }
-        } else {
-            tx = db.runTransaction { transaction ->
+                logsRepository.logEventWithTransaction(
+                    db,
+                    transaction,
+                    LogsApp.LogEventType.INFO,
+                    LogsApp.LogEventName.USER_UPDATE,
+                    MasterUserDataSession.getDniUser(),
+                    dni,
+                    category
+                )
+
+            } else {
                 val today = LocalDate.now()
-                val trabajaDesdeDate = LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                val trabajaDesdeDate =
+                    LocalDate.parse(fechaDesde, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
 
                 val fechaDesdeTimestamp = convertStringToTimestamp(fechaDesde)
                 val fechaHastaTimestamp = convertStringToTimestamp(fechaHasta)
-                if (trabajaDesdeDate.isAfter(today)){
-                    transaction.update(docRefUserUpdated,
-                        "nombre", name,
-                        "apellido", surname,
-                        "email", email,
-                        "categoria", category,
-                        "estado", "Inactivo",
-                        "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                        "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesdeTimestamp,
-                        "trabajaHasta", fechaHastaTimestamp)
+                if (trabajaDesdeDate.isAfter(today)) {
+                    transaction.update(
+                        docRefUserUpdated,
+                        "nombre",
+                        name,
+                        "apellido",
+                        surname,
+                        "email",
+                        newEmail,
+                        "categoria",
+                        category,
+                        "estado",
+                        "Inactivo",
+                        "areasPermitidas",
+                        allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos",
+                        institutesSelected,
+                        "trabajaDesde",
+                        fechaDesdeTimestamp,
+                        "trabajaHasta",
+                        fechaHastaTimestamp
+                    )
                 }
                 if (trabajaDesdeDate.isEqual(today)) {
-                    transaction.update(docRefUserUpdated,
-                        "nombre", name,
-                        "apellido", surname,
-                        "email", email,
-                        "categoria", category,
-                        "estado", state,
-                        "areasPermitidas", allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
-                        "institutos", institutesSelected,
-                        "trabajaDesde", fechaDesdeTimestamp,
-                        "trabajaHasta", fechaHastaTimestamp)
+                    transaction.update(
+                        docRefUserUpdated,
+                        "nombre",
+                        name,
+                        "apellido",
+                        surname,
+                        "email",
+                        newEmail,
+                        "categoria",
+                        category,
+                        "estado",
+                        state,
+                        "areasPermitidas",
+                        allowedAreasUtils.getAllowedAreas(institutesSelected).toList(),
+                        "institutos",
+                        institutesSelected,
+                        "trabajaDesde",
+                        fechaDesdeTimestamp,
+                        "trabajaHasta",
+                        fechaHastaTimestamp
+                    )
                 }
 
-                logsRepository.logEventWithTransaction(db, transaction, LogsApp.LogEventType.INFO, LogsApp.LogEventName.USER_UPDATE,MasterUserDataSession.getDniUser(), dni, category)
+                logsRepository.logEventWithTransaction(
+                    db,
+                    transaction,
+                    LogsApp.LogEventType.INFO,
+                    LogsApp.LogEventName.USER_UPDATE,
+                    MasterUserDataSession.getDniUser(),
+                    dni,
+                    category
+                )
             }
         }
-        return tx
     }
 
     fun deactivateUserFirebase(dni: String): Task<Transaction> {

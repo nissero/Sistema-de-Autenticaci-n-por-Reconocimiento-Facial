@@ -82,7 +82,8 @@ class FormValidations {
 
     private fun hasOnlyLetters(text: String): Boolean {
         val alphanumericRegex = "^[A-Za-z]*$".toRegex()
-        return alphanumericRegex.matches(text)
+        val textWithoutSpaces = text.filterNot { it.isWhitespace() }
+        return alphanumericRegex.matches(textWithoutSpaces)
     }
 
     fun isFormValid(
