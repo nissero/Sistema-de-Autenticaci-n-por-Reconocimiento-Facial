@@ -33,11 +33,19 @@ class FirebaseSyncService(context: Context) {
                             if (!offlineDatabaseHelper.checkIfSecurity(dni)){
                                 offlineDatabaseHelper.registerSecurity(dni)
                                 Log.d(TAG, "User: $dni, $estado, $categoria REGISTRADO COMO SEGURIDAD")
+                                if (offlineDatabaseHelper.checkInDatabase(dni)){
+                                    Log.d(TAG, "User: $dni, $estado, $categoria ERA USUARIO")
+                                    offlineDatabaseHelper.deleteUserByDni(dni)
+                                }
                             }
                         } else {
                             if (!offlineDatabaseHelper.checkInDatabase(dni)){
                                 offlineDatabaseHelper.registerUser(dni)
                                 Log.d(TAG, "User: $dni, $estado, $categoria REGISTRADO COMO USUARIO")
+                                if (offlineDatabaseHelper.checkIfSecurity(dni)){
+                                    Log.d(TAG, "User: $dni, $estado, $categoria ERA SEGURIDAD")
+                                    offlineDatabaseHelper.deleteSecurityByDni(dni)
+                                }
                             }
                         }
                     }
