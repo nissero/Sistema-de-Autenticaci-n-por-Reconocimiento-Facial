@@ -3,6 +3,7 @@ const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {logger} = require("firebase-functions");
 const functions = require("firebase-functions");
 const nodemailer = require('nodemailer');
+const moment = require('moment-timezone');
 
 // The Firebase Admin SDK to access Firestore (if needed).
 const admin = require("firebase-admin");
@@ -191,17 +192,24 @@ exports.scheduledEmail = functions.pubsub.schedule("0 23 * * *").timeZone("Ameri
 
     const logs = await docLogs.where('timestamp', '>=', startOfDay)
         .where('timestamp', '<=', endOfDay)
-        .where('logEventName', 'in', ['USER UNSUCCESSFUL AUTHENTICATION', 'RRHH UNSUCCESSFUL LOGIN', 'SECURITY UNSUCCESSFUL LOGIN']).get();
+        .where('logEventName', 'in', ['USER UNSUCCESSFUL AUTHENTICATION', 'RRHH UNSUCCESSFUL LOGIN', 'SECURITY UNSUCCESSFUL LOGIN', 'ADMIN UNSUCCESSFUL LOGIN', 'HIERARCHICAL UNSUCCESSFUL LOGIN']).get();
 
     for (const logDoc of logs.docs) {
         const logData = logDoc.data();
-        emailContent += `Categoría: ${logData.category} | DNI Usuario Maestro: ${logData.dniMasterUser} | DNI Usuario Afectado: ${logData.dniUserAffected} | Evento: ${logData.logEventName} | Tipo de Evento: ${logData.logEventType} | Fecha y Hora: ${logData.timestamp.toDate()}\n`;
+        const timestampUTC3 = moment(logData.timestamp.toDate()).tz('America/Argentina/Buenos_Aires').format('YYYY-MM-DD HH:mm:ss');
+        emailContent += `Categoría: ${logData.category} | DNI Usuario Maestro: ${logData.dniMasterUser} | DNI Usuario Afectado: ${logData.dniUserAffected} | Evento: ${logData.logEventName} | Tipo de Evento: ${logData.logEventType} | Fecha y Hora: ${timestampUTC3}\n \n`;
     }
+
+    const formattedDate = currentDate.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
 
     const mailOptions = {
         from: gmailEmail,
         to: recipientEmail.toString(),
-        subject: `RESUMEN DIARIO DE AUTENTICACIONES FALLIDAS - ${currentDate.toLocaleDateString()}`,
+        subject: `RESUMEN DIARIO DE AUTENTICACIONES FALLIDAS - ${formattedDate}`,
         text: emailContent
     };
 
